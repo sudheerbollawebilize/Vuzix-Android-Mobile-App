@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/colorWhite">
+
+        <com.webilize.vuzixfilemanager.utils.customviews.AppTextView
+            android:id="@+id/txtHeading"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/ten_dp"
+            android:gravity="center_vertical"
+            android:padding="@dimen/fifteen_dp"
+            android:text="@string/actions"
+            android:textColor="@color/colorGrey"
+            android:textSize="@dimen/sixteen_sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:txt_font_type="bold" />
+
+        <com.webilize.vuzixfilemanager.utils.customviews.AppTextView
+            android:id="@+id/txtSaveToPhone"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:drawableStart="@drawable/ic_download"
+            android:drawablePadding="@dimen/ten_dp"
+            android:gravity="center_vertical"
+            android:padding="@dimen/fifteen_dp"
+            android:text="@string/save_to_phone"
+            android:textColor="@color/colorBlack"
+            android:textSize="@dimen/fifteen_sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/txtHeading" />
+
+        <com.webilize.vuzixfilemanager.utils.customviews.AppTextView
+            android:id="@+id/txtBookMark"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:drawableStart="@drawable/ic_bookmark"
+            android:drawablePadding="@dimen/ten_dp"
+            android:gravity="center_vertical"
+            android:padding="@dimen/fifteen_dp"
+            android:text="@string/add_to_favourite_locations"
+            android:textColor="@color/colorBlack"
+            android:textSize="@dimen/fifteen_sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/txtSaveToPhone" />
+
+        <com.webilize.vuzixfilemanager.utils.customviews.AppTextView
+            android:id="@+id/txtRemoveBookMark"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:drawableStart="@drawable/ic_remove_bookmark"
+            android:drawablePadding="@dimen/ten_dp"
+            android:gravity="center_vertical"
+            android:padding="@dimen/fifteen_dp"
+            android:text="@string/remove_favourite_locations"
+            android:textColor="@color/colorBlack"
+            android:textSize="@dimen/fifteen_sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/txtBookMark" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>

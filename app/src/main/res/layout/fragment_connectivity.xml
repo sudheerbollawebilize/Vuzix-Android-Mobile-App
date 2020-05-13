@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fillViewport="true"
+        android:fitsSystemWindows="true"
+        android:overScrollMode="never"
+        android:scrollbars="none">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorWhite"
+            tools:context=".activities.MainActivity">
+
+            <LinearLayout
+                android:id="@+id/linDevice"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:background="@color/colorLightGrey"
+                android:padding="@dimen/six_dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <com.webilize.vuzixfilemanager.utils.customviews.AppTextView
+                    android:id="@+id/txtDevice"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:paddingStart="@dimen/seven_dp"
+                    android:paddingEnd="@dimen/three_dp"
+                    android:text="@string/device"
+                    android:textColor="@color/colorBlack"
+                    android:textSize="@dimen/fourteen_sp" />
+
+                <com.webilize.vuzixfilemanager.utils.customviews.AppTextView
+                    android:id="@+id/txtDeviceName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:paddingStart="@dimen/ten_dp"
+                    android:paddingEnd="@dimen/ten_dp"
+                    android:textColor="@color/colorBlack"
+                    android:textSize="@dimen/sixteen_sp"
+                    app:txt_font_type="bold" />
+
+            </LinearLayout>
+
+            <View
+                android:id="@+id/seperator"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/one_dp"
+                android:background="@color/colorPrimaryDark"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/linDevice" />
+
+            <com.webilize.vuzixfilemanager.utils.customviews.AppTextView
+                android:id="@+id/txtConnectionsHeading"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/fifteen_dp"
+                android:layout_marginTop="@dimen/ten_dp"
+                android:layout_marginEnd="@dimen/fifteen_dp"
+                android:padding="@dimen/ten_dp"
+                android:text="@string/wireless_amp_networks"
+                android:textColor="@color/colorCyan"
+                android:textSize="@dimen/sixteen_sp"
+                android:textStyle="bold"
+                app:layout_constraintTop_toBottomOf="@id/seperator" />
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/switchBluetooth"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/fifteen_dp"
+                android:layout_marginTop="@dimen/ten_dp"
+                android:layout_marginEnd="@dimen/fifteen_dp"
+                android:drawableStart="@drawable/ic_bluetooth"
+                android:drawablePadding="@dimen/seven_dp"
+                android:padding="@dimen/ten_dp"
+                android:text="@string/bluetooth"
+                android:textColor="@color/colorBlack"
+                android:textSize="@dimen/sixteen_sp"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/txtConnectionsHeading" />
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/switchWifi"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/fifteen_dp"
+                android:layout_marginTop="@dimen/ten_dp"
+                android:layout_marginEnd="@dimen/fifteen_dp"
+                android:drawableStart="@drawable/ic_wifi"
+                android:drawablePadding="@dimen/seven_dp"
+                android:padding="@dimen/ten_dp"
+                android:text="@string/wifi"
+                android:textColor="@color/colorBlack"
+                android:textSize="@dimen/sixteen_sp"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/switchBluetooth" />
+
+            <View
+                android:id="@+id/seperatorGrey"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/ten_dp"
+                android:background="@color/colorLightGrey"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/switchWifi" />
+
+            <com.webilize.vuzixfilemanager.utils.customviews.AppTextView
+                android:id="@+id/txtConnectedDevices"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/fifteen_dp"
+                android:layout_marginTop="@dimen/ten_dp"
+                android:layout_marginEnd="@dimen/fifteen_dp"
+                android:padding="@dimen/ten_dp"
+                android:text="@string/connected_device"
+                android:textColor="@color/colorCyan"
+                android:textSize="@dimen/sixteen_sp"
+                android:textStyle="bold"
+                app:layout_constraintTop_toBottomOf="@id/seperatorGrey" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerViewConnectedDevices"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/five_dp"
+                android:overScrollMode="never"
+                android:padding="@dimen/five_dp"
+                android:scrollbars="none"
+                app:layout_constraintTop_toBottomOf="@id/txtConnectedDevices" />
+
+            <View
+                android:id="@+id/seperatorGrey1"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/ten_dp"
+                android:background="@color/colorLightGrey"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/recyclerViewConnectedDevices" />
+
+            <com.webilize.vuzixfilemanager.utils.customviews.AppTextView
+                android:id="@+id/txtAvailableDevices"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/fifteen_dp"
+                android:layout_marginTop="@dimen/ten_dp"
+                android:layout_marginEnd="@dimen/fifteen_dp"
+                android:padding="@dimen/ten_dp"
+                android:text="@string/available_devices"
+                android:textColor="@color/colorCyan"
+                android:textSize="@dimen/sixteen_sp"
+                android:textStyle="bold"
+                android:visibility="visible"
+                app:layout_constraintTop_toBottomOf="@id/seperatorGrey1" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerViewAvailableDevices"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/five_dp"
+                android:overScrollMode="never"
+                android:padding="@dimen/five_dp"
+                android:scrollbars="none"
+                android:visibility="visible"
+                app:layout_constraintTop_toBottomOf="@id/txtAvailableDevices" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:gravity="center"
+                android:padding="@dimen/three_dp"
+                android:weightSum="3"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/recyclerViewAvailableDevices">
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btnQRCode"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/five_dp"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="@string/generate_qr_code"
+                    android:textAllCaps="true"
+                    android:textColor="@color/colorBlack" />
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btnScanForDevices"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/five_dp"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="@string/scan_for_devices"
+                    android:textAllCaps="true"
+                    android:textColor="@color/colorBlack" />
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btnScanForBTDevices"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/five_dp"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="@string/scan_for_bt_devices"
+                    android:textAllCaps="true"
+                    android:textColor="@color/colorBlack" />
+
+            </LinearLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </ScrollView>
+
+</layout>

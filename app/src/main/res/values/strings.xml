@@ -1,0 +1,110 @@
+<resources>
+    <string name="app_name">Vuzix File Manager</string>
+    <string name="app_id">VuzixFileManager_ID</string>
+
+    <string name="storage_permission_mandatory">Storage permission is mandatory to read files on the device. So kindly allow the permissions to use the app.</string>
+    <string name="allow">Allow</string>
+    <string name="home">Home</string>
+    <string name="details">Details</string>
+    <string name="delete">Delete</string>
+    <string name="rename">Rename</string>
+    <string name="copy">Copy</string>
+    <string name="share">Share</string>
+    <string name="send_to_blade">Send To Blade</string>
+    <string name="folder_is_empty">Folder is Empty</string>
+    <string name="title_activity_main2">Main2Activity</string>
+
+    <string name="files_manager">File Manager</string>
+    <string name="device_files">Device Files</string>
+    <string name="transfers">Transfers</string>
+    <string name="connectivity">Connectivity</string>
+    <string name="you_have_no_files_being_transferred_at_the_moment">You have no files being transferred at the moment</string>
+    <string name="folder">Folder</string>
+    <string name="file">File</string>
+    <string name="show_hidden_files">Show Hidden Files</string>
+    <string name="copy_path">Copy Path</string>
+    <string name="create_shortcut">Create ShortCut</string>
+    <string name="select_all">Select all</string>
+    <string name="de_select_all">Deselect all</string>
+    <string name="new_folder">New Folder</string>
+    <string name="device">Device:</string>
+    <string name="paste">Paste</string>
+    <string name="copied_to_clipboard">Copied to Clipboard</string>
+    <string name="file_name_already_exists">file name already exists.</string>
+    <string name="cancel">Cancel</string>
+    <string name="new_file">New File</string>
+    <string name="folder_already_exists">Folder already exists</string>
+    <string name="create">Create</string>
+    <string name="wireless_amp_networks"><![CDATA[Wireless & networks]]></string>
+    <string name="bluetooth">Bluetooth</string>
+    <string name="connected_device">Connected Devices</string>
+    <string name="recently_connected_device">Recently Connected Devices</string>
+    <string name="wifi">Wifi</string>
+    <string name="search_file_folder_here">Search file/folder here</string>
+    <string name="add_to_favourite_locations">Add to Favourite Locations</string>
+    <string name="remove_favourite_locations">Remove from Favourite Locations</string>
+    <string name="actions">Actions</string>
+    <string name="favourite_locations">Favourite Locations</string>
+    <string name="phone_files">Phone Files</string>
+    <string name="are_you_sure_you_want_to_delete_the_file">Are you sure you want to delete the file?</string>
+    <string name="are_you_sure_you_want_to_delete_the_files">Are you sure you want to delete the files?</string>
+    <string name="successfully_deleted">Successfully Deleted</string>
+    <string name="failed_to_delete">Failed to delete</string>
+    <string name="send_to_device">Send to Device</string>
+    <string name="scan_for_devices">Scan For Devices</string>
+    <string name="scan_for_bt_devices">Scan For Bluetooth Devices</string>
+    <string name="images">Images</string>
+    <string name="videos">Videos</string>
+    <string name="audio">Audio</string>
+    <string name="recent">Recent</string>
+    <string name="downloads">Downloads</string>
+    <string name="download">Download</string>
+    <string name="internal_storage">Internal Storage</string>
+    <string name="drive">Drive</string>
+    <string name="files">Files</string>
+    <string name="external_storage">External Storage</string>
+    <string name="show_empty_folders">Show Empty folders</string>
+    <string name="show_only_files">Show Only Files</string>
+    <string name="show_only_folders">Show Only Folders</string>
+    <string name="press_once_again_to_exit">Press once again to exit!</string>
+    <string name="enter_paste_google_drive_url_here">Enter/Paste Google Drive URL here</string>
+    <string name="loading">Loading…</string>
+    <string name="available_devices">Available Devices</string>
+    <string name="connect">Connect</string>
+    <string name="disconnect">DisConnect</string>
+    <string name="save_to_phone">Save To Phone</string>
+    <string name="scan_qr_code">Scan Qr Code</string>
+    <string name="generate_qr_code">Generate Qr Code</string>
+    <string name="show_finished">Show Finished</string>
+    <string name="cancel_all_downloads">Cancel all downloads</string>
+    <string name="remove_files">Remove file</string>
+    <string name="open_up_the_file_transfer_app_on_your_vuzix_device_and_scan_the_qr_code">Open up the File Transfer App on your Vuzix Device and scan the QR Code.</string>
+    <string name="pair_your_blade">Pair your Blade</string>
+    <string name="settings">Settings</string>
+    <string name="select_default_incoming_folder">Select Default Incoming Folder</string>
+    <string name="long_press_on_folder_to_set_incoming_folder">Long Press on folder to set Incoming folder</string>
+    <string name="back">Back</string>
+    <string name="follow_system">Follow System</string>
+    <string name="ui_mode">UI Mode</string>
+    <string name="dark_mode">Dark Mode</string>
+    <string name="currently_no_device_is_connected_nplease_connect_to_blade_to_view_data">Currently no device is connected.\nPlease Connect to Blade to view data.</string>
+    <string name="open_files_location">Open Files Location</string>
+    <string name="light_mode">Light Mode</string>
+    <string name="blade_files">Blade Files</string>
+    <string name="all_folders">All Folders</string>
+    <string name="no_transfers_yet_nconnect_to_the_devices_and_start_transfers">No transfers yet. \nConnect to the devices and start transfers.</string>
+    <string name="show_favourite_folders">Show Favourite Folders</string>
+    <string name="show_all_folders">Show All Folders</string>
+    <string name="add_to_favourites">Add to Favourites</string>
+    <string name="send_to_this_folder">Send to this folder</string>
+    <string name="incoming">Incoming</string>
+    <string name="outgoing">Outgoing</string>
+
+    <string-array name="files_filter">
+        <item>Name</item>
+        <item>Modified</item>
+        <item>Size</item>
+        <!--        <item>Type</item>-->
+    </string-array>
+
+</resources>

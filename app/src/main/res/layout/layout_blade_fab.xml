@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <com.webilize.vuzixfilemanager.utils.customviews.AppTextView
+            android:id="@+id/txtAllFolders"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginEnd="@dimen/eighty_eight_dp"
+            android:layout_marginBottom="@dimen/one_hundred_eighty_six_dp"
+            android:background="@color/colorBlack"
+            android:padding="@dimen/eight_dp"
+            android:text="@string/all_folders"
+            android:textColor="@color/colorWhite"
+            android:visibility="invisible" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fabAllFolders"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginEnd="@dimen/twenty_four_dp"
+            android:layout_marginBottom="@dimen/one_hundred_seventy_six_dp"
+            android:background="?android:attr/selectableItemBackground"
+            android:clickable="true"
+            android:elevation="@dimen/sixteen_dp"
+            android:focusable="true"
+            android:visibility="invisible"
+            app:backgroundTint="@color/colorWhite"
+            app:pressedTranslationZ="@dimen/twelve_dp"
+            app:srcCompat="@drawable/ic_folder" />
+
+        <com.webilize.vuzixfilemanager.utils.customviews.AppTextView
+            android:id="@+id/txtFavourites"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginEnd="@dimen/eighty_eight_dp"
+            android:layout_marginBottom="@dimen/one_hundred_sixteen_dp"
+            android:background="@color/colorBlack"
+            android:padding="@dimen/eight_dp"
+            android:text="@string/favourite_locations"
+            android:textColor="@color/colorWhite"
+            android:visibility="invisible" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fabFavourites"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginEnd="@dimen/twenty_four_dp"
+            android:layout_marginBottom="@dimen/one_hundred_six_dp"
+            android:background="?android:attr/selectableItemBackground"
+            android:clickable="true"
+            android:elevation="@dimen/sixteen_dp"
+            android:focusable="true"
+            android:visibility="invisible"
+            app:backgroundTint="@color/colorWhite"
+            app:pressedTranslationZ="@dimen/twelve_dp"
+            app:srcCompat="@drawable/ic_fav_selected" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fabFoldersMenu"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginEnd="@dimen/twenty_four_dp"
+            android:layout_marginBottom="@dimen/thirty_two_dp"
+            android:background="?android:attr/selectableItemBackground"
+            android:clickable="true"
+            android:elevation="@dimen/sixteen_dp"
+            android:focusable="true"
+            android:visibility="visible"
+            app:backgroundTint="@color/colorWhite"
+            app:pressedTranslationZ="@dimen/twelve_dp"
+            app:srcCompat="@drawable/ic_list" />
+
+    </RelativeLayout>
+
+</layout>

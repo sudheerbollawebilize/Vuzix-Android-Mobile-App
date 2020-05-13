@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <import type="android.view.View" />
+
+        <variable
+            name="mediaItem"
+            type="com.webilize.vuzixfilemanager.models.FileFolderItem" />
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fitsSystemWindows="true">
+
+        <RelativeLayout
+            android:id="@+id/relTopBar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/colorPrimary"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/imgBack"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:background="?attr/selectableItemBackground"
+                android:padding="@dimen/ten_dp"
+                app:srcCompat="@drawable/ic_back" />
+
+            <com.webilize.vuzixfilemanager.utils.customviews.AppTextView
+                android:id="@+id/txtFolderName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:layout_marginStart="@dimen/ten_dp"
+                android:layout_toStartOf="@id/imgMenu"
+                android:layout_toEndOf="@id/imgBack"
+                android:clickable="false"
+                android:ellipsize="end"
+                android:inputType="textNoSuggestions"
+                android:longClickable="false"
+                android:padding="@dimen/two_dp"
+                android:singleLine="true"
+                android:textColor="@color/colorWhite"
+                android:textIsSelectable="false"
+                android:textSize="@dimen/sixteen_sp" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/imgMenu"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:background="?attr/selectableItemBackground"
+                android:padding="@dimen/ten_dp"
+                app:srcCompat="@drawable/ic_menu" />
+
+        </RelativeLayout>
+
+        <com.webilize.vuzixfilemanager.utils.customviews.TouchImageView
+            android:id="@+id/imgImage"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/relTopBar" />
+
+        <RelativeLayout
+            android:id="@+id/relAudioPlayer"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:background="@color/audio_bg"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/relTopBar">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/imgPlay"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:clickable="true"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:padding="@dimen/ten_dp"
+                android:src="@drawable/ic_play" />
+
+            <com.webilize.vuzixfilemanager.utils.customviews.AppTextView
+                android:id="@+id/txtFileName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/imgPlay"
+                android:layout_margin="@dimen/five_dp"
+                android:clickable="false"
+                android:ellipsize="marquee"
+                android:gravity="center"
+                android:longClickable="false"
+                android:paddingStart="@dimen/seven_dp"
+                android:paddingEnd="@dimen/seven_dp"
+                android:selectAllOnFocus="false"
+                android:textColor="@color/colorWhite"
+                android:textIsSelectable="false"
+                android:textSize="@dimen/seventeen_sp" />
+
+            <com.webilize.vuzixfilemanager.utils.customviews.AppTextView
+                android:id="@+id/txtFileDetails"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/txtFileName"
+                android:layout_marginStart="@dimen/five_dp"
+                android:layout_marginEnd="@dimen/five_dp"
+                android:clickable="false"
+                android:ellipsize="marquee"
+                android:gravity="center"
+                android:longClickable="false"
+                android:paddingStart="@dimen/seven_dp"
+                android:paddingEnd="@dimen/seven_dp"
+                android:selectAllOnFocus="false"
+                android:textColor="@color/colorWhite"
+                android:textIsSelectable="false"
+                android:textSize="@dimen/twelve_sp" />
+
+            <androidx.appcompat.widget.AppCompatSeekBar
+                android:id="@+id/seekBarAudio"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/txtFileDetails"
+                android:layout_margin="@dimen/fifteen_dp" />
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/relVideoPlayer"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/relTopBar">
+
+            <com.webilize.vuzixfilemanager.utils.customviews.AppTextView
+                android:id="@+id/txtVideoFileName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_margin="@dimen/five_dp"
+                android:clickable="false"
+                android:ellipsize="marquee"
+                android:gravity="center"
+                android:longClickable="false"
+                android:paddingStart="@dimen/seven_dp"
+                android:paddingTop="@dimen/five_dp"
+                android:paddingEnd="@dimen/seven_dp"
+                android:selectAllOnFocus="false"
+                android:textColor="@color/colorWhite"
+                android:textIsSelectable="false"
+                android:textSize="@dimen/seventeen_sp" />
+
+            <RelativeLayout
+                android:id="@+id/relVideo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/txtVideoFileName">
+
+                <com.potyvideo.library.AndExoPlayerView
+                    android:id="@+id/exoPlayerView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    app:andexo_play_when_ready="true"
+                    app:andexo_show_controller="true" />
+
+            </RelativeLayout>
+
+            <TextView
+                android:id="@+id/txtVideoFileDetails"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/relVideo"
+                android:layout_marginStart="@dimen/five_dp"
+                android:layout_marginEnd="@dimen/five_dp"
+                android:clickable="false"
+                android:ellipsize="marquee"
+                android:gravity="center"
+                android:longClickable="false"
+                android:paddingStart="@dimen/seven_dp"
+                android:paddingEnd="@dimen/seven_dp"
+                android:selectAllOnFocus="false"
+                android:textColor="@color/colorWhite"
+                android:textIsSelectable="false"
+                android:textSize="@dimen/twelve_sp" />
+
+            <androidx.appcompat.widget.AppCompatSeekBar
+                android:id="@+id/seekBarVideo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/txtVideoFileDetails"
+                android:layout_margin="@dimen/fifteen_dp" />
+
+        </RelativeLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>

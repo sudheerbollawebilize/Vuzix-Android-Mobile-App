@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <RelativeLayout
+            android:id="@+id/relTopBar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/colorPrimary"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/imgBack"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:background="?attr/selectableItemBackground"
+                android:padding="@dimen/ten_dp"
+                app:srcCompat="@drawable/ic_back" />
+
+            <com.webilize.vuzixfilemanager.utils.customviews.AppTextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_centerInParent="true"
+                android:layout_toEndOf="@id/imgBack"
+                android:gravity="center_vertical"
+                android:padding="@dimen/two_dp"
+                android:text="@string/settings"
+                android:textColor="@color/colorWhite"
+                android:textSize="@dimen/sixteen_sp"
+                app:txt_font_type="bold" />
+
+        </RelativeLayout>
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:background="@color/colorWhite"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/relTopBar">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <RelativeLayout
+                    android:id="@+id/relSelectIncomingFolder"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="?attr/selectableItemBackground"
+                    android:padding="@dimen/twelve_dp">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/imgTransfer"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentStart="true"
+                        android:layout_centerInParent="true"
+                        android:padding="@dimen/seven_dp"
+                        app:srcCompat="@drawable/ic_file_transfer" />
+
+                    <com.webilize.vuzixfilemanager.utils.customviews.AppTextView
+                        android:id="@+id/txtLabel"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_toEndOf="@id/imgTransfer"
+                        android:gravity="center_vertical"
+                        android:padding="@dimen/two_dp"
+                        android:text="@string/select_default_incoming_folder"
+                        android:textColor="@color/colorBlack"
+                        android:textSize="@dimen/sixteen_sp"
+                        app:txt_font_type="bold" />
+
+                    <com.webilize.vuzixfilemanager.utils.customviews.AppTextView
+                        android:id="@+id/txtDefaultFolder"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/txtLabel"
+                        android:layout_toEndOf="@id/imgTransfer"
+                        android:gravity="center_vertical"
+                        android:padding="@dimen/two_dp"
+                        android:textColor="@color/colorBlack"
+                        android:textSize="@dimen/thirteen_sp"
+                        app:txt_font_type="light" />
+
+                </RelativeLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/one_dp"
+                    android:background="@color/colorGrey" />
+
+                <androidx.appcompat.widget.SwitchCompat
+                    android:id="@+id/switchMode"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:drawableStart="@drawable/ic_night"
+                    android:drawablePadding="@dimen/ten_dp"
+                    android:gravity="center_vertical"
+                    android:padding="@dimen/fifteen_dp"
+                    android:text="@string/dark_mode"
+                    android:textColor="@color/colorBlack"
+                    android:textSize="@dimen/sixteen_sp" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/one_dp"
+                    android:background="@color/colorGrey" />
+
+                <com.webilize.vuzixfilemanager.utils.customviews.AppTextView
+                    android:id="@+id/txtFavouriteLocations"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="?attr/selectableItemBackground"
+                    android:drawableStart="@drawable/ic_fav_selected"
+                    android:drawablePadding="@dimen/eight_dp"
+                    android:gravity="center_vertical"
+                    android:padding="@dimen/sixteen_dp"
+                    android:text="@string/favourite_locations"
+                    android:textColor="@color/colorBlack"
+                    android:textSize="@dimen/sixteen_sp"
+                    app:txt_font_type="bold" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/one_dp"
+                    android:background="@color/colorGrey" />
+
+            </LinearLayout>
+
+        </ScrollView>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>

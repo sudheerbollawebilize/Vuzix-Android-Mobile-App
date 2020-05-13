@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+        <import type="android.view.View" />
+
+        <variable
+            name="fileFolderItem"
+            type="com.webilize.vuzixfilemanager.models.FileFolderItem" />
+
+    </data>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardBody"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/two_dp"
+        android:longClickable="true"
+        android:transitionName="folder"
+        app:cardBackgroundColor="@color/colorWhite"
+        app:cardCornerRadius="@dimen/five_dp"
+        app:cardElevation="@dimen/two_dp"
+        app:cardPreventCornerOverlap="true"
+        app:cardUseCompatPadding="true">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/ten_dp">
+
+            <com.webilize.vuzixfilemanager.utils.customviews.AppTextView
+                android:id="@+id/txtFolderName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:layout_gravity="center"
+                android:layout_toStartOf="@id/imgMore"
+                android:clickable="false"
+                android:drawableStart="@drawable/ic_folder"
+                android:drawablePadding="@dimen/seven_dp"
+                android:ellipsize="marquee"
+                android:gravity="center_vertical"
+                android:inputType="textNoSuggestions"
+                android:longClickable="false"
+                android:padding="@dimen/five_dp"
+                android:selectAllOnFocus="false"
+                android:singleLine="true"
+                android:text="@{fileFolderItem.name}"
+                android:textColor="@color/colorBlack"
+                android:textIsSelectable="false"
+                android:textSize="@dimen/thirteen_sp" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/imgMore"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerInParent="true"
+                android:layout_margin="@dimen/two_dp"
+                android:padding="@dimen/five_dp"
+                app:srcCompat="@drawable/ic_menu_black" />
+
+        </RelativeLayout>
+
+    </androidx.cardview.widget.CardView>
+
+</layout>

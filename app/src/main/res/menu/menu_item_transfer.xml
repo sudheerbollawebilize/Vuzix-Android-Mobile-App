@@ -1,0 +1,16 @@
+<?xml version = "1.0" encoding = "utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/menuCancel"
+        android:title="@string/cancel" />
+
+    <item
+        android:id="@+id/menuRemove"
+        android:title="@string/remove_files" />
+
+    <item
+        android:id="@+id/menuShowLocation"
+        android:title="@string/open_files_location" />
+
+</menu>

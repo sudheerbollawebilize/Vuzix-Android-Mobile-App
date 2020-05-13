@@ -1,0 +1,12 @@
+<?xml version = "1.0" encoding = "utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/menuShowFinished"
+        android:title="@string/show_finished"
+        android:checkable="true"/>
+    <item
+        android:id="@+id/menuCancelAllDownloads"
+        android:title="@string/cancel_all_downloads" />
+
+</menu>
