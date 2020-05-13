@@ -72,6 +72,8 @@ public class RXConnectionFGService extends Service implements ConnectionHelper.L
     private DeviceModel deviceModel;
     private boolean isAllowNewRequests = true;
 
+
+
     private DBHelper dbHelper;
     private TransferModel transferModel;
     private Consumer<DataWrapper> progressObserver = new Consumer<DataWrapper>() {
