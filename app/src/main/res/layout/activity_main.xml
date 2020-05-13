@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <androidx.drawerlayout.widget.DrawerLayout
+        android:id="@+id/drawer_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fitsSystemWindows="true">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:elevation="@dimen/two_dp"
+            tools:context=".activities.MainActivity">
+
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/relTopBar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:background="@color/colorPrimary"
+                android:contentInsetStart="0dp"
+                android:contentInsetLeft="0dp"
+                android:contentInsetEnd="0dp"
+                android:contentInsetRight="0dp"
+                app:contentInsetEnd="0dp"
+                app:contentInsetLeft="0dp"
+                app:contentInsetRight="0dp"
+                app:contentInsetStart="0dp"
+                app:titleTextColor="@color/colorWhite">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/imgBack"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentStart="true"
+                        android:layout_centerVertical="true"
+                        android:background="?attr/selectableItemBackground"
+                        android:padding="@dimen/seven_dp"
+                        android:visibility="gone"
+                        app:srcCompat="@drawable/ic_back" />
+
+                    <com.webilize.vuzixfilemanager.utils.customviews.AppTextView
+                        android:id="@+id/txtFolderName"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_centerInParent="true"
+                        android:layout_toStartOf="@id/imgTransfer"
+                        android:layout_toEndOf="@id/imgBack"
+                        android:gravity="center_vertical"
+                        android:padding="@dimen/two_dp"
+                        android:textColor="@color/colorWhite"
+                        android:textSize="@dimen/seventeen_sp" />
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/imgTransfer"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_toStartOf="@id/imgMore"
+                        android:background="?attr/selectableItemBackground"
+                        android:padding="@dimen/ten_dp"
+                        android:visibility="gone"
+                        app:srcCompat="@drawable/ic_transfer" />
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/imgSearch"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_toStartOf="@id/imgTransfer"
+                        android:background="?attr/selectableItemBackground"
+                        android:padding="@dimen/ten_dp"
+                        app:srcCompat="@drawable/ic_search" />
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/imgSettings"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_toStartOf="@id/imgMore"
+                        android:background="?attr/selectableItemBackground"
+                        android:padding="@dimen/ten_dp"
+                        android:visibility="gone"
+                        app:srcCompat="@drawable/ic_settings" />
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/imgMore"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:background="?attr/selectableItemBackground"
+                        android:padding="@dimen/ten_dp"
+                        app:srcCompat="@drawable/ic_menu" />
+
+                </RelativeLayout>
+
+            </androidx.appcompat.widget.Toolbar>
+
+            <androidx.fragment.app.FragmentContainerView
+                android:id="@+id/mainFrame"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_above="@id/bottomBar"
+                android:layout_below="@id/relTopBar"
+                app:defaultNavHost="true"
+                app:navGraph="@navigation/mobile_navigation" />
+
+            <com.google.android.material.bottomnavigation.BottomNavigationView
+                android:id="@+id/bottomBar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_marginStart="0dp"
+                android:layout_marginEnd="0dp"
+                android:background="?android:attr/windowBackground"
+                app:itemBackground="@color/colorWhite"
+                app:itemIconTint="@color/color_bottom_nav"
+                app:itemTextColor="@color/color_bottom_nav"
+                app:labelVisibilityMode="labeled"
+                app:menu="@menu/bottom_nav_menu" />
+
+        </RelativeLayout>
+
+        <com.google.android.material.navigation.NavigationView
+            android:id="@+id/sideNavigationView"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="start"
+            android:background="#ffffff"
+            app:itemIconTint="#000"
+            app:itemTextColor="#000"
+            app:menu="@menu/side_nav_menu" />
+
+    </androidx.drawerlayout.widget.DrawerLayout>
+
+</layout>

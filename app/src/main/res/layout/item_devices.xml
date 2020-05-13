@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <RelativeLayout
+        android:id="@+id/relFile"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorWhite"
+        android:padding="@dimen/five_dp">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/imgFileSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:layout_margin="@dimen/six_dp"
+            android:padding="@dimen/seven_dp"
+            android:tint="@color/colorCyan"
+            app:srcCompat="@drawable/ic_glasses" />
+
+        <com.webilize.vuzixfilemanager.utils.customviews.AppTextView
+            android:id="@+id/txtDeviceName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_toStartOf="@id/txtConnect"
+            android:layout_toEndOf="@id/imgFileSmall"
+            android:clickable="false"
+            android:ellipsize="marquee"
+            android:gravity="center_vertical"
+            android:inputType="textNoSuggestions"
+            android:longClickable="false"
+            android:paddingStart="@dimen/five_dp"
+            android:paddingEnd="@dimen/five_dp"
+            android:selectAllOnFocus="false"
+            android:singleLine="true"
+            android:textAllCaps="true"
+            android:textColor="@color/colorBlack"
+            android:textIsSelectable="false"
+            android:textSize="@dimen/sixteen_sp" />
+
+        <com.webilize.vuzixfilemanager.utils.customviews.AppTextView
+            android:id="@+id/txtConnect"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_margin="@dimen/eight_dp"
+            android:padding="@dimen/six_dp"
+            android:background="?attr/selectableItemBackground"
+            android:text="@string/connect"
+            android:textAllCaps="true"
+            android:textColor="@color/colorBlue"
+            android:textSize="@dimen/seventeen_sp"
+            app:txt_font_type="bold" />
+
+    </RelativeLayout>
+
+</layout>

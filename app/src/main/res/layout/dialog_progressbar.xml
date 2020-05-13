@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardBody"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/twelve_dp"
+        android:longClickable="true"
+        android:transitionName="folder"
+        app:cardBackgroundColor="@color/colorWhite"
+        app:cardCornerRadius="@dimen/five_dp"
+        app:cardElevation="@dimen/two_dp"
+        app:cardPreventCornerOverlap="true"
+        app:cardUseCompatPadding="true">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorWhite"
+            android:padding="@dimen/ten_dp">
+
+            <com.webilize.vuzixfilemanager.utils.customviews.AppTextView
+                android:id="@+id/txtHeading"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clickable="false"
+                android:gravity="center"
+                android:inputType="textNoSuggestions"
+                android:longClickable="false"
+                android:selectAllOnFocus="false"
+                android:singleLine="true"
+                android:text="@string/app_name"
+                android:textColor="@color/colorBlack"
+                android:textIsSelectable="false"
+                android:textSize="@dimen/eighteen_sp"
+                android:textStyle="bold" />
+
+            <com.webilize.vuzixfilemanager.utils.customviews.AppTextView
+                android:id="@+id/txtMessage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/txtHeading"
+                android:layout_centerInParent="true"
+                android:layout_margin="@dimen/seven_dp"
+                android:clickable="false"
+                android:gravity="center"
+                android:inputType="textNoSuggestions"
+                android:longClickable="false"
+                android:selectAllOnFocus="false"
+                android:singleLine="true"
+                android:text="@string/loading"
+                android:textColor="@color/colorPrimaryDark"
+                android:textIsSelectable="false"
+                android:textSize="@dimen/fifteen_sp" />
+
+            <ProgressBar
+                android:id="@+id/progressBar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/txtMessage"
+                android:layout_centerInParent="true"
+                android:layout_margin="@dimen/ten_dp"
+                android:indeterminate="true"
+                android:padding="@dimen/five_dp" />
+
+            <com.webilize.vuzixfilemanager.utils.customviews.AppTextView
+                android:id="@+id/txtCancel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/progressBar"
+                android:layout_centerInParent="true"
+                android:layout_margin="@dimen/ten_dp"
+                android:background="?attr/selectableItemBackground"
+                android:gravity="center"
+                android:padding="@dimen/ten_dp"
+                android:text="@string/cancel"
+                android:textColor="@color/colorBlack"
+                android:textSize="@dimen/seventeen_sp"
+                android:textStyle="bold" />
+
+        </RelativeLayout>
+
+    </androidx.cardview.widget.CardView>
+
+</layout>

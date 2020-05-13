@@ -1,0 +1,42 @@
+<?xml version = "1.0" encoding = "utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/menuNewFolder"
+        android:title="@string/new_folder" />
+    <item
+        android:id="@+id/menuDetails"
+        android:title="@string/details" />
+    <item
+        android:id="@+id/menuCopy"
+        android:title="@string/copy_path" />
+    <item
+        android:id="@+id/menuPaste"
+        android:title="@string/paste" />
+    <item
+        android:id="@+id/menuSelectAll"
+        android:title="@string/select_all" />
+    <item
+        android:id="@+id/menuDelete"
+        android:title="@string/delete" />
+    <item
+        android:id="@+id/menuSendToBlade"
+        android:title="@string/send_to_blade" />
+    <item
+        android:id="@+id/menuShowHiddenFiles"
+        android:checkable="true"
+        android:title="@string/show_hidden_files" />
+    <item
+        android:id="@+id/menuShowEmptyFolders"
+        android:checkable="true"
+        android:title="@string/show_empty_folders" />
+    <item
+        android:id="@+id/menuShowFilesOnly"
+        android:checkable="true"
+        android:title="@string/show_only_files" />
+    <item
+        android:id="@+id/menuShowOnlyFolders"
+        android:checkable="true"
+        android:title="@string/show_only_folders" />
+
+</menu>

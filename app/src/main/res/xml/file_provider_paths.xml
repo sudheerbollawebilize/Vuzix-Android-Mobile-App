@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths>
+    <cache-path
+        name="cache"
+        path="." />
+    <!-- <external-path
+         name="dcim"
+         path="DCIM" />
+     <external-files-path
+         name="Blade Photos"
+         path="Pictures" />-->
+    <external-path
+        name="external_files"
+        path="." />
+    <external-files-path
+        name="external_files_path"
+        path="." />
+    <root-path
+        name="SD Card"
+        path="/storage/" />
+
+</paths>

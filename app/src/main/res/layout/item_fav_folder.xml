@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/selectableItemBackground">
+
+        <com.webilize.vuzixfilemanager.utils.customviews.AppTextView
+            android:id="@+id/txtFileName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_toStartOf="@id/imgRemove"
+            android:background="?attr/selectableItemBackground"
+            android:drawableStart="@drawable/ic_folder"
+            android:drawablePadding="@dimen/seven_dp"
+            android:ellipsize="marquee"
+            android:gravity="center_vertical"
+            android:padding="@dimen/ten_dp"
+            android:selectAllOnFocus="false"
+            android:singleLine="true"
+            android:textColor="@color/colorBlack"
+            android:textIsSelectable="false"
+            android:textSize="@dimen/fourteen_sp" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/imgRemove"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerInParent="true"
+            android:background="?attr/selectableItemBackground"
+            android:padding="@dimen/ten_dp"
+            app:srcCompat="@drawable/ic_clear" />
+
+    </RelativeLayout>
+
+</layout>

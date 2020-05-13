@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/colorWhite">
+
+        <LinearLayout
+            android:id="@+id/linDevice"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@color/colorLightGrey"
+            android:padding="@dimen/six_dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <com.webilize.vuzixfilemanager.utils.customviews.AppTextView
+                android:id="@+id/txtDevice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:paddingStart="@dimen/seven_dp"
+                android:paddingEnd="@dimen/three_dp"
+                android:text="@string/device"
+                android:textColor="@color/colorBlack"
+                android:textSize="@dimen/fourteen_sp" />
+
+            <com.webilize.vuzixfilemanager.utils.customviews.AppTextView
+                android:id="@+id/txtDeviceName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:paddingStart="@dimen/ten_dp"
+                android:paddingEnd="@dimen/ten_dp"
+                android:textColor="@color/colorBlack"
+                android:textSize="@dimen/sixteen_sp"
+                app:txt_font_type="bold" />
+
+        </LinearLayout>
+
+        <View
+            android:id="@+id/seperator"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/one_dp"
+            android:background="@color/colorPrimaryDark"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/linDevice" />
+
+        <RelativeLayout
+            android:id="@+id/relFilter"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorLightGrey"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/seperator">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/imgListMode"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_centerInParent="true"
+                android:padding="@dimen/ten_dp" />
+
+            <androidx.appcompat.widget.AppCompatSpinner
+                android:id="@+id/spinnerFilter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerInParent="true"
+                android:layout_margin="@dimen/five_dp"
+                android:padding="@dimen/five_dp" />
+
+        </RelativeLayout>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerView"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:animateLayoutChanges="false"
+            android:overScrollMode="never"
+            android:padding="@dimen/five_dp"
+            android:scrollbars="none"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/relFilter" />
+
+        <com.webilize.vuzixfilemanager.utils.customviews.AppTextView
+            android:id="@+id/txtNoDataFound"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:gravity="center"
+            android:text="@string/folder_is_empty"
+            android:textColor="@color/colorBlack"
+            android:textSize="@dimen/eighteen_sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/relFilter" />
+
+        <include
+            android:id="@+id/layouFab"
+            layout="@layout/layout_fab"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>

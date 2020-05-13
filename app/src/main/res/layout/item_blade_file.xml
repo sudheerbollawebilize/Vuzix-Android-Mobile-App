@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardBody"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/two_dp"
+        android:longClickable="true"
+        android:transitionName="folder"
+        app:cardBackgroundColor="@color/colorWhite"
+        app:cardCornerRadius="@dimen/five_dp"
+        app:cardElevation="@dimen/two_dp"
+        app:cardPreventCornerOverlap="true"
+        app:cardUseCompatPadding="true"
+        app:contentPadding="@dimen/three_dp">
+
+        <RelativeLayout
+            android:id="@+id/relFile"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:layout_toStartOf="@id/imgMore"
+                android:padding="@dimen/eight_dp">
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/imgFileSmall"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="@dimen/three_dp"
+                    android:layout_marginEnd="@dimen/five_dp" />
+
+                <com.webilize.vuzixfilemanager.utils.customviews.AppTextView
+                    android:id="@+id/txtFileName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_toEndOf="@id/imgFileSmall"
+                    android:clickable="false"
+                    android:ellipsize="marquee"
+                    android:gravity="center_vertical"
+                    android:inputType="textNoSuggestions"
+                    android:longClickable="false"
+                    android:paddingStart="@dimen/five_dp"
+                    android:paddingEnd="@dimen/five_dp"
+                    android:selectAllOnFocus="false"
+                    android:singleLine="true"
+                    android:textColor="@color/colorBlack"
+                    android:textIsSelectable="false"
+                    android:textSize="@dimen/fourteen_sp" />
+
+                <com.webilize.vuzixfilemanager.utils.customviews.AppTextView
+                    android:id="@+id/txtFileDetails"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/txtFileName"
+                    android:layout_marginTop="@dimen/one_dp"
+                    android:layout_toEndOf="@id/imgFileSmall"
+                    android:clickable="false"
+                    android:ellipsize="marquee"
+                    android:gravity="center_vertical"
+                    android:inputType="textNoSuggestions"
+                    android:longClickable="false"
+                    android:paddingStart="@dimen/five_dp"
+                    android:paddingEnd="@dimen/five_dp"
+                    android:selectAllOnFocus="false"
+                    android:singleLine="true"
+                    android:textColor="@color/colorBlack"
+                    android:textIsSelectable="false"
+                    android:textSize="@dimen/ten_sp" />
+
+            </RelativeLayout>
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/imgMore"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentEnd="true"
+                android:layout_margin="@dimen/eight_dp"
+                android:padding="@dimen/six_dp"
+                app:srcCompat="@drawable/ic_menu_black" />
+
+        </RelativeLayout>
+
+    </androidx.cardview.widget.CardView>
+
+</layout>

@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <RelativeLayout
+        android:id="@+id/relTransfer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorWhite"
+        android:padding="@dimen/ten_dp">
+
+        <RelativeLayout
+            android:id="@+id/relBody"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:padding="@dimen/three_dp">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/imgFileSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_centerInParent="true"
+                android:padding="@dimen/ten_dp"
+                app:srcCompat="@drawable/ic_file" />
+
+            <com.webilize.vuzixfilemanager.utils.customviews.AppTextView
+                android:id="@+id/txtFileName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_toStartOf="@id/imgMore"
+                android:layout_toEndOf="@id/imgFileSmall"
+                android:gravity="center_vertical"
+                android:inputType="textNoSuggestions"
+                android:padding="@dimen/five_dp"
+                android:textColor="@color/colorBlack"
+                android:textSize="@dimen/sixteen_sp" />
+
+            <ProgressBar
+                android:id="@+id/progressBar"
+                style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/txtFileName"
+                android:layout_toStartOf="@id/imgStatus"
+                android:layout_toEndOf="@id/imgFileSmall"
+                android:max="100"
+                android:padding="@dimen/five_dp"
+                android:progressDrawable="@drawable/progress_drawable" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/imgStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignTop="@id/progressBar"
+                android:layout_toStartOf="@id/imgMore"
+                android:padding="@dimen/five_dp"
+                app:srcCompat="@drawable/ic_downloading" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/imgMore"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignTop="@id/progressBar"
+                android:layout_alignParentEnd="true"
+                android:layout_marginEnd="@dimen/two_dp"
+                android:padding="@dimen/five_dp"
+                app:srcCompat="@drawable/ic_menu_black" />
+
+            <com.webilize.vuzixfilemanager.utils.customviews.AppTextView
+                android:id="@+id/txtIsIncoming"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/progressBar"
+                android:layout_toEndOf="@id/imgFileSmall"
+                android:inputType="textNoSuggestions"
+                android:padding="@dimen/five_dp"
+                android:textColor="@color/colorBlack"
+                android:textSize="@dimen/fifteen_sp" />
+
+            <com.webilize.vuzixfilemanager.utils.customviews.AppTextView
+                android:id="@+id/txtFileSize"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/progressBar"
+                android:layout_marginStart="@dimen/twenty_five_dp"
+                android:layout_toEndOf="@id/txtIsIncoming"
+                android:gravity="center_vertical"
+                android:inputType="textNoSuggestions"
+                android:padding="@dimen/five_dp"
+                android:textColor="@color/colorBlack"
+                android:textSize="@dimen/fourteen_sp" />
+
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+</layout>
