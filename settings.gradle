@@ -1,2 +1,2 @@
-include ':app', ':transfersdk', ':pdfviewer'
+include ':app', /*':transfersdk',*/ ':pdfviewer'
 rootProject.name='VuzixFileManager'
