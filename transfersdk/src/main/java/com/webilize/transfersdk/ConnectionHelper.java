@@ -4,6 +4,7 @@ import android.content.Context;
 import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.os.Handler;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.webilize.transfersdk.exceptions.NoPeersFoundException;
@@ -17,7 +18,11 @@ import com.webilize.transfersdk.wifidirect.WiFiP2PInstance;
 import com.webilize.transfersdk.wifidirect.direct.WiFiDirectUtils;
 import com.webilize.transfersdk.wifidirect.listeners.ServiceDiscoveredListener;
 
+import java.net.Inet4Address;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
 import java.util.ArrayList;
+import java.util.Enumeration;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
@@ -96,7 +101,7 @@ public class ConnectionHelper {
         initialize(context, listener, false, isServer, port);
     }
 
-    public void initialize(Context context, Listener listener, boolean isService, boolean isServer, int port) {
+    /*public void initialize(Context context, Listener listener, boolean isService, boolean isServer, int port) {
 
         bag = new CompositeDisposable();
         wifiDirectConnected = false;
@@ -122,6 +127,48 @@ public class ConnectionHelper {
                 if (!isService) {
                     findWifiDirectDevices(listener);
                 }
+//                getIP(context);
+            } else {
+                listener.onError(new WifiNotEnabledException());
+            }
+        } else {
+            if (WifiHelper.isConnected(context)) {
+                if (isServer) {
+                    startTCPCommunication(context, listener, "", 0, isServer, false);
+                } else {
+                    listener.onTCPClientReady();
+                }
+            } else {
+                getIP(context);
+                listener.onError(new WifiNotConnectedException());
+            }
+        }
+    }
+*/
+    public void initialize(Context context, Listener listener, boolean isService, boolean isServer, int port) {
+
+        bag = new CompositeDisposable();
+        wifiDirectConnected = false;
+        findGroupsTry = 0;
+
+        if (!forceTCP && WifiHelper.isWifiDirectSupported(context)) {
+            if (WifiHelper.isEnabled(context)) {
+                wiFiP2PInstance = WiFiP2PInstance.getInstance(context, isService, port);
+                if (!isBroadcastReceiverRegistered) {
+                    wiFiP2PInstance.registerReceiver(context);
+                    isBroadcastReceiverRegistered = true;
+                }
+
+                wiFiP2PInstance.setPeerConnectedListener(ip -> {
+                            wifiDirectConnected = true;
+                            wiFiP2PInstance.setBroadcastListener(null);
+                            startTCPCommunication(context, listener, ip, port, isServer, true);
+                        }
+                );
+
+                if (!isService) {
+                    findWifiDirectDevices(listener);
+                }
 
             } else {
                 listener.onError(new WifiNotEnabledException());
@@ -134,8 +181,33 @@ public class ConnectionHelper {
                     listener.onTCPClientReady();
                 }
             } else {
-                listener.onError(new WifiNotConnectedException());
+                if (WifiHelper.isEnabled(context)) {
+                    String ip = getHostIpAddress();
+                    if (!TextUtils.isEmpty(ip))
+                        startTCPCommunication(context, listener, ip, port, isServer, false);
+                    else listener.onError(new WifiNotConnectedException());
+                } else
+                    listener.onError(new WifiNotConnectedException());
             }
+        }
+    }
+
+    public static String getHostIpAddress() {
+        try {
+            for (final Enumeration<NetworkInterface> enumerationNetworkInterface = NetworkInterface.getNetworkInterfaces(); enumerationNetworkInterface.hasMoreElements(); ) {
+                final NetworkInterface networkInterface = enumerationNetworkInterface.nextElement();
+                for (Enumeration<InetAddress> enumerationInetAddress = networkInterface.getInetAddresses(); enumerationInetAddress.hasMoreElements(); ) {
+                    final InetAddress inetAddress = enumerationInetAddress.nextElement();
+                    final String ipAddress = inetAddress.getHostAddress();
+                    if (!inetAddress.isLoopbackAddress() && inetAddress instanceof Inet4Address) {
+                        return ipAddress;
+                    }
+                }
+            }
+            return null;
+        } catch (final Exception e) {
+            Log.e("WifiUtils", "exception in fetching inet address: " + e.getMessage());
+            return null;
         }
     }
 
@@ -282,7 +354,10 @@ public class ConnectionHelper {
                             // is Server, we should wait for client to connect
                             if (!isWifiDirect) {
                                 // user should show the IP & port to the client
-                                listener.onTCPServerReady(WifiHelper.getIp(activity.getApplicationContext()), rxConnection.getPort());
+                                if (TextUtils.isEmpty(rxConnection.getIP())) {
+                                    listener.onTCPServerReady(WifiHelper.getIp(activity.getApplicationContext()), rxConnection.getPort());
+                                } else
+                                    listener.onTCPServerReady(rxConnection.getIP(), rxConnection.getPort());
                             }
                             iWaitClient(listener, isWifiDirect);
                         } else {

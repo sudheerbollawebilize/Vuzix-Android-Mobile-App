@@ -99,6 +99,7 @@
     <string name="send_to_this_folder">Send to this folder</string>
     <string name="incoming">Incoming</string>
     <string name="outgoing">Outgoing</string>
+    <string name="connect_via_hotspot">Connect via Hotspot</string>
 
     <string-array name="files_filter">
         <item>Name</item>

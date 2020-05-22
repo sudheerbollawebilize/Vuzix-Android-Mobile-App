@@ -162,6 +162,7 @@ public class RXConnectionFGService extends Service implements ConnectionHelper.L
                 if (intent.hasExtra("IsQr")) {
                     startForeground(1, notification);
                     initializeQRConnection();
+//                    initializeHPConnection();
                 } else {
                     startForeground(1, notification);
                     initializeRXConnection();
@@ -430,6 +431,16 @@ public class RXConnectionFGService extends Service implements ConnectionHelper.L
         connectionHelper.setForceTCP(true);
         toast("Initializing connection...");
         connectionHelper.initialize(this, this, false, true, CommunicationProtocol.DEAULT_PORT);
+    }
+
+    private void initializeHPConnection() {
+        if (connectionHelper != null)
+            connectionHelper.destroy(this);
+
+        connectionHelper = new ConnectionHelper();
+        connectionHelper.setForceTCP(false);
+        toast("Initializing connection...");
+        connectionHelper.initialize(this, this, true, true, CommunicationProtocol.DEAULT_PORT);
     }
 
     /**
