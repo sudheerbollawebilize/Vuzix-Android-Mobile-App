@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "276610465384",
+    "firebase_url": "https://vuzixfilemanagermobile.firebaseio.com",
+    "project_id": "vuzixfilemanagermobile",
+    "storage_bucket": "vuzixfilemanagermobile.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:276610465384:android:b31ea110954db9317945dd",
+        "android_client_info": {
+          "package_name": "com.webilize.vuzixfilemanager"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "276610465384-8k17lo6aleu9ljlsd6lij1nr8p3unje4.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.webilize.vuzixfilemanager",
+            "certificate_hash": "b9e2fe229428603e126f69c5aa4b043c7cd37a89"
+          }
+        },
+        {
+          "client_id": "276610465384-ptvetbg3lj7ru5t84hvvh9itaus56289.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCtqhNXmAWCCRFMl4tGSyxklvTaVqjhSu0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "276610465384-ptvetbg3lj7ru5t84hvvh9itaus56289.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

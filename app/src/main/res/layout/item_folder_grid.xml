@@ -28,7 +28,7 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="@dimen/five_dp">
+            android:padding="@dimen/ten_dp">
 
             <com.webilize.vuzixfilemanager.utils.customviews.AppTextView
                 android:id="@+id/txtFolderName"
@@ -39,7 +39,7 @@
                 android:layout_toStartOf="@id/imgMore"
                 android:clickable="false"
                 android:drawableStart="@drawable/ic_folder"
-                android:drawablePadding="@dimen/fifteen_dp"
+                android:drawablePadding="@dimen/seven_dp"
                 android:ellipsize="marquee"
                 android:gravity="center_vertical"
                 android:inputType="textNoSuggestions"
@@ -58,6 +58,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
                 android:layout_centerInParent="true"
+                android:layout_margin="@dimen/two_dp"
                 android:padding="@dimen/five_dp"
                 app:srcCompat="@drawable/ic_menu_black" />
 

@@ -176,7 +176,11 @@ public class ConnectionHelper {
         } else {
             if (WifiHelper.isConnected(context)) {
                 if (isServer) {
-                    startTCPCommunication(context, listener, "", 0, isServer, false);
+                    String ip = getHostIpAddress();
+                    if (!TextUtils.isEmpty(ip))
+                        startTCPCommunication(context, listener, ip, port, isServer, false);
+                    else listener.onError(new WifiNotConnectedException());
+//                    startTCPCommunication(context, listener, "", port, isServer, false);
                 } else {
                     listener.onTCPClientReady();
                 }

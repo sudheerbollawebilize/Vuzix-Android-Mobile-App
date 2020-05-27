@@ -19,7 +19,7 @@ public class FileFolderItem implements Parcelable {
 
     public UsbFile usbFile;
     public File file;
-    public String mimeType = "", extension = "", fileInfo = "", name = "";
+    public String mimeType = "", extension = "", fileInfo = "", name = "", size = "", timeStamp = "";
     public int imageRes = R.drawable.ic_folder;
     public boolean isSelected = false;
 
@@ -29,10 +29,17 @@ public class FileFolderItem implements Parcelable {
         if (file.isFile()) {
             extension = FileUtils.getExtensionByStringHandling(file.getAbsolutePath());
             mimeType = StaticUtils.getMimeTypeFromExtension(extension);
-            fileInfo = FileUtils.getFileSize(file) + DateUtils.getDateTimeFromTimeStamp(file.lastModified(), DateUtils.DATE_FORMAT_0);
+            size = FileUtils.getFileSize(file);
+            timeStamp = DateUtils.getDateTimeFromTimeStamp(file.lastModified(), DateUtils.DATE_FORMAT_0);
+            fileInfo = size + "\n" + timeStamp;
             imageRes = StaticUtils.getFileDrawable(file);
             name = FileUtils.getFileNameWthoutExtension(file);
-        } else name = file.getName();
+        } else {
+            name = file.getName();
+            size = (file.list() != null ? (file.list().length + " files") : "0 files");
+            timeStamp = DateUtils.getDateTimeFromTimeStamp(file.lastModified(), DateUtils.DATE_FORMAT_0);
+            fileInfo = size + "\n" + timeStamp;
+        }
     }
 
     public FileFolderItem(UsbFile file) {

@@ -94,6 +94,7 @@ public class TransfersFragment extends BaseFragment implements IClickListener, V
             if (cp.isConnected()) {
                 fragmentTransfersBinding.txtDeviceName.setText(StaticUtils.getDeviceName(mainActivity));
             } else fragmentTransfersBinding.txtDeviceName.setText("");
+            fragmentTransfersBinding.txtConnectionType.setText(StaticUtils.getConnectionType());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -133,6 +134,7 @@ public class TransfersFragment extends BaseFragment implements IClickListener, V
     public void onSocketConnected(OnSocketConnected onSocketConnected) {
         try {
             fragmentTransfersBinding.txtDeviceName.setText(StaticUtils.getDeviceName(mainActivity));
+            fragmentTransfersBinding.txtConnectionType.setText(StaticUtils.getConnectionType());
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -492,4 +492,14 @@ public class StaticUtils {
         return "";
     }
 
+    private static String connectionType = "";
+
+    public static String getConnectionType() {
+        return connectionType;
+    }
+
+    public static void setConnectionType(String type) {
+        connectionType = type;
+    }
+
 }

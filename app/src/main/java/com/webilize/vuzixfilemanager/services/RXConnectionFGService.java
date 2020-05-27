@@ -34,6 +34,7 @@ import com.webilize.vuzixfilemanager.models.TransferModel;
 import com.webilize.vuzixfilemanager.utils.AppConstants;
 import com.webilize.vuzixfilemanager.utils.AppStorage;
 import com.webilize.vuzixfilemanager.utils.DateUtils;
+import com.webilize.vuzixfilemanager.utils.StaticUtils;
 import com.webilize.vuzixfilemanager.utils.eventbus.OnConnectionError;
 import com.webilize.vuzixfilemanager.utils.eventbus.OnJSONObjectReceived;
 import com.webilize.vuzixfilemanager.utils.eventbus.OnJSONObjectReceivedFolders;
@@ -159,12 +160,19 @@ public class RXConnectionFGService extends Service implements ConnectionHelper.L
                     .build();
             communicationProtocol = CommunicationProtocol.getInstance();
             if (input.equalsIgnoreCase("start")) {
+                startForeground(1, notification);
                 if (intent.hasExtra("IsQr")) {
-                    startForeground(1, notification);
-                    initializeQRConnection();
-//                    initializeHPConnection();
+                    if (intent.getBooleanExtra("IsQr", true)) {
+                        StaticUtils.setConnectionType(AppConstants.CONST_QR_CODE);
+                        initializeQRConnection();
+                    } else {
+                        StaticUtils.setConnectionType(AppConstants.CONST_WIFI_HOTSPOT);
+                        initializeHPConnection();
+                    }
+                } else if (intent.hasExtra("IsBle")) {
+                    StaticUtils.setConnectionType(AppConstants.CONST_BLUETOOTH);
                 } else {
-                    startForeground(1, notification);
+                    StaticUtils.setConnectionType(AppConstants.CONST_WIFI_DIRECT);
                     initializeRXConnection();
                 }
             } else if (input.equalsIgnoreCase("connect")) {
@@ -215,9 +223,11 @@ public class RXConnectionFGService extends Service implements ConnectionHelper.L
                     toast("Already another transaction is going on. Please wait till it is done.");
             } else if (input.equalsIgnoreCase("stop")) {
                 AppStorage.getInstance(this).setValue(AppStorage.SP_DEVICE_ADDRESS, "");
+                StaticUtils.setConnectionType(AppConstants.CONST_CONNECTION_EMPTY);
                 stopForeground(true);
                 stopSelf();
             } else if (input.equalsIgnoreCase("stopTransfer")) {
+                StaticUtils.setConnectionType(AppConstants.CONST_CONNECTION_EMPTY);
                 stopOnGoingTransfers();
             }
         }
@@ -438,9 +448,9 @@ public class RXConnectionFGService extends Service implements ConnectionHelper.L
             connectionHelper.destroy(this);
 
         connectionHelper = new ConnectionHelper();
-        connectionHelper.setForceTCP(false);
+        connectionHelper.setForceTCP(true);
         toast("Initializing connection...");
-        connectionHelper.initialize(this, this, true, true, CommunicationProtocol.DEAULT_PORT);
+        connectionHelper.initialize(this, this, false, true, CommunicationProtocol.DEAULT_PORT);
     }
 
     /**

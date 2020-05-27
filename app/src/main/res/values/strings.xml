@@ -100,6 +100,13 @@
     <string name="incoming">Incoming</string>
     <string name="outgoing">Outgoing</string>
     <string name="connect_via_hotspot">Connect via Hotspot</string>
+    <string name="paired_devices">Paired Devices</string>
+    <string name="other_devices">Other Devices</string>
+    <string name="select_device">Select Device</string>
+    <string name="none_found">None found</string>
+    <string name="scanning">Scanning</string>
+    <string name="none_paired">None paired</string>
+    <string name="another_connection_is_active">Another connection is active.</string>
 
     <string-array name="files_filter">
         <item>Name</item>

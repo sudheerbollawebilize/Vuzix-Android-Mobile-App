@@ -39,6 +39,7 @@
     <dimen name="fifty_dp">50dp</dimen>
     <dimen name="fifty_five_dp">55dp</dimen>
     <dimen name="sixty_dp">60dp</dimen>
+    <dimen name="seventy_five_dp">75dp</dimen>
     <dimen name="hundred_dp">100dp</dimen>
     <dimen name="one_twenty_dp">120dp</dimen>
     <dimen name="one_fifty_dp">150dp</dimen>

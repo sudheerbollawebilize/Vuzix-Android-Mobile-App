@@ -1,3 +1,8 @@
-<manifest package="com.webilize.transfersdk" >
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.webilize.transfersdk">
 
+    <uses-permission
+        android:name="android.permission.BLUETOOTH"
+        android:required="false" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
 </manifest>

@@ -13,7 +13,7 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="com.webilize.vuzixfilemanager.DEVICE_MANAGEMENT" />
-    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES"/>
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
 
     <uses-feature
         android:name="android.hardware.camera"
@@ -47,8 +47,11 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
+
         <activity android:name=".activities.WebViewActivity"></activity>
+
         <activity android:name=".activities.SettingsActivity" />
+
         <activity
             android:name=".activities.SplashActivity"
             android:configChanges="uiMode">
@@ -111,6 +114,13 @@
         <service
             android:name=".services.RXConnectionFGService"
             android:enabled="true" />
+
+        <activity
+            android:name=".activities.BtDeviceListActivity"
+            android:configChanges="orientation|keyboardHidden"
+            android:label="@string/select_device"
+            android:theme="@style/DialogActivity" />
+
     </application>
 
 </manifest>

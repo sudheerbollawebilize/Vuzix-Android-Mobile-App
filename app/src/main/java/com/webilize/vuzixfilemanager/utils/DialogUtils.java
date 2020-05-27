@@ -123,6 +123,25 @@ public class DialogUtils {
         alert.show();
     }
 
+    public static void showDropDownListBT(Context context, final String[] categoryNames, final View view,
+                                               String heading, final View.OnClickListener clickListener) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        if (TextUtils.isEmpty(heading))
+            builder.setTitle(R.string.app_name);
+        else builder.setTitle(heading);
+        builder.setItems(categoryNames, (dialog, item) -> {
+            alert.dismiss();
+            if (view != null) view.setTag(categoryNames[item]);
+            if (clickListener != null) {
+                clickListener.onClick(view);
+            }
+        });
+        alert = builder.create();
+        alert.setCancelable(true);
+        alert.setCanceledOnTouchOutside(true);
+        alert.show();
+    }
+
     static FavouriteLocationsAdapter favouriteLocationsAdapter;
 
     public static Dialog showFavouritesDialog(Context context, boolean showRemove) {

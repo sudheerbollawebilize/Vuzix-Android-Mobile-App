@@ -10,24 +10,32 @@ import android.content.pm.PackageManager;
 import android.net.wifi.WifiManager;
 import android.net.wifi.p2p.WifiP2pDevice;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CompoundButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.databinding.DataBindingUtil;
+import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.webilize.transfersdk.bluetooth.Constants;
 import com.webilize.vuzixfilemanager.R;
+import com.webilize.vuzixfilemanager.activities.BtDeviceListActivity;
 import com.webilize.vuzixfilemanager.activities.MainActivity;
 import com.webilize.vuzixfilemanager.adapters.AvailableDevicesAdapter;
 import com.webilize.vuzixfilemanager.databinding.FragmentConnectivityBinding;
 import com.webilize.vuzixfilemanager.interfaces.IClickListener;
+import com.webilize.transfersdk.bluetooth.BluetoothChatService;
 import com.webilize.vuzixfilemanager.services.RXConnectionFGService;
+import com.webilize.vuzixfilemanager.utils.AppConstants;
 import com.webilize.vuzixfilemanager.utils.DialogUtils;
 import com.webilize.vuzixfilemanager.utils.StaticUtils;
 import com.webilize.vuzixfilemanager.utils.eventbus.OnConnectionError;
@@ -66,6 +74,14 @@ public class ConnectivityFragment extends BaseFragment implements CompoundButton
         cp = CommunicationProtocol.getInstance();
     }
 
+    private void ensureDiscoverable() {
+        if (mBluetoothAdapter.getScanMode() != BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE) {
+            Intent discoverableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
+            discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300);
+            startActivity(discoverableIntent);
+        }
+    }
+
     @Override
     void initComponents() {
         wifiP2pDeviceArrayList = new ArrayList<>();
@@ -86,6 +102,7 @@ public class ConnectivityFragment extends BaseFragment implements CompoundButton
         fragmentConnectivityBinding.btnScanForDevices.setOnClickListener(this);
         fragmentConnectivityBinding.btnQRCode.setOnClickListener(this);
         fragmentConnectivityBinding.btnScanForBTDevices.setOnClickListener(this);
+        fragmentConnectivityBinding.btnHotSpot.setOnClickListener(this);
     }
 
     private void checkForControlsEnable() {
@@ -132,6 +149,7 @@ public class ConnectivityFragment extends BaseFragment implements CompoundButton
             } else if (mBluetoothAdapter.isEnabled()) {
                 fragmentConnectivityBinding.switchBluetooth.setEnabled(true);
                 fragmentConnectivityBinding.switchBluetooth.setChecked(true);
+                ensureDiscoverable();
             } else {
                 fragmentConnectivityBinding.switchBluetooth.setEnabled(true);
                 fragmentConnectivityBinding.switchBluetooth.setChecked(false);
@@ -154,12 +172,41 @@ public class ConnectivityFragment extends BaseFragment implements CompoundButton
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == 1)
+        if (requestCode == REQUEST_ENABLE_BT)
             if (resultCode == Activity.RESULT_OK) {
                 fragmentConnectivityBinding.switchBluetooth.setChecked(mBluetoothAdapter.isEnabled());
             } else fragmentConnectivityBinding.switchBluetooth.setChecked(false);
+        else if (requestCode == REQUEST_CONNECT_DEVICE_INSECURE) {
+            if (resultCode == Activity.RESULT_OK) {
+                connectDevice(data, true);
+            }
+        } else if (requestCode == REQUEST_CONNECT_DEVICE_SECURE) {
+            if (resultCode == Activity.RESULT_OK) {
+                connectDevice(data, false);
+            }
+        }
         checkForControlsEnable();
     }
+
+    /**
+     * Establish connection with other device
+     *
+     * @param data   An {@link Intent} with {@link BtDeviceListActivity#EXTRA_DEVICE_ADDRESS} extra.
+     * @param secure Socket Security type - Secure (true) , Insecure (false)
+     */
+    private void connectDevice(Intent data, boolean secure) {
+        // Get the device MAC address
+        Bundle extras = data.getExtras();
+        if (extras == null) {
+            return;
+        }
+        String address = extras.getString(BtDeviceListActivity.EXTRA_DEVICE_ADDRESS);
+        // Get the BluetoothDevice object
+        BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(address);
+        // Attempt to connect to the device
+        mChatService.connect(device, secure);
+    }
+
 
     @Override
     public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
@@ -171,7 +218,7 @@ public class ConnectivityFragment extends BaseFragment implements CompoundButton
                             mBluetoothAdapter.disable();
                         } else {
                             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-                            startActivityForResult(enableBtIntent, 1);
+                            startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
                         }
                     else if (mBluetoothAdapter.isEnabled()) {
                         mBluetoothAdapter.disable();
@@ -192,32 +239,101 @@ public class ConnectivityFragment extends BaseFragment implements CompoundButton
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btnScanForDevices:
-                if (availableDevicesAdapter != null) availableDevicesAdapter.notifyDataSetChanged();
-                initWifiDirect();
-                DialogUtils.showProgressDialog(mainActivity, "Looking for devices...", v1 -> {
-                    MainActivity.stopServiceManually(mainActivity);
-                });
+                if (!cp.isConnected()) {
+                    if (availableDevicesAdapter != null)
+                        availableDevicesAdapter.notifyDataSetChanged();
+                    initWifiDirect();
+                    DialogUtils.showProgressDialog(mainActivity, "Looking for devices...", v1 -> {
+                        MainActivity.stopServiceManually(mainActivity);
+                    });
+                } else
+                    StaticUtils.showToast(mainActivity, getString(R.string.another_connection_is_active));
                 break;
             case R.id.btnQRCode:
-                initQRConnection();
+                if (!cp.isConnected()) {
+                    initQRConnection();
+                } else
+                    StaticUtils.showToast(mainActivity, getString(R.string.another_connection_is_active));
+                break;
+            case R.id.btnHotSpot:
+                if (!cp.isConnected()) {
+                    initHPConnection();
+                } else
+                    StaticUtils.showToast(mainActivity, getString(R.string.another_connection_is_active));
                 break;
             case R.id.btnScanForBTDevices:
-                initBTConnection();
+                if (!cp.isConnected()) {
+                    initBTConnection();
+                } else
+                    StaticUtils.showToast(mainActivity, getString(R.string.another_connection_is_active));
                 break;
             default:
                 break;
         }
     }
 
-    private void initBTConnection() {
-        BluetoothAdapter.LeScanCallback scanCallback = new BluetoothAdapter.LeScanCallback() {
-            @Override
-            public void onLeScan(BluetoothDevice device, int rssi, byte[] scanRecord) {
+    private static final int REQUEST_CONNECT_DEVICE_SECURE = 1;
+    private static final int REQUEST_CONNECT_DEVICE_INSECURE = 2;
+    private static final int REQUEST_ENABLE_BT = 3;
+    private BluetoothChatService mChatService = null;
 
-            }
-        };
-        mBluetoothAdapter.startLeScan(scanCallback);
+    private void initBTConnection() {
+        mChatService = new BluetoothChatService(mainActivity, mHandler);
+        if (mChatService.getState() == BluetoothChatService.STATE_NONE) {
+            mChatService.start();
+        }
+
+        Intent serverIntent = new Intent(getActivity(), BtDeviceListActivity.class);
+        startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE_SECURE);
     }
+
+    private final Handler mHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            FragmentActivity activity = getActivity();
+            switch (msg.what) {
+                case Constants.MESSAGE_STATE_CHANGE:
+                    switch (msg.arg1) {
+                        case BluetoothChatService.STATE_CONNECTED:
+//                            setStatus(getString(R.string.title_connected_to, mConnectedDeviceName));
+//                            mConversationArrayAdapter.clear();
+                            break;
+                        case BluetoothChatService.STATE_CONNECTING:
+//                            setStatus(R.string.title_connecting);
+                            break;
+                        case BluetoothChatService.STATE_LISTEN:
+                        case BluetoothChatService.STATE_NONE:
+//                            setStatus(R.string.title_not_connected);
+                            break;
+                    }
+                    break;
+                case Constants.MESSAGE_WRITE:
+//                    byte[] writeBuf = (byte[]) msg.obj;
+//                    // construct a string from the buffer
+//                    String writeMessage = new String(writeBuf);
+//                    mConversationArrayAdapter.add("Me:  " + writeMessage);
+                    break;
+                case Constants.MESSAGE_READ:
+//                    byte[] readBuf = (byte[]) msg.obj;
+//                    // construct a string from the valid bytes in the buffer
+//                    String readMessage = new String(readBuf, 0, msg.arg1);
+//                    mConversationArrayAdapter.add(mConnectedDeviceName + ":  " + readMessage);
+                    break;
+                case Constants.MESSAGE_DEVICE_NAME:
+                    // save the connected device's name
+                    String mConnectedDeviceName = msg.getData().getString(Constants.DEVICE_NAME);
+                    if (null != activity) {
+                        Toast.makeText(activity, "Connected to " + mConnectedDeviceName, Toast.LENGTH_SHORT).show();
+                    }
+                    break;
+                case Constants.MESSAGE_TOAST:
+                    if (null != activity) {
+                        Toast.makeText(activity, msg.getData().getString(Constants.TOAST), Toast.LENGTH_SHORT).show();
+                    }
+                    break;
+            }
+        }
+    };
 
     private void initWifiDirect() {
         Intent serviceIntent = new Intent(mainActivity, RXConnectionFGService.class);
@@ -229,6 +345,13 @@ public class ConnectivityFragment extends BaseFragment implements CompoundButton
         Intent serviceIntent = new Intent(mainActivity, RXConnectionFGService.class);
         serviceIntent.putExtra("inputExtra", "start");
         serviceIntent.putExtra("IsQr", true);
+        ContextCompat.startForegroundService(mainActivity, serviceIntent);
+    }
+
+    private void initHPConnection() {
+        Intent serviceIntent = new Intent(mainActivity, RXConnectionFGService.class);
+        serviceIntent.putExtra("inputExtra", "start");
+        serviceIntent.putExtra("IsQr", false);
         ContextCompat.startForegroundService(mainActivity, serviceIntent);
     }
 
@@ -284,12 +407,25 @@ public class ConnectivityFragment extends BaseFragment implements CompoundButton
             setAdapters();
         }
         StaticUtils.showToast(mainActivity, "Connected");
+        fragmentConnectivityBinding.txtConnectionType.setText(StaticUtils.getConnectionType());
+        DialogUtils.dismissProgressDialog();
         try {
-            fragmentConnectivityBinding.txtDeviceName.setText(StaticUtils.getDeviceName(mainActivity));
+            if (cp.isConnected()) {
+                fragmentConnectivityBinding.txtDeviceName.setText(StaticUtils.getDeviceName(mainActivity));
+                fragmentConnectivityBinding.btnQRCode.setEnabled(false);
+                fragmentConnectivityBinding.btnScanForDevices.setEnabled(false);
+                fragmentConnectivityBinding.btnHotSpot.setEnabled(false);
+                fragmentConnectivityBinding.btnScanForBTDevices.setEnabled(false);
+            } else {
+                fragmentConnectivityBinding.txtDeviceName.setText("");
+                fragmentConnectivityBinding.btnQRCode.setEnabled(true);
+                fragmentConnectivityBinding.btnScanForDevices.setEnabled(true);
+                fragmentConnectivityBinding.btnHotSpot.setEnabled(true);
+                fragmentConnectivityBinding.btnScanForBTDevices.setEnabled(true);
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        DialogUtils.dismissProgressDialog();
     }
 
     @Override
@@ -298,10 +434,21 @@ public class ConnectivityFragment extends BaseFragment implements CompoundButton
         try {
             if (cp.isConnected()) {
                 fragmentConnectivityBinding.txtDeviceName.setText(StaticUtils.getDeviceName(mainActivity));
-            } else fragmentConnectivityBinding.txtDeviceName.setText("");
+                fragmentConnectivityBinding.btnQRCode.setEnabled(false);
+                fragmentConnectivityBinding.btnScanForDevices.setEnabled(false);
+                fragmentConnectivityBinding.btnHotSpot.setEnabled(false);
+                fragmentConnectivityBinding.btnScanForBTDevices.setEnabled(false);
+            } else {
+                fragmentConnectivityBinding.txtDeviceName.setText("");
+                fragmentConnectivityBinding.btnQRCode.setEnabled(true);
+                fragmentConnectivityBinding.btnScanForDevices.setEnabled(true);
+                fragmentConnectivityBinding.btnHotSpot.setEnabled(true);
+                fragmentConnectivityBinding.btnScanForBTDevices.setEnabled(true);
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
+        fragmentConnectivityBinding.txtConnectionType.setText(StaticUtils.getConnectionType());
     }
 
     @Override

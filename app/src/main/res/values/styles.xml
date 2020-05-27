@@ -33,6 +33,11 @@
         <item name="android:windowFullscreen">false</item>
     </style>
 
+    <style name="DialogActivity" parent="Theme.AppCompat.DayNight.Dialog.Alert">
+        <item name="windowActionBar">false</item>
+        <item name="android:windowFullscreen">false</item>
+    </style>
+
     <style name="AppButtonStyle" parent="@android:style/Widget.TextView">
         <item name="android:textSize">@dimen/fourteen_sp</item>
         <!--        <item name="android:background">@drawable/bg_custom_btn_app_color</item>-->

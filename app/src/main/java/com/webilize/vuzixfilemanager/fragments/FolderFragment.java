@@ -201,6 +201,7 @@ public class FolderFragment extends BaseFragment implements IClickListener, View
             if (cp.isConnected()) {
                 folderFragmentBinding.txtDeviceName.setText(StaticUtils.getDeviceName(mainActivity));
             } else folderFragmentBinding.txtDeviceName.setText("");
+            folderFragmentBinding.txtConnectionType.setText(StaticUtils.getConnectionType());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -210,6 +211,7 @@ public class FolderFragment extends BaseFragment implements IClickListener, View
     public void onSocketConnected(OnSocketConnected onSocketConnected) {
         try {
             folderFragmentBinding.txtDeviceName.setText(StaticUtils.getDeviceName(mainActivity));
+            folderFragmentBinding.txtConnectionType.setText(StaticUtils.getConnectionType());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -458,17 +460,11 @@ public class FolderFragment extends BaseFragment implements IClickListener, View
             folderFragmentBinding.layouFab.fabFolder.startAnimation(fabClose);
             folderFragmentBinding.layouFab.fabAdd.startAnimation(fabAnticlock);
             folderFragmentBinding.layouFab.fabFolder.setClickable(false);
-//            folderFragmentBinding.layouFab.txtFile.setVisibility(View.INVISIBLE);
-//            folderFragmentBinding.layouFab.fabFile.startAnimation(fabClose);
-//            folderFragmentBinding.layouFab.fabFile.setClickable(false);
         } else {
             folderFragmentBinding.layouFab.txtFolder.setVisibility(View.VISIBLE);
             folderFragmentBinding.layouFab.fabFolder.startAnimation(fabOpen);
             folderFragmentBinding.layouFab.fabAdd.startAnimation(fabClock);
             folderFragmentBinding.layouFab.fabFolder.setClickable(true);
-//            folderFragmentBinding.layouFab.txtFile.setVisibility(View.VISIBLE);
-//            folderFragmentBinding.layouFab.fabFile.startAnimation(fabOpen);
-//            folderFragmentBinding.layouFab.fabFile.setClickable(true);
         }
         isOpen = !isOpen;
     }
@@ -478,7 +474,7 @@ public class FolderFragment extends BaseFragment implements IClickListener, View
             layoutManager = new LinearLayoutManager(mainActivity);
             folderFragmentBinding.imgListMode.setImageDrawable(ContextCompat.getDrawable(mainActivity, R.drawable.ic_grid));
         } else {
-            layoutManager = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
+            layoutManager = new StaggeredGridLayoutManager(3, StaggeredGridLayoutManager.VERTICAL);
             folderFragmentBinding.imgListMode.setImageDrawable(ContextCompat.getDrawable(mainActivity, R.drawable.ic_list));
         }
         if (layoutManager != null)

@@ -24,8 +24,7 @@
         app:cardCornerRadius="@dimen/five_dp"
         app:cardElevation="@dimen/two_dp"
         app:cardPreventCornerOverlap="true"
-        app:cardUseCompatPadding="true"
-        app:contentPadding="@dimen/three_dp">
+        app:cardUseCompatPadding="true">
 
         <RelativeLayout
             android:id="@+id/relFile"
@@ -35,12 +34,11 @@
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/imgFile"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/one_seventy_five_dp"
-                bind:fileInfo="@{fileFolderItem}" />
-            <!--
-                app:srcCompat="@drawable/ic_file"
-                bind:loadAppropriateThumb="@{fileFolderItem.imageRes}"
-            -->
+                android:layout_height="@dimen/seventy_five_dp"
+                android:padding="@dimen/fifteen_dp"
+                android:scaleType="center"
+                bind:imageFile="@{fileFolderItem}" />
+
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -87,16 +85,15 @@
                     android:clickable="false"
                     android:ellipsize="marquee"
                     android:gravity="center_vertical"
-                    android:inputType="textNoSuggestions"
+                    android:lineSpacingExtra="@dimen/three_dp"
                     android:longClickable="false"
                     android:paddingStart="@dimen/five_dp"
                     android:paddingEnd="@dimen/five_dp"
                     android:selectAllOnFocus="false"
-                    android:singleLine="true"
-                    android:text="@{fileFolderItem.fileInfo}"
                     android:textColor="@color/colorBlack"
                     android:textIsSelectable="false"
                     android:textSize="@dimen/ten_sp" />
+                <!--                android:text="@{fileFolderItem.fileInfo}"-->
 
             </RelativeLayout>
 
@@ -106,8 +103,8 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentTop="true"
                 android:layout_alignParentEnd="true"
-                android:layout_margin="@dimen/eight_dp"
-                android:padding="@dimen/six_dp"
+                android:layout_margin="@dimen/five_dp"
+                android:padding="@dimen/five_dp"
                 app:srcCompat="@drawable/ic_menu_black" />
 
         </RelativeLayout>

@@ -312,7 +312,7 @@ public class ExternalStorageFolderFragment extends BaseFragment implements IClic
             layoutManager = new LinearLayoutManager(mainActivity);
             folderFragmentBinding.imgListMode.setImageDrawable(ContextCompat.getDrawable(mainActivity, R.drawable.ic_grid));
         } else {
-            layoutManager = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
+            layoutManager = new StaggeredGridLayoutManager(3, StaggeredGridLayoutManager.VERTICAL);
             folderFragmentBinding.imgListMode.setImageDrawable(ContextCompat.getDrawable(mainActivity, R.drawable.ic_list));
         }
         if (layoutManager != null)
@@ -384,6 +384,7 @@ public class ExternalStorageFolderFragment extends BaseFragment implements IClic
             if (cp.isConnected()) {
                 folderFragmentBinding.txtDeviceName.setText(StaticUtils.getDeviceName(mainActivity));
             } else folderFragmentBinding.txtDeviceName.setText("");
+            folderFragmentBinding.txtConnectionType.setText(StaticUtils.getConnectionType());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -393,6 +394,7 @@ public class ExternalStorageFolderFragment extends BaseFragment implements IClic
     public void onSocketConnected(OnSocketConnected onSocketConnected) {
         try {
             folderFragmentBinding.txtDeviceName.setText(StaticUtils.getDeviceName(mainActivity));
+            folderFragmentBinding.txtConnectionType.setText(StaticUtils.getConnectionType());
         } catch (Exception e) {
             e.printStackTrace();
         }

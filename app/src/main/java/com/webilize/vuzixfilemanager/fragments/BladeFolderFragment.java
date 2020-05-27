@@ -228,7 +228,10 @@ public class BladeFolderFragment extends BaseFragment implements IClickListener,
         try {
             if (cp.isConnected()) {
                 folderFragmentBinding.txtDeviceName.setText(StaticUtils.getDeviceName(mainActivity));
-            } else folderFragmentBinding.txtDeviceName.setText("");
+            } else {
+                folderFragmentBinding.txtDeviceName.setText("");
+            }
+            folderFragmentBinding.txtConnectionType.setText(StaticUtils.getConnectionType());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -331,7 +334,7 @@ public class BladeFolderFragment extends BaseFragment implements IClickListener,
             layoutManager = new LinearLayoutManager(mainActivity);
             folderFragmentBinding.imgListMode.setImageDrawable(ContextCompat.getDrawable(mainActivity, R.drawable.ic_grid));
         } else {
-            layoutManager = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
+            layoutManager = new StaggeredGridLayoutManager(3, StaggeredGridLayoutManager.VERTICAL);
             folderFragmentBinding.imgListMode.setImageDrawable(ContextCompat.getDrawable(mainActivity, R.drawable.ic_list));
         }
         if (layoutManager != null)
