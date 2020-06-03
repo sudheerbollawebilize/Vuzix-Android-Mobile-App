@@ -19,7 +19,6 @@ import com.webilize.vuzixfilemanager.adapters.TransfersAdapter;
 import com.webilize.vuzixfilemanager.databinding.FragmentTransfersBinding;
 import com.webilize.vuzixfilemanager.dbutils.DBHelper;
 import com.webilize.vuzixfilemanager.interfaces.IClickListener;
-import com.webilize.vuzixfilemanager.interfaces.NavigationListener;
 import com.webilize.vuzixfilemanager.models.FileFolderItem;
 import com.webilize.vuzixfilemanager.models.TransferModel;
 import com.webilize.vuzixfilemanager.utils.AppConstants;
@@ -44,9 +43,8 @@ public class TransfersFragment extends BaseFragment implements IClickListener, V
     private View rootView;
     private MainActivity mainActivity;
     private DBHelper dbHelper;
-    private NavigationListener navigationListener;
     private CommunicationProtocol cp;
-    private ArrayList<TransferModel> transferModelArrayList;
+    private ArrayList<TransferModel> transferModelArrayListOutGoing, transferModelArrayListIncoming;
     private TransfersAdapter transfersAdapter;
     private PopupMenu popupMenu, itemPopUpMenu;
     private TransferModel selectedFile;
@@ -62,17 +60,9 @@ public class TransfersFragment extends BaseFragment implements IClickListener, V
             mainActivity = (MainActivity) context;
             cp = CommunicationProtocol.getInstance();
             dbHelper = new DBHelper(mainActivity);
-            if (context instanceof NavigationListener)
-                navigationListener = (NavigationListener) context;
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        navigationListener = null;
     }
 
     @Override
@@ -104,7 +94,8 @@ public class TransfersFragment extends BaseFragment implements IClickListener, V
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         fragmentTransfersBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_transfers, container, false);
         rootView = fragmentTransfersBinding.getRoot();
-        transferModelArrayList = new ArrayList<>();
+        transferModelArrayListOutGoing = new ArrayList<>();
+        transferModelArrayListIncoming = new ArrayList<>();
         return rootView;
     }
 
@@ -116,10 +107,10 @@ public class TransfersFragment extends BaseFragment implements IClickListener, V
 
     @Override
     public void onClick(View view, int position) {
-        selectedFile = transferModelArrayList.get(position);
+        selectedFile = transferModelArrayListOutGoing.get(position);
         switch (view.getId()) {
             case R.id.imgMore:
-                prepareItemPopUpMenu(view, transferModelArrayList.get(position));
+                prepareItemPopUpMenu(view, transferModelArrayListOutGoing.get(position));
                 break;
         }
     }
@@ -144,10 +135,10 @@ public class TransfersFragment extends BaseFragment implements IClickListener, V
     public void onProgressUpdated(OnProgressUpdated onProgressUpdated) {
         try {
             if (onProgressUpdated.transferModel != null) {
-                if (transferModelArrayList.contains(onProgressUpdated.transferModel)) {
+                if (transferModelArrayListOutGoing.contains(onProgressUpdated.transferModel)) {
                     getIndex(onProgressUpdated.transferModel);
                 } else {
-                    transferModelArrayList.add(0, onProgressUpdated.transferModel);
+                    transferModelArrayListOutGoing.add(0, onProgressUpdated.transferModel);
                     setAdapter();
                 }
             }
@@ -167,10 +158,10 @@ public class TransfersFragment extends BaseFragment implements IClickListener, V
     }
 
     private void getIndex(TransferModel transferModel) {
-        if (transferModelArrayList != null && !transferModelArrayList.isEmpty()) {
-            for (int i = 0; i < transferModelArrayList.size(); i++) {
-                if (transferModel.id == transferModelArrayList.get(i).id) {
-                    transferModelArrayList.set(i, transferModel);
+        if (transferModelArrayListOutGoing != null && !transferModelArrayListOutGoing.isEmpty()) {
+            for (int i = 0; i < transferModelArrayListOutGoing.size(); i++) {
+                if (transferModel.id == transferModelArrayListOutGoing.get(i).id) {
+                    transferModelArrayListOutGoing.set(i, transferModel);
                     if (transfersAdapter != null) transfersAdapter.notifyItemChanged(i);
 //                    fragmentTransfersBinding.recyclerView.smoothScrollToPosition(i);
                     return;
@@ -207,7 +198,7 @@ public class TransfersFragment extends BaseFragment implements IClickListener, V
 
     private ArrayList<TransferModel> getOnGoingTransfers() {
         ArrayList<TransferModel> onGoingTransfersArrayList = new ArrayList<>();
-        for (TransferModel transferModel : transferModelArrayList) {
+        for (TransferModel transferModel : transferModelArrayListOutGoing) {
             if (transferModel.status == AppConstants.CONST_TRANSFER_ONGOING) {
                 onGoingTransfersArrayList.add(transferModel);
             }
@@ -233,7 +224,7 @@ public class TransfersFragment extends BaseFragment implements IClickListener, V
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             dbHelper.deleteTransferModel(selectedFile.id + "");
-                            transferModelArrayList.remove(selectedFile);
+                            transferModelArrayListOutGoing.remove(selectedFile);
                             transfersAdapter.notifyDataSetChanged();
                         }
                     });
@@ -251,9 +242,10 @@ public class TransfersFragment extends BaseFragment implements IClickListener, V
     }
 
     private void getTransfersData() {
-        if (transferModelArrayList == null) transferModelArrayList = new ArrayList<>();
-        else transferModelArrayList.clear();
-        transferModelArrayList.addAll(dbHelper.getTransferModelsList());
+        if (transferModelArrayListOutGoing == null)
+            transferModelArrayListOutGoing = new ArrayList<>();
+        else transferModelArrayListOutGoing.clear();
+        transferModelArrayListOutGoing.addAll(dbHelper.getTransferModelsList(false));
         checkForVisibility();
         setAdapter();
     }
@@ -261,12 +253,12 @@ public class TransfersFragment extends BaseFragment implements IClickListener, V
     private void setAdapter() {
         fragmentTransfersBinding.recyclerView.addItemDecoration(new DividerItemDecoration(mainActivity, DividerItemDecoration.VERTICAL_LIST));
         fragmentTransfersBinding.recyclerView.setLayoutManager(new LinearLayoutManager(mainActivity));
-        transfersAdapter = new TransfersAdapter(mainActivity, transferModelArrayList, this);
+        transfersAdapter = new TransfersAdapter(mainActivity, transferModelArrayListOutGoing, this);
         fragmentTransfersBinding.recyclerView.setAdapter(transfersAdapter);
     }
 
     private void checkForVisibility() {
-        if (transferModelArrayList == null || transferModelArrayList.isEmpty()) {
+        if (transferModelArrayListOutGoing == null || transferModelArrayListOutGoing.isEmpty()) {
             fragmentTransfersBinding.txtNoDataFound.setVisibility(View.VISIBLE);
             fragmentTransfersBinding.recyclerView.setVisibility(View.GONE);
         } else {

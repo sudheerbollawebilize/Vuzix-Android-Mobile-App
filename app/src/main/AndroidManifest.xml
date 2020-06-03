@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.webilize.vuzixfilemanager">
 
     <uses-permission android:name="android.permission.INTERNET" />
@@ -34,6 +35,12 @@
         android:required="false" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
 
+    <uses-permission
+        android:name="android.permission.WRITE_SETTINGS"
+        tools:ignore="ProtectedPermissions" />
+    <uses-permission android:name="android.permission.TETHER_PRIVILEGED" />
+
+
     <application
         android:name=".BaseApplication"
         android:allowBackup="true"
@@ -48,7 +55,7 @@
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
 
-        <activity android:name=".activities.WebViewActivity"></activity>
+        <activity android:name=".activities.WebViewActivity" />
 
         <activity android:name=".activities.SettingsActivity" />
 
@@ -66,11 +73,18 @@
         <activity android:name=".activities.MainActivity">
             <intent-filter>
                 <action android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED" />
+                <data android:scheme="wifihotspot" />
+
+                <category android:name="android.intent.category.BROWSABLE" />
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <action android:name="android.intent.action.VIEW" />
             </intent-filter>
 
             <meta-data
                 android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED"
                 android:resource="@xml/device_filter" />
+
         </activity>
 
         <provider
@@ -120,6 +134,20 @@
             android:configChanges="orientation|keyboardHidden"
             android:label="@string/select_device"
             android:theme="@style/DialogActivity" />
+        <service
+            android:name=".services.HotSpotIntentService"
+            android:enabled="true"
+            android:exported="true" />
+
+        <receiver
+            android:name=".receivers.HotSpotIntentReceiver"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="${applicationId}.TURN_ON" />
+                <action android:name="${applicationId}.TURN_OFF" />
+            </intent-filter>
+        </receiver>
 
     </application>
 

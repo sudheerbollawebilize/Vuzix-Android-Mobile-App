@@ -17,7 +17,6 @@ public class BluetoothClientSocket extends ISocket {
 
     BluetoothSocket socket;
 
-
     @Override
     public void connect() throws IOException, Exception {
         connected = true;

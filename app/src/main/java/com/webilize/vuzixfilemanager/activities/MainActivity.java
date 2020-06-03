@@ -571,6 +571,24 @@ public class MainActivity extends BaseActivity implements NavigationListener, Vi
                 });
     }
 
+    public void sendFileToBladeBT(File file) {
+        DialogUtils.showSendFileDialog(this, "Do you want to send file to default folder, or change the Destination?",
+                (dialog, which) -> {
+                    Intent intent = new Intent(this, BladeFoldersActivity.class);
+                    intent.putExtra("inputExtra", "send");
+                    intent.putExtra("bt", true);
+                    intent.putExtra("file", file);
+                    startActivityForResult(intent, AppConstants.REQUEST_BLADE_FOLDERS);
+                }, (dialog, which) -> {
+                    Intent serviceIntent = new Intent(this, RXConnectionFGService.class);
+                    serviceIntent.putExtra("inputExtra", "send");
+                    serviceIntent.putExtra("file", file);
+                    serviceIntent.putExtra("bt", true);
+                    ContextCompat.startForegroundService(this, serviceIntent);
+                    activityMainBinding.bottomBar.setSelectedItemId(R.id.navTransfers);
+                });
+    }
+
     public void sendFilesToBlade(String[] files) {
         DialogUtils.showSendFileDialog(this, "Do you want to send files to default folder, or change the Destination?",
                 (dialog, which) -> {
@@ -582,6 +600,24 @@ public class MainActivity extends BaseActivity implements NavigationListener, Vi
                     Intent serviceIntent = new Intent(this, RXConnectionFGService.class);
                     serviceIntent.putExtra("inputExtra", "send");
                     serviceIntent.putExtra("files", files);
+                    ContextCompat.startForegroundService(this, serviceIntent);
+                    activityMainBinding.bottomBar.setSelectedItemId(R.id.navTransfers);
+                });
+    }
+
+    public void sendFilesToBladeBT(String[] files) {
+        DialogUtils.showSendFileDialog(this, "Do you want to send files to default folder, or change the Destination?",
+                (dialog, which) -> {
+                    Intent intent = new Intent(this, BladeFoldersActivity.class);
+                    intent.putExtra("inputExtra", "send");
+                    intent.putExtra("bt", true);
+                    intent.putExtra("files", files);
+                    startActivityForResult(intent, AppConstants.REQUEST_BLADE_FOLDERS);
+                }, (dialog, which) -> {
+                    Intent serviceIntent = new Intent(this, RXConnectionFGService.class);
+                    serviceIntent.putExtra("inputExtra", "send");
+                    serviceIntent.putExtra("files", files);
+                    serviceIntent.putExtra("bt", true);
                     ContextCompat.startForegroundService(this, serviceIntent);
                     activityMainBinding.bottomBar.setSelectedItemId(R.id.navTransfers);
                 });
@@ -635,6 +671,9 @@ public class MainActivity extends BaseActivity implements NavigationListener, Vi
                 activityMainBinding.imgBack.setVisibility(View.GONE);
             } else {
                 activityMainBinding.txtFolderName.setText(folderName);
+                activityMainBinding.imgBack.setVisibility(View.VISIBLE);
+            }
+            if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
                 activityMainBinding.imgBack.setVisibility(View.VISIBLE);
             }
         } catch (Exception e) {

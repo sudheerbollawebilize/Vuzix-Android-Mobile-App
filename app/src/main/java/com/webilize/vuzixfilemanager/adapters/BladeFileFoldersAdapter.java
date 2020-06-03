@@ -2,6 +2,7 @@ package com.webilize.vuzixfilemanager.adapters;
 
 import android.content.Context;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
@@ -13,6 +14,8 @@ import com.webilize.vuzixfilemanager.R;
 import com.webilize.vuzixfilemanager.databinding.ItemBladeFileBinding;
 import com.webilize.vuzixfilemanager.interfaces.IClickListener;
 import com.webilize.vuzixfilemanager.models.BladeItem;
+import com.webilize.vuzixfilemanager.utils.AppConstants;
+import com.webilize.vuzixfilemanager.utils.AppStorage;
 
 import java.util.ArrayList;
 
@@ -21,6 +24,7 @@ public class BladeFileFoldersAdapter extends RecyclerView.Adapter<BladeFileFolde
     private ArrayList<BladeItem> fileFolderItemArrayList;
     private Context context;
     private IClickListener iClickListener;
+    private int listMode;
 
     public BladeFileFoldersAdapter(Context context, ArrayList<BladeItem> fileFolderItemArrayList, IClickListener iClickListener) {
         this.context = context;
@@ -37,6 +41,7 @@ public class BladeFileFoldersAdapter extends RecyclerView.Adapter<BladeFileFolde
     @Override
     public void onBindViewHolder(@NonNull FileViewHolder fileFoldersViewHolder, int position) {
         BladeItem fileFolderItem = fileFolderItemArrayList.get(position);
+        listMode = AppStorage.getInstance(context).getValue(AppStorage.SP_LIST_MODE, AppConstants.SHOW_GRID);
         fileFoldersViewHolder.itemView.setOnClickListener(v -> {
             if (iClickListener != null) iClickListener.onClick(v, position);
         });
@@ -47,17 +52,32 @@ public class BladeFileFoldersAdapter extends RecyclerView.Adapter<BladeFileFolde
         fileFoldersViewHolder.itemFileBinding.imgMore.setOnClickListener(v -> {
             if (iClickListener != null) iClickListener.onClick(v, position);
         });
+        if (listMode == AppConstants.SHOW_LIST) {
+            fileFoldersViewHolder.itemFileBinding.imgFile.setVisibility(View.GONE);
+            fileFoldersViewHolder.itemFileBinding.imgFileSmall.setVisibility(View.VISIBLE);
+        } else {
+            fileFoldersViewHolder.itemFileBinding.imgFile.setVisibility(View.VISIBLE);
+            fileFoldersViewHolder.itemFileBinding.imgFileSmall.setVisibility(View.GONE);
+        }
         int thumb = fileFolderItem.imageRes;
         fileFoldersViewHolder.itemFileBinding.txtFileName.setText(fileFolderItem.name);
         fileFoldersViewHolder.itemFileBinding.txtFileDetails.setText(fileFolderItem.fileInfo);
         if (fileFolderItem.isSelected) {
-            fileFoldersViewHolder.itemFileBinding.imgFileSmall.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_select));
+            if (listMode == AppConstants.SHOW_LIST) {
+                fileFoldersViewHolder.itemFileBinding.imgFileSmall.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_select));
+            } else {
+                fileFoldersViewHolder.itemFileBinding.imgFile.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_select));
+            }
             fileFoldersViewHolder.itemFileBinding.cardBody.setCardBackgroundColor(ContextCompat.getColor(context,
                     R.color.colorRedTint));
         } else {
             fileFoldersViewHolder.itemFileBinding.cardBody.setCardBackgroundColor(ContextCompat.getColor(context,
                     R.color.colorWhite));
-            fileFoldersViewHolder.itemFileBinding.imgFileSmall.setImageDrawable(ContextCompat.getDrawable(context, thumb));
+            if (listMode == AppConstants.SHOW_LIST) {
+                fileFoldersViewHolder.itemFileBinding.imgFileSmall.setImageDrawable(ContextCompat.getDrawable(context, thumb));
+            } else {
+                fileFoldersViewHolder.itemFileBinding.imgFile.setImageDrawable(ContextCompat.getDrawable(context, thumb));
+            }
         }
     }
 

@@ -124,7 +124,7 @@ public class DialogUtils {
     }
 
     public static void showDropDownListBT(Context context, final String[] categoryNames, final View view,
-                                               String heading, final View.OnClickListener clickListener) {
+                                          String heading, final View.OnClickListener clickListener) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         if (TextUtils.isEmpty(heading))
             builder.setTitle(R.string.app_name);
@@ -326,6 +326,25 @@ public class DialogUtils {
         });
         builder.setNegativeButton("Proceed", (dialog, which) -> {
             proceedClickListener.onClick(dialog, which);
+            dialog.dismiss();
+        });
+        builder.setNeutralButton("Cancel", (dialog, which) -> dialog.dismiss());
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+    }
+
+    public static void showHotSpotDialog(Context context, final DialogInterface.OnClickListener onClickListener,
+                                         final DialogInterface.OnClickListener offClickListener) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setMessage("Hotspot On/Off");
+        builder.setTitle(context.getString(R.string.app_name));
+        builder.setCancelable(false);
+        builder.setPositiveButton("Switch On", (dialog, which) -> {
+            onClickListener.onClick(dialog, which);
+            dialog.dismiss();
+        });
+        builder.setNegativeButton("Switch Off", (dialog, which) -> {
+            offClickListener.onClick(dialog, which);
             dialog.dismiss();
         });
         builder.setNeutralButton("Cancel", (dialog, which) -> dialog.dismiss());

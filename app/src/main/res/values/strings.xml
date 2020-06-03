@@ -115,4 +115,7 @@
         <!--        <item>Type</item>-->
     </string-array>
 
+    <string name="notification_chnnl_location_descr">Keeps wifi hot spot persistent</string>
+    <string name="send_via_bluetooth">Send via Bluetooth</string>
+
 </resources>

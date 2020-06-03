@@ -1,5 +1,6 @@
 package com.webilize.vuzixfilemanager.fragments;
 
+import android.Manifest;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -7,33 +8,31 @@ import android.bluetooth.BluetoothManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.net.wifi.WifiManager;
 import android.net.wifi.p2p.WifiP2pDevice;
+import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
+import android.provider.Settings;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CompoundButton;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.databinding.DataBindingUtil;
-import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
-import com.webilize.transfersdk.bluetooth.Constants;
 import com.webilize.vuzixfilemanager.R;
 import com.webilize.vuzixfilemanager.activities.BtDeviceListActivity;
 import com.webilize.vuzixfilemanager.activities.MainActivity;
 import com.webilize.vuzixfilemanager.adapters.AvailableDevicesAdapter;
 import com.webilize.vuzixfilemanager.databinding.FragmentConnectivityBinding;
 import com.webilize.vuzixfilemanager.interfaces.IClickListener;
-import com.webilize.transfersdk.bluetooth.BluetoothChatService;
 import com.webilize.vuzixfilemanager.services.RXConnectionFGService;
 import com.webilize.vuzixfilemanager.utils.AppConstants;
 import com.webilize.vuzixfilemanager.utils.DialogUtils;
@@ -62,6 +61,11 @@ public class ConnectivityFragment extends BaseFragment implements CompoundButton
     private ArrayList<WifiP2pDevice> wifiP2pDeviceArrayList, connectedDevicesArrayList;
     private int selectedPos;
     private CommunicationProtocol cp;
+    private static final int REQUEST_CONNECT_DEVICE_SECURE = 1;
+    private static final int REQUEST_CONNECT_DEVICE_INSECURE = 2;
+    private static final int REQUEST_ENABLE_BT = 3;
+    private boolean mLocationPermission = false;
+    private boolean mSettingPermission = true;
 
     public ConnectivityFragment() {
         // Required empty public constructor
@@ -149,7 +153,7 @@ public class ConnectivityFragment extends BaseFragment implements CompoundButton
             } else if (mBluetoothAdapter.isEnabled()) {
                 fragmentConnectivityBinding.switchBluetooth.setEnabled(true);
                 fragmentConnectivityBinding.switchBluetooth.setChecked(true);
-                ensureDiscoverable();
+//                ensureDiscoverable();
             } else {
                 fragmentConnectivityBinding.switchBluetooth.setEnabled(true);
                 fragmentConnectivityBinding.switchBluetooth.setChecked(false);
@@ -169,44 +173,15 @@ public class ConnectivityFragment extends BaseFragment implements CompoundButton
         return rootView;
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_ENABLE_BT)
-            if (resultCode == Activity.RESULT_OK) {
-                fragmentConnectivityBinding.switchBluetooth.setChecked(mBluetoothAdapter.isEnabled());
-            } else fragmentConnectivityBinding.switchBluetooth.setChecked(false);
-        else if (requestCode == REQUEST_CONNECT_DEVICE_INSECURE) {
-            if (resultCode == Activity.RESULT_OK) {
-                connectDevice(data, true);
-            }
-        } else if (requestCode == REQUEST_CONNECT_DEVICE_SECURE) {
-            if (resultCode == Activity.RESULT_OK) {
-                connectDevice(data, false);
-            }
-        }
-        checkForControlsEnable();
-    }
-
-    /**
-     * Establish connection with other device
-     *
-     * @param data   An {@link Intent} with {@link BtDeviceListActivity#EXTRA_DEVICE_ADDRESS} extra.
-     * @param secure Socket Security type - Secure (true) , Insecure (false)
-     */
     private void connectDevice(Intent data, boolean secure) {
-        // Get the device MAC address
         Bundle extras = data.getExtras();
         if (extras == null) {
             return;
         }
         String address = extras.getString(BtDeviceListActivity.EXTRA_DEVICE_ADDRESS);
-        // Get the BluetoothDevice object
         BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(address);
-        // Attempt to connect to the device
-        mChatService.connect(device, secure);
+        initBTService(device, secure);
     }
-
 
     @Override
     public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
@@ -263,6 +238,7 @@ public class ConnectivityFragment extends BaseFragment implements CompoundButton
                 break;
             case R.id.btnScanForBTDevices:
                 if (!cp.isConnected()) {
+                    ensureDiscoverable();
                     initBTConnection();
                 } else
                     StaticUtils.showToast(mainActivity, getString(R.string.another_connection_is_active));
@@ -272,68 +248,11 @@ public class ConnectivityFragment extends BaseFragment implements CompoundButton
         }
     }
 
-    private static final int REQUEST_CONNECT_DEVICE_SECURE = 1;
-    private static final int REQUEST_CONNECT_DEVICE_INSECURE = 2;
-    private static final int REQUEST_ENABLE_BT = 3;
-    private BluetoothChatService mChatService = null;
-
     private void initBTConnection() {
-        mChatService = new BluetoothChatService(mainActivity, mHandler);
-        if (mChatService.getState() == BluetoothChatService.STATE_NONE) {
-            mChatService.start();
-        }
-
-        Intent serverIntent = new Intent(getActivity(), BtDeviceListActivity.class);
-        startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE_SECURE);
+        initBTService();
+//        Intent serverIntent = new Intent(getActivity(), BtDeviceListActivity.class);
+//        startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE_SECURE);
     }
-
-    private final Handler mHandler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            FragmentActivity activity = getActivity();
-            switch (msg.what) {
-                case Constants.MESSAGE_STATE_CHANGE:
-                    switch (msg.arg1) {
-                        case BluetoothChatService.STATE_CONNECTED:
-//                            setStatus(getString(R.string.title_connected_to, mConnectedDeviceName));
-//                            mConversationArrayAdapter.clear();
-                            break;
-                        case BluetoothChatService.STATE_CONNECTING:
-//                            setStatus(R.string.title_connecting);
-                            break;
-                        case BluetoothChatService.STATE_LISTEN:
-                        case BluetoothChatService.STATE_NONE:
-//                            setStatus(R.string.title_not_connected);
-                            break;
-                    }
-                    break;
-                case Constants.MESSAGE_WRITE:
-//                    byte[] writeBuf = (byte[]) msg.obj;
-//                    // construct a string from the buffer
-//                    String writeMessage = new String(writeBuf);
-//                    mConversationArrayAdapter.add("Me:  " + writeMessage);
-                    break;
-                case Constants.MESSAGE_READ:
-//                    byte[] readBuf = (byte[]) msg.obj;
-//                    // construct a string from the valid bytes in the buffer
-//                    String readMessage = new String(readBuf, 0, msg.arg1);
-//                    mConversationArrayAdapter.add(mConnectedDeviceName + ":  " + readMessage);
-                    break;
-                case Constants.MESSAGE_DEVICE_NAME:
-                    // save the connected device's name
-                    String mConnectedDeviceName = msg.getData().getString(Constants.DEVICE_NAME);
-                    if (null != activity) {
-                        Toast.makeText(activity, "Connected to " + mConnectedDeviceName, Toast.LENGTH_SHORT).show();
-                    }
-                    break;
-                case Constants.MESSAGE_TOAST:
-                    if (null != activity) {
-                        Toast.makeText(activity, msg.getData().getString(Constants.TOAST), Toast.LENGTH_SHORT).show();
-                    }
-                    break;
-            }
-        }
-    };
 
     private void initWifiDirect() {
         Intent serviceIntent = new Intent(mainActivity, RXConnectionFGService.class);
@@ -348,11 +267,111 @@ public class ConnectivityFragment extends BaseFragment implements CompoundButton
         ContextCompat.startForegroundService(mainActivity, serviceIntent);
     }
 
-    private void initHPConnection() {
+    private void initBTService(BluetoothDevice device, boolean secure) {
         Intent serviceIntent = new Intent(mainActivity, RXConnectionFGService.class);
         serviceIntent.putExtra("inputExtra", "start");
-        serviceIntent.putExtra("IsQr", false);
+        serviceIntent.putExtra("IsBle", true);
+        serviceIntent.putExtra("device", device);
+        serviceIntent.putExtra("secure", secure);
         ContextCompat.startForegroundService(mainActivity, serviceIntent);
+    }
+
+    private void initBTService() {
+        Intent serviceIntent = new Intent(mainActivity, RXConnectionFGService.class);
+        serviceIntent.putExtra("inputExtra", "start");
+        serviceIntent.putExtra("IsBle", true);
+        ContextCompat.startForegroundService(mainActivity, serviceIntent);
+    }
+
+    private void initHPConnection() {
+        proceedWithOreoHotSpot();
+    }
+
+    private void settingPermission() {
+        mSettingPermission = true;
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (!Settings.System.canWrite(mainActivity.getApplicationContext())) {
+                mSettingPermission = false;
+                Intent intent = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS, Uri.parse("package:" + mainActivity.getPackageName()));
+                startActivityForResult(intent, AppConstants.MY_PERMISSIONS_MANAGE_WRITE_SETTINGS);
+            }
+        }
+    }
+
+    private void locationsPermission() {
+        mLocationPermission = true;
+        if (ContextCompat.checkSelfPermission(mainActivity, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            mLocationPermission = false;
+            if (ActivityCompat.shouldShowRequestPermissionRationale(mainActivity, Manifest.permission.ACCESS_COARSE_LOCATION)) {
+                // Show an explanation to the user *asynchronously* -- don't block
+                // this thread waiting for the user's response! After the user
+                // sees the explanation, try again to request the permission.
+            } else {
+                requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, AppConstants.MY_PERMISSIONS_REQUEST_ACCESS_COARSE_LOCATION);
+            }
+        }
+    }
+
+    private void openHotSpotDialog() {
+        DialogUtils.showHotSpotDialog(mainActivity, (dialog, which) -> startHotSpot(), (dialog, which) -> stopHotSpot());
+    }
+
+    private void startHotSpot() {
+        Intent intent = new Intent(AppConstants.ACTION_HOTSPOT_TURNON);
+        StaticUtils.sendImplicitBroadcast(mainActivity, intent);
+    }
+
+    private void stopHotSpot() {
+        Intent intent = new Intent(AppConstants.ACTION_HOTSPOT_TURNOFF);
+        StaticUtils.sendImplicitBroadcast(mainActivity, intent);
+    }
+
+    private void proceedWithOreoHotSpot() {
+        settingPermission();
+        locationsPermission();
+        if (mLocationPermission && mSettingPermission) openHotSpotDialog();
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_ENABLE_BT)
+            if (resultCode == Activity.RESULT_OK) {
+                fragmentConnectivityBinding.switchBluetooth.setChecked(mBluetoothAdapter.isEnabled());
+            } else fragmentConnectivityBinding.switchBluetooth.setChecked(false);
+        else if (requestCode == REQUEST_CONNECT_DEVICE_INSECURE) {
+            if (resultCode == Activity.RESULT_OK) {
+                connectDevice(data, true);
+            }
+        } else if (requestCode == REQUEST_CONNECT_DEVICE_SECURE) {
+            if (resultCode == Activity.RESULT_OK) {
+                connectDevice(data, false);
+            }
+        } else if (requestCode == AppConstants.MY_PERMISSIONS_MANAGE_WRITE_SETTINGS) {
+            if (resultCode == Activity.RESULT_OK) {
+                mSettingPermission = true;
+                if (!mLocationPermission) locationsPermission();
+            } else {
+                proceedWithOreoHotSpot();
+            }
+        } else if (requestCode == AppConstants.MY_PERMISSIONS_REQUEST_ACCESS_COARSE_LOCATION) {
+            if (resultCode == Activity.RESULT_OK) {
+                mLocationPermission = true;
+                if (!mSettingPermission) settingPermission();
+            } else {
+                proceedWithOreoHotSpot();
+            }
+        }
+        checkForControlsEnable();
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == AppConstants.MY_PERMISSIONS_REQUEST_ACCESS_COARSE_LOCATION) {
+            locationsPermission();
+        }
     }
 
     @Override

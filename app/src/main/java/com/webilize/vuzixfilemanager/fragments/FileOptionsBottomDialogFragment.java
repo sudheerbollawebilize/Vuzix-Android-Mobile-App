@@ -87,6 +87,7 @@ public class FileOptionsBottomDialogFragment extends BottomSheetDialogFragment i
             fragmentFileOptionsBinding.txtRemoveBookMark.setVisibility(View.GONE);
             fragmentFileOptionsBinding.txtBookMark.setVisibility(View.GONE);
         }
+        fragmentFileOptionsBinding.txtSendToDeviceBT.setOnClickListener(this);
         fragmentFileOptionsBinding.txtCopy.setOnClickListener(this);
         fragmentFileOptionsBinding.txtDelete.setOnClickListener(this);
         fragmentFileOptionsBinding.txtRename.setOnClickListener(this);

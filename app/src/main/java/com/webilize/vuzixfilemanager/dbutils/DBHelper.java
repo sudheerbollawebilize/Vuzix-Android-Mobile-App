@@ -159,7 +159,7 @@ public class DBHelper {
      * Get list of records in ascending order for each individual table
      */
     @Synchronized
-    public ArrayList<TransferModel> getTransferModelsList() {
+    public ArrayList<TransferModel> getTransferModelsList(boolean isIncoming) {
         boolean showFinished = AppStorage.getInstance(BaseApplication.getInstance()).getValue(AppStorage.SP_SHOW_FINISHED, false);
         ArrayList<TransferModel> arrayList = new ArrayList<>();
         String selectQuery = "";

@@ -3,10 +3,13 @@ package com.webilize.vuzixfilemanager.utils;
 import android.app.Activity;
 import android.content.ClipData;
 import android.content.ClipboardManager;
+import android.content.ComponentName;
 import android.content.ContentUris;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.database.Cursor;
 import android.graphics.Point;
 import android.net.ConnectivityManager;
@@ -30,6 +33,7 @@ import android.webkit.MimeTypeMap;
 import android.widget.Toast;
 
 import androidx.annotation.DrawableRes;
+import androidx.core.content.ContextCompat;
 
 import com.github.mjdev.libaums.fs.UsbFile;
 import com.webilize.transfersdk.wifidirect.direct.WiFiDirectUtils;
@@ -38,6 +42,8 @@ import com.webilize.vuzixfilemanager.R;
 import com.webilize.vuzixfilemanager.dbutils.DBHelper;
 import com.webilize.vuzixfilemanager.models.DeviceFavouritesModel;
 import com.webilize.vuzixfilemanager.models.DeviceModel;
+import com.webilize.vuzixfilemanager.services.HotSpotIntentService;
+import com.webilize.vuzixfilemanager.services.RXConnectionFGService;
 
 import java.io.File;
 import java.net.URLConnection;
@@ -500,6 +506,47 @@ public class StaticUtils {
 
     public static void setConnectionType(String type) {
         connectionType = type;
+    }
+
+    public static void turnOnHotSpot(Context c) {
+        Uri uri = new Uri.Builder().scheme(AppConstants.DATA_SCHEME).authority(AppConstants.DATA_SCHEME_ON).build();
+        showToast(c, "Turn on. Uri: " + uri.toString());
+        Intent i = new Intent(Intent.ACTION_VIEW);
+        i.setData(uri);
+        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//        c.startActivity(i);
+        HotSpotIntentService.start(c, i);
+
+        Intent serviceIntent = new Intent(c, RXConnectionFGService.class);
+        serviceIntent.putExtra("inputExtra", "start");
+        serviceIntent.putExtra("IsQr", false);
+        ContextCompat.startForegroundService(c, serviceIntent);
+
+    }
+
+    public static void turnOffHotSpot(Context c) {
+        Uri uri = new Uri.Builder().scheme(AppConstants.DATA_SCHEME).authority(AppConstants.DATA_SCHEME_OFF).build();
+        showToast(c, "Turn off. Uri: " + uri.toString());
+        Intent i = new Intent(Intent.ACTION_VIEW);
+        i.setData(uri);
+        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//        c.startActivity(i);
+        HotSpotIntentService.start(c, i);
+
+        Intent serviceIntent = new Intent(c, RXConnectionFGService.class);
+        serviceIntent.putExtra("inputExtra", "stop");
+        ContextCompat.startForegroundService(c, serviceIntent);
+    }
+
+    public static void sendImplicitBroadcast(Context ctxt, Intent i) {
+        PackageManager pm = ctxt.getPackageManager();
+        List<ResolveInfo> matches = pm.queryBroadcastReceivers(i, 0);
+        for (ResolveInfo resolveInfo : matches) {
+            Intent explicit = new Intent(i);
+            ComponentName cn = new ComponentName(resolveInfo.activityInfo.applicationInfo.packageName, resolveInfo.activityInfo.name);
+            explicit.setComponent(cn);
+            ctxt.sendBroadcast(explicit);
+        }
     }
 
 }

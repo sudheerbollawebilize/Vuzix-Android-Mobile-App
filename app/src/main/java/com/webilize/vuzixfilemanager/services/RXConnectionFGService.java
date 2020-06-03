@@ -5,6 +5,7 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
 import android.net.wifi.p2p.WifiP2pDevice;
 import android.os.Build;
@@ -14,11 +15,14 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
+import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 
 import com.webilize.transfersdk.Certificate;
 import com.webilize.transfersdk.ConnectionHelper;
 import com.webilize.transfersdk.RXConnection;
+import com.webilize.transfersdk.bluetooth.BluetoothChatService;
+import com.webilize.transfersdk.bluetooth.BluetoothEventsInterface;
 import com.webilize.transfersdk.exceptions.NoPeersFoundException;
 import com.webilize.transfersdk.exceptions.WifiNotConnectedException;
 import com.webilize.transfersdk.exceptions.WifiNotEnabledException;
@@ -46,12 +50,16 @@ import com.webilize.vuzixfilemanager.utils.eventbus.WifiDevicesList;
 import com.webilize.vuzixfilemanager.utils.transferutils.CommunicationProtocol;
 import com.webilize.vuzixfilemanager.utils.transferutils.SocialBladeProtocol;
 
+import org.apache.commons.io.FileUtils;
 import org.greenrobot.eventbus.EventBus;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -106,6 +114,7 @@ public class RXConnectionFGService extends Service implements ConnectionHelper.L
             }
         }
     };
+    private BluetoothChatService bluetoothChatService;
 
     public RXConnectionFGService() {
     }
@@ -170,7 +179,13 @@ public class RXConnectionFGService extends Service implements ConnectionHelper.L
                         initializeHPConnection();
                     }
                 } else if (intent.hasExtra("IsBle")) {
-                    StaticUtils.setConnectionType(AppConstants.CONST_BLUETOOTH);
+                    if (intent.hasExtra("device")) {
+                        BluetoothDevice device = intent.getParcelableExtra("device");
+                        initialiseBTConnection(device, intent.getBooleanExtra("secure", false));
+                        StaticUtils.setConnectionType(AppConstants.CONST_BLUETOOTH);
+                    } else {
+                        initialiseBTConnection();
+                    }
                 } else {
                     StaticUtils.setConnectionType(AppConstants.CONST_WIFI_DIRECT);
                     initializeRXConnection();
@@ -199,10 +214,16 @@ public class RXConnectionFGService extends Service implements ConnectionHelper.L
             } else if (input.equalsIgnoreCase("send")) {
                 if (isAllowNewRequests) {
                     startForeground(1, notification);
-                    if (intent.hasExtra("file"))
-                        sendFileToBlade((File) intent.getSerializableExtra("file"));
+                    if (intent.hasExtra("file")) {
+                        if (intent.hasExtra("bt") && intent.getBooleanExtra("bt", false)) {
+                            sendFileToBladeBt((File) intent.getSerializableExtra("file"));
+                        } else
+                            sendFileToBlade((File) intent.getSerializableExtra("file"));
+                    }
                     if (intent.hasExtra("files"))
-                        sendFileToBlade(intent.getStringArrayExtra("files"));
+                        if (intent.hasExtra("bt") && intent.getBooleanExtra("bt", false)) {
+                            sendFileToBladeBt(intent.getStringArrayExtra("files"));
+                        } else sendFileToBlade(intent.getStringArrayExtra("files"));
                 } else
                     toast("Already another transaction is going on. Please wait till it is done.");
             } else if (input.equalsIgnoreCase("destinationPath")) {
@@ -232,6 +253,91 @@ public class RXConnectionFGService extends Service implements ConnectionHelper.L
             }
         }
         return START_STICKY;
+    }
+
+    private void initialiseBTConnection(BluetoothDevice device, boolean isSecure) {
+        if (bluetoothChatService == null) initialiseBTConnection();
+        bluetoothChatService.connect(device, isSecure);
+    }
+
+    private void initialiseBTConnection() {
+        bluetoothChatService = new BluetoothChatService(this, new BluetoothEventsInterface() {
+            @Override
+            public void onJsonReceived(JSONObject jsonObject) {
+                Log.e(TAG, "json received " + jsonObject.toString());
+            }
+
+            @Override
+            public void onFilesReceived(File file) {
+                Log.e(TAG, "onFilesReceived");
+
+            }
+
+            @Override
+            public void onDataReceived(byte[] data) {
+                Log.e(TAG, "onDataReceived");
+            }
+
+            @Override
+            public void onDataReceived(int data) {
+                Log.e(TAG, "onDataReceived");
+                File dir = new File(AppConstants.homeDirectory+"/Bluetooth");
+                if(!dir.exists()) dir.mkdirs();
+
+                File someFile = new File(dir,"testimg.jpg");
+                FileOutputStream fos = null;
+                try {
+                    fos = new FileOutputStream(someFile);
+                    fos.write(data);
+                    fos.flush();
+                    fos.close();
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onDeviceConnected(String deviceName, @Nullable String macAddress) {
+                Log.e(TAG, "onDeviceConnected" + deviceName);
+            }
+
+            @Override
+            public void onFileSent() {
+                Log.e(TAG, "onFileSent");
+            }
+
+            @Override
+            public void onJsonSent() {
+                Log.e(TAG, "onJsonSent");
+            }
+
+            @Override
+            public void onConnectionFailed(String reason) {
+                Log.e(TAG, "onConnectionFailed " + reason);
+            }
+
+            @Override
+            public void connectionState(int status) {
+                switch (status) {
+                    case BluetoothChatService.STATE_CONNECTED:
+                        toast("Connected");
+                        break;
+                    case BluetoothChatService.STATE_CONNECTING:
+                        toast("Connecting");
+                        break;
+                    case BluetoothChatService.STATE_LISTEN:
+                    case BluetoothChatService.STATE_NONE:
+                        toast("Not Connected");
+                        break;
+                }
+                Log.e(TAG, "connectionState " + status);
+            }
+        });
+        if (bluetoothChatService.getState() == BluetoothChatService.STATE_NONE) {
+            bluetoothChatService.start();
+        }
     }
 
     /**
@@ -607,6 +713,26 @@ public class RXConnectionFGService extends Service implements ConnectionHelper.L
         } catch (Exception e) {
             Log.e(TAG, "onCreateView: ", e);
         }
+    }
+
+    private void sendFileToBladeBt(File file) {
+        try {
+            byte[] bytes = FileUtils.readFileToByteArray(file);
+            bluetoothChatService.writeImg(bytes);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+//        sendFileToBlade(new String[]{file.getAbsolutePath()});
+    }
+
+    private void sendFileToBladeBt(String[] files) {
+//        ArrayList<File> fileArrayList = new ArrayList<>();
+//        for (String filePath : files) {
+//            File file = new File(filePath);
+//            fileArrayList.add(file);
+////            if (file.isFile()) fileSize += file.length();
+//        }
     }
 
     /**

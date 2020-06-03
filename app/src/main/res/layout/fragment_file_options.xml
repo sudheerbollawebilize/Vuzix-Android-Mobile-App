@@ -34,8 +34,25 @@
             android:textColor="@color/colorBlack"
             android:textSize="@dimen/fifteen_sp"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/txtHeading" />
+
+        <com.webilize.vuzixfilemanager.utils.customviews.AppTextView
+            android:id="@+id/txtSendToDeviceBT"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:drawableStart="@drawable/ic_cloud"
+            android:drawablePadding="@dimen/ten_dp"
+            android:gravity="center_vertical"
+            android:padding="@dimen/fifteen_dp"
+            android:text="@string/send_via_bluetooth"
+            android:textColor="@color/colorBlack"
+            android:textSize="@dimen/fifteen_sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/txtSendToDevice" />
 
         <com.webilize.vuzixfilemanager.utils.customviews.AppTextView
             android:id="@+id/txtCopy"
@@ -50,7 +67,7 @@
             android:textSize="@dimen/fifteen_sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/txtSendToDevice" />
+            app:layout_constraintTop_toBottomOf="@id/txtSendToDeviceBT" />
 
         <com.webilize.vuzixfilemanager.utils.customviews.AppTextView
             android:id="@+id/txtRename"

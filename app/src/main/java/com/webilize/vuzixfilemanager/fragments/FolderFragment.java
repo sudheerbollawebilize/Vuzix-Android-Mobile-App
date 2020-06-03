@@ -286,6 +286,15 @@ public class FolderFragment extends BaseFragment implements IClickListener, View
             case R.id.txtRename:
                 performRename();
                 break;
+            case R.id.txtSendToDeviceBT:
+                if (selectedFile.file.isFile()) {
+                    mainActivity.sendFileToBladeBT(selectedFile.file);
+                } else {
+                    if (selectedFile.file.list() != null && selectedFile.file.list().length > 0) {
+                        mainActivity.sendFilesToBladeBT(selectedFile.file.list());
+                    } else StaticUtils.showToast(mainActivity, "No files in the folder.");
+                }
+                break;
             case R.id.txtSendToDevice:
                 if (selectedFile.file.isFile()) {
                     mainActivity.sendFileToBlade(selectedFile.file);
