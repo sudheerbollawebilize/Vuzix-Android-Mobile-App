@@ -43,12 +43,10 @@ public class TransfersAdapter extends RecyclerView.Adapter<TransfersAdapter.Devi
     public void onBindViewHolder(@NonNull DevicesViewHolder fileFoldersViewHolder, int position) {
         TransferModel transferModel = transferModelArrayList.get(position);
         fileFoldersViewHolder.itemFolderBinding.txtFileName.setText(transferModel.name);
-        fileFoldersViewHolder.itemFolderBinding.txtIsIncoming.setText(transferModel.isIncoming ? "Incoming" : "Outgoing");
+//        fileFoldersViewHolder.itemFolderBinding.txtIsIncoming.setText(transferModel.isIncoming ? "Incoming" : "Outgoing");
         if (transferModel.isIncoming) {
             fileFoldersViewHolder.itemFolderBinding.imgFileSmall.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_incoming));
-            fileFoldersViewHolder.itemFolderBinding.txtIsIncoming.setText(R.string.incoming);
         } else {
-            fileFoldersViewHolder.itemFolderBinding.txtIsIncoming.setText(R.string.outgoing);
             fileFoldersViewHolder.itemFolderBinding.imgFileSmall.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_outgoing));
         }
         fileFoldersViewHolder.itemFolderBinding.imgStatus.setImageDrawable(getStatus(transferModel.status));

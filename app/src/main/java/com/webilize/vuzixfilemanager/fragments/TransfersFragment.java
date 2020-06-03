@@ -6,12 +6,15 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewpager.widget.PagerAdapter;
 
 import com.webilize.vuzixfilemanager.R;
 import com.webilize.vuzixfilemanager.activities.MainActivity;
@@ -245,27 +248,128 @@ public class TransfersFragment extends BaseFragment implements IClickListener, V
         if (transferModelArrayListOutGoing == null)
             transferModelArrayListOutGoing = new ArrayList<>();
         else transferModelArrayListOutGoing.clear();
+        if (transferModelArrayListIncoming == null)
+            transferModelArrayListIncoming = new ArrayList<>();
+        else transferModelArrayListIncoming.clear();
         transferModelArrayListOutGoing.addAll(dbHelper.getTransferModelsList(false));
-        checkForVisibility();
+        transferModelArrayListIncoming.addAll(dbHelper.getTransferModelsList(true));
         setAdapter();
     }
 
-    private void setAdapter() {
-        fragmentTransfersBinding.recyclerView.addItemDecoration(new DividerItemDecoration(mainActivity, DividerItemDecoration.VERTICAL_LIST));
-        fragmentTransfersBinding.recyclerView.setLayoutManager(new LinearLayoutManager(mainActivity));
-        transfersAdapter = new TransfersAdapter(mainActivity, transferModelArrayListOutGoing, this);
-        fragmentTransfersBinding.recyclerView.setAdapter(transfersAdapter);
-    }
 
-    private void checkForVisibility() {
-        if (transferModelArrayListOutGoing == null || transferModelArrayListOutGoing.isEmpty()) {
-            fragmentTransfersBinding.txtNoDataFound.setVisibility(View.VISIBLE);
-            fragmentTransfersBinding.recyclerView.setVisibility(View.GONE);
-        } else {
-            fragmentTransfersBinding.txtNoDataFound.setVisibility(View.GONE);
-            fragmentTransfersBinding.recyclerView.setVisibility(View.VISIBLE);
+    public class TransfersPagerAdapter extends PagerAdapter {
+
+        private Context mContext;
+        RecyclerView recyclerView;
+        TextView txtNoDataFound;
+
+        public TransfersPagerAdapter(Context context) {
+            mContext = context;
         }
 
+        @NonNull
+        @Override
+        public Object instantiateItem(@NonNull ViewGroup collection, int position) {
+            LayoutInflater inflater = LayoutInflater.from(mContext);
+            ViewGroup layout = (ViewGroup) inflater.inflate(R.layout.fragment_transfers_list, collection, false);
+            recyclerView = layout.findViewById(R.id.recyclerView);
+            txtNoDataFound = layout.findViewById(R.id.txtNoDataFound);
+            if (position == 0) {
+                recyclerView.addItemDecoration(new DividerItemDecoration(mainActivity, DividerItemDecoration.VERTICAL_LIST));
+                recyclerView.setLayoutManager(new LinearLayoutManager(mainActivity));
+                transfersAdapter = new TransfersAdapter(mainActivity, transferModelArrayListIncoming, new IClickListener() {
+                    @Override
+                    public void onClick(View view, int position) {
+                        selectedFile = transferModelArrayListIncoming.get(position);
+                        switch (view.getId()) {
+                            case R.id.imgMore:
+                                prepareItemPopUpMenu(view, selectedFile);
+                                break;
+                        }
+                    }
+
+                    @Override
+                    public void onLongClick(View view, int position) {
+
+                    }
+                });
+                recyclerView.setAdapter(transfersAdapter);
+                checkForVisibility(true);
+            } else {
+                recyclerView.addItemDecoration(new DividerItemDecoration(mainActivity, DividerItemDecoration.VERTICAL_LIST));
+                recyclerView.setLayoutManager(new LinearLayoutManager(mainActivity));
+                transfersAdapter = new TransfersAdapter(mainActivity, transferModelArrayListOutGoing, new IClickListener() {
+                    @Override
+                    public void onClick(View view, int position) {
+                        selectedFile = transferModelArrayListOutGoing.get(position);
+                        switch (view.getId()) {
+                            case R.id.imgMore:
+                                prepareItemPopUpMenu(view, selectedFile);
+                                break;
+                        }
+                    }
+
+                    @Override
+                    public void onLongClick(View view, int position) {
+
+                    }
+                });
+                recyclerView.setAdapter(transfersAdapter);
+                checkForVisibility(false);
+            }
+            collection.addView(layout);
+            return layout;
+        }
+
+        @Override
+        public void destroyItem(ViewGroup collection, int position, Object view) {
+            collection.removeView((View) view);
+        }
+
+        @Override
+        public int getCount() {
+            return 2;
+        }
+
+        @Override
+        public boolean isViewFromObject(View view, Object object) {
+            return view == object;
+        }
+
+        @Override
+        public CharSequence getPageTitle(int position) {
+            if (position == 0) {
+                return getString(R.string.incoming);
+            } else {
+                return getString(R.string.outgoing);
+            }
+        }
+
+        private void checkForVisibility(boolean isIncoming) {
+            if (isIncoming) {
+                if (transferModelArrayListOutGoing == null || transferModelArrayListOutGoing.isEmpty()) {
+                    txtNoDataFound.setVisibility(View.VISIBLE);
+                    recyclerView.setVisibility(View.GONE);
+                } else {
+                    txtNoDataFound.setVisibility(View.GONE);
+                    recyclerView.setVisibility(View.VISIBLE);
+                }
+            } else {
+                if (transferModelArrayListIncoming == null || transferModelArrayListIncoming.isEmpty()) {
+                    txtNoDataFound.setVisibility(View.VISIBLE);
+                    recyclerView.setVisibility(View.GONE);
+                } else {
+                    txtNoDataFound.setVisibility(View.GONE);
+                    recyclerView.setVisibility(View.VISIBLE);
+                }
+            }
+        }
+
+    }
+
+    private void setAdapter() {
+        fragmentTransfersBinding.viewPager.setAdapter(new TransfersPagerAdapter(mainActivity));
+        fragmentTransfersBinding.tabLayout.setupWithViewPager(fragmentTransfersBinding.viewPager);
     }
 
 }

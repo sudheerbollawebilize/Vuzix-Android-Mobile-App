@@ -75,6 +75,7 @@
                 android:layout_below="@id/progressBar"
                 android:layout_toEndOf="@id/imgFileSmall"
                 android:inputType="textNoSuggestions"
+                android:visibility="gone"
                 android:padding="@dimen/five_dp"
                 android:textColor="@color/colorBlack"
                 android:textSize="@dimen/fifteen_sp" />
@@ -84,8 +85,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/progressBar"
-                android:layout_marginStart="@dimen/twenty_five_dp"
-                android:layout_toEndOf="@id/txtIsIncoming"
+                android:layout_toEndOf="@id/imgFileSmall"
                 android:gravity="center_vertical"
                 android:inputType="textNoSuggestions"
                 android:padding="@dimen/five_dp"

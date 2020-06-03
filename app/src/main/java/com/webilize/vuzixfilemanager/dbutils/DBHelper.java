@@ -164,11 +164,24 @@ public class DBHelper {
         ArrayList<TransferModel> arrayList = new ArrayList<>();
         String selectQuery = "";
         if (showFinished) {
-            selectQuery =
-                    "select * FROM " + TableTransferModel.getInstance().TABLE_NAME + " ORDER BY " + TableTransferModel.getInstance().id + " DESC LIMIT 20";
+            if (isIncoming) {
+                selectQuery =
+                        "select * FROM " + TableTransferModel.getInstance().TABLE_NAME + " WHERE " + TableTransferModel.getInstance().isIncoming + "='" + 0 + "'" + " ORDER BY " + TableTransferModel.getInstance().id + " DESC LIMIT 20";
+            } else {
+                selectQuery =
+                        "select * FROM " + TableTransferModel.getInstance().TABLE_NAME + " WHERE " + TableTransferModel.getInstance().isIncoming + "='" + 1 + "'" + " ORDER BY " + TableTransferModel.getInstance().id + " DESC LIMIT 20";
+            }
         } else {
             selectQuery =
-                    "select * FROM " + TableTransferModel.getInstance().TABLE_NAME + " WHERE " + TableTransferModel.getInstance().status + "='" + 0 + "'" + " ORDER BY " + TableTransferModel.getInstance().id + " DESC LIMIT 20";
+                    "select * FROM " + TableTransferModel.getInstance().TABLE_NAME + " WHERE " + TableTransferModel.getInstance().status + "='" + 0 + (isIncoming ? ("' AND " + TableTransferModel.getInstance().isIncoming + "='" + 0 + "'") : "'") + " ORDER BY " + TableTransferModel.getInstance().id + " DESC LIMIT 20";
+
+//            if (isIncoming) {
+//                selectQuery =
+//                        "select * FROM " + TableTransferModel.getInstance().TABLE_NAME + " WHERE " + TableTransferModel.getInstance().status + "='" + 0 + (isIncoming ? ("' AND" + TableTransferModel.getInstance().isIncoming + "='" + 0 + "'") : "'") + " ORDER BY " + TableTransferModel.getInstance().id + " DESC LIMIT 20";
+//            } else {
+//                selectQuery =
+//                        "select * FROM " + TableTransferModel.getInstance().TABLE_NAME + " WHERE " + TableTransferModel.getInstance().status + "='" + 0 + "' AND" + TableTransferModel.getInstance().isIncoming + "='" + 1 + "'" + " ORDER BY " + TableTransferModel.getInstance().id + " DESC LIMIT 20";
+//            }
         }
         databaseHandler.getReadableDatabase();
         Cursor cursor = databaseHandler.selectData(selectQuery, true);
