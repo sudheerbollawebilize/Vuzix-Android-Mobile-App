@@ -301,7 +301,6 @@ public class RXConnection {
                         } else {
                             return (new DataWrapper(SocketState.DISCONNECTED, null));
                         }
-
                     } else {
                         byte[] typeBytes = buffer.toByteArray();
                         switch (typeBytes[0]) {
@@ -324,9 +323,7 @@ public class RXConnection {
                                 JSONObject jsonObject = jsonStrategy.read();
 
                                 return new DataWrapper(SocketState.JSON_RECEIVED, jsonObject);
-
                             case Protocol.MULTIPLE:
-
                                 MultipleFilesReadStrategy multipleFilesReadStrategy = new MultipleFilesReadStrategy.Builder()
                                         .setFolder(folder)
                                         .setInputStream(input)

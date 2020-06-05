@@ -5,16 +5,17 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
 import android.content.Context;
-import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.text.TextUtils;
 import android.util.Log;
 
-import org.apache.commons.io.FileUtils;
+import com.webilize.transfersdk.write.FileWriteStrategy;
+import com.webilize.transfersdk.write.IWriteStrategy;
+
+import org.apache.commons.io.IOUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -68,7 +69,6 @@ public class BluetoothChatService {
 //        mNewState = mState;
 //        mHandler = handler;
 //    }
-
     public BluetoothChatService(Context context, BluetoothEventsInterface bluetoothEventsInterface) {
         mAdapter = BluetoothAdapter.getDefaultAdapter();
         mState = STATE_NONE;
@@ -503,6 +503,8 @@ public class BluetoothChatService {
             while (mState == STATE_CONNECTED) {
                 try {
                     // Read from the InputStream
+//                    (len = bis.read(buffer)) != -1
+//                    allBytes.length
                     bytes = mmInStream.read(buffer);
                     String readMessage = new String(buffer, 0, bytes);
                     if (!TextUtils.isEmpty(readMessage)) {
@@ -513,6 +515,12 @@ public class BluetoothChatService {
                             e.printStackTrace();
                         }
                         if (jsonObject == null) {
+                            try {
+                                byte[] allBytes = IOUtils.toByteArray(mmInStream);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+
                             bluetoothEventsInterface.onDataReceived(bytes);
 //                            mHandler.obtainMessage(Constants.MESSAGE_READ_IMG, bytes, -1, buffer)
 //                                    .sendToTarget();
@@ -549,6 +557,29 @@ public class BluetoothChatService {
             }
         }
 
+        public void writeImg(File file) {
+            try {
+                //            byte[] bytes = FileUtils.readFileToByteArray(file);
+                byte[] buffer;
+//                mmOutStream.write(buffer, 0, buffer.length);
+                IWriteStrategy writeStrategy = new FileWriteStrategy.Builder()
+                        .setFile(file)
+                        .setOutputStream(mmOutStream)
+                        .setBufferedStreams(true)
+                        .build();
+//                if (emitter != null)
+//                    writeStrategy.setEmitter(emitter);
+                writeStrategy.write();
+                bluetoothEventsInterface.onFileSent();
+                // Share the sent message back to the UI Activity
+//                mHandler.obtainMessage(Constants.MESSAGE_WRITE_IMG, -1, -1, buffer).sendToTarget();
+            } catch (IOException e) {
+                Log.e(TAG, "Exception during write", e);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
         public void writeImg(byte[] buffer) {
             try {
                 mmOutStream.write(buffer, 0, buffer.length);
@@ -557,6 +588,8 @@ public class BluetoothChatService {
 //                mHandler.obtainMessage(Constants.MESSAGE_WRITE_IMG, -1, -1, buffer).sendToTarget();
             } catch (IOException e) {
                 Log.e(TAG, "Exception during write", e);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
 

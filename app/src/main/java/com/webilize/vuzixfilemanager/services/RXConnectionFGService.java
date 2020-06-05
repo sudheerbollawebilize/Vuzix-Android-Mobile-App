@@ -245,6 +245,11 @@ public class RXConnectionFGService extends Service implements ConnectionHelper.L
             } else if (input.equalsIgnoreCase("stop")) {
                 AppStorage.getInstance(this).setValue(AppStorage.SP_DEVICE_ADDRESS, "");
                 StaticUtils.setConnectionType(AppConstants.CONST_CONNECTION_EMPTY);
+                try {
+                    bluetoothChatService.stop();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
                 stopForeground(true);
                 stopSelf();
             } else if (input.equalsIgnoreCase("stopTransfer")) {
@@ -281,10 +286,10 @@ public class RXConnectionFGService extends Service implements ConnectionHelper.L
             @Override
             public void onDataReceived(int data) {
                 Log.e(TAG, "onDataReceived");
-                File dir = new File(AppConstants.homeDirectory+"/Bluetooth");
-                if(!dir.exists()) dir.mkdirs();
+                File dir = new File(AppConstants.homeDirectory + "/Bluetooth");
+                if (!dir.exists()) dir.mkdirs();
 
-                File someFile = new File(dir,"testimg.jpg");
+                File someFile = new File(dir, "testimg.jpg");
                 FileOutputStream fos = null;
                 try {
                     fos = new FileOutputStream(someFile);
@@ -322,14 +327,14 @@ public class RXConnectionFGService extends Service implements ConnectionHelper.L
             public void connectionState(int status) {
                 switch (status) {
                     case BluetoothChatService.STATE_CONNECTED:
-                        toast("Connected");
+//                        toast("Connected");
                         break;
                     case BluetoothChatService.STATE_CONNECTING:
-                        toast("Connecting");
+//                        toast("Connecting");
                         break;
                     case BluetoothChatService.STATE_LISTEN:
                     case BluetoothChatService.STATE_NONE:
-                        toast("Not Connected");
+//                        toast("Not Connected");
                         break;
                 }
                 Log.e(TAG, "connectionState " + status);
@@ -719,7 +724,7 @@ public class RXConnectionFGService extends Service implements ConnectionHelper.L
         try {
             byte[] bytes = FileUtils.readFileToByteArray(file);
             bluetoothChatService.writeImg(bytes);
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 

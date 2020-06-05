@@ -281,7 +281,7 @@ public class MainActivity extends BaseActivity implements NavigationListener, Vi
         Fragment curr = getCurrentFragment();
         if (curr instanceof FolderFragment && isSelectionTopBar) {
             ((FolderFragment) curr).deselectAll();
-        } else if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
+        } else if (curr instanceof FolderFragment && getSupportFragmentManager().getBackStackEntryCount() > 0) {
             popBackStack();
         } else if (!(curr instanceof FolderFragment) && activityMainBinding.bottomBar.getSelectedItemId() != R.id.navFilesManager) {
             activityMainBinding.bottomBar.setSelectedItemId(R.id.navFilesManager);
