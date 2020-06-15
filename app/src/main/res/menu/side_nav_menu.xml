@@ -2,7 +2,9 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <group android:id="@+id/menuFileTypes">
-        <item android:title="@string/files" />
+       <!-- <item
+            android:icon="@drawable/ic_file"
+            android:title="@string/files" />-->
         <item
             android:id="@+id/menuImages"
             android:icon="@drawable/ic_image"
@@ -15,10 +17,10 @@
             android:id="@+id/menuAudio"
             android:icon="@drawable/ic_music"
             android:title="@string/audio" />
-      <!--  <item
-            android:id="@+id/menuRecent"
-            android:icon="@drawable/ic_recent"
-            android:title="@string/recent" />-->
+        <!--  <item
+              android:id="@+id/menuRecent"
+              android:icon="@drawable/ic_recent"
+              android:title="@string/recent" />-->
     </group>
     <group android:id="@+id/menuDevices">
         <item

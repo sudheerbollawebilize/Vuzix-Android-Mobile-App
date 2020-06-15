@@ -7,11 +7,15 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.graphics.drawable.Drawable;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbManager;
+import android.net.Uri;
 import android.net.wifi.p2p.WifiP2pDevice;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.text.TextUtils;
@@ -25,6 +29,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 import androidx.core.view.GravityCompat;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
@@ -34,6 +39,7 @@ import com.github.mjdev.libaums.UsbMassStorageDevice;
 import com.github.mjdev.libaums.fs.FileSystem;
 import com.github.mjdev.libaums.fs.UsbFile;
 import com.github.mjdev.libaums.fs.UsbFileInputStream;
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.webilize.vuzixfilemanager.BuildConfig;
 import com.webilize.vuzixfilemanager.R;
 import com.webilize.vuzixfilemanager.databinding.ActivityMainBinding;
@@ -47,6 +53,7 @@ import com.webilize.vuzixfilemanager.fragments.TransfersFragment;
 import com.webilize.vuzixfilemanager.interfaces.NavigationListener;
 import com.webilize.vuzixfilemanager.models.BladeItem;
 import com.webilize.vuzixfilemanager.models.FileFolderItem;
+import com.webilize.vuzixfilemanager.models.Memory;
 import com.webilize.vuzixfilemanager.models.TransferModel;
 import com.webilize.vuzixfilemanager.services.RXConnectionFGService;
 import com.webilize.vuzixfilemanager.utils.AppConstants;
@@ -294,6 +301,7 @@ public class MainActivity extends BaseActivity implements NavigationListener, Vi
             updateTitle(viewModel.getCurrentFileFolderItem().file == null ? viewModel.getCurrentFileFolderItem().usbFile.getName() : viewModel.getCurrentFileFolderItem().file.getName());
         } catch (Exception e) {
             e.printStackTrace();
+            FirebaseCrashlytics.getInstance().recordException(e);
         }
     }
 
@@ -358,11 +366,11 @@ public class MainActivity extends BaseActivity implements NavigationListener, Vi
             viewModel.updateAvailableWifiP2PDevices(connectionEvent.wifiP2pDeviceArrayList);
             if ((fragment instanceof ConnectivityFragment)) {
                 ConnectivityFragment connectivityFragment = (ConnectivityFragment) fragment;
-                connectivityFragment.onWifiDevicesListFound();
+                connectivityFragment.onWifiDevicesListFound(connectionEvent.wifiP2pDeviceArrayList);
             }
         } else if ((fragment instanceof ConnectivityFragment)) {
             ConnectivityFragment connectivityFragment = (ConnectivityFragment) fragment;
-            connectivityFragment.onWifiDevicesListFound();
+            connectivityFragment.onWifiDevicesListFound(connectionEvent.wifiP2pDeviceArrayList);
         }
 //            showPickWifiDirectDeviceDialog(connectionEvent.wifiP2pDeviceArrayList);
 //        else {
@@ -396,6 +404,7 @@ public class MainActivity extends BaseActivity implements NavigationListener, Vi
             openQRCode(onTCPInitialized.ip, onTCPInitialized.port);
         } catch (Exception e) {
             e.printStackTrace();
+            FirebaseCrashlytics.getInstance().recordException(e);
         }
     }
 
@@ -412,6 +421,7 @@ public class MainActivity extends BaseActivity implements NavigationListener, Vi
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
+                FirebaseCrashlytics.getInstance().recordException(e);
             }
         }
         if (bladeItemArrayList.isEmpty()) {
@@ -427,33 +437,6 @@ public class MainActivity extends BaseActivity implements NavigationListener, Vi
             qrCodeDialog = new QRCodeDialog(this, R.style.CameraDialog, ip, port);
             qrCodeDialog.show();
         }
-    }
-
-    private void showPickWifiDirectDeviceDialog(final ArrayList<WifiP2pDevice> devices) {
-        List<String> deviceNames = new ArrayList<>();
-        for (WifiP2pDevice device : devices) {
-            deviceNames.add(device.deviceName);
-        }
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Select a device");
-        builder.setItems(deviceNames.toArray(new String[deviceNames.size()]), (dialog, which) -> {
-            connectToWifiDirect(devices.get(which));
-        });
-        builder.setCancelable(false);
-        builder.setPositiveButton("Retry", (dialogInterface, i) -> {
-            dialogInterface.dismiss();
-            activityMainBinding.bottomBar.setSelectedItemId(R.id.navConnectivity);
-        });
-        builder.setNeutralButton(R.string.cancel, (dialogInterface, i) -> {
-            dialogInterface.dismiss();
-        });
-        builder.setNegativeButton("QR Code", (dialogInterface, i) -> {
-            dialogInterface.dismiss();
-            Toast.makeText(this, "Module Under Development", Toast.LENGTH_SHORT).show();
-        });
-        pickGroupDialog = builder.create();
-        pickGroupDialog.show();
     }
 
     public static void stopServiceManually(Context context) {
@@ -478,6 +461,7 @@ public class MainActivity extends BaseActivity implements NavigationListener, Vi
                 op.createNewFile();
             } catch (IOException e) {
                 e.printStackTrace();
+                FirebaseCrashlytics.getInstance().recordException(e);
             }
         }
         CopyTaskParam copyTaskParam = new CopyTaskParam();
@@ -497,6 +481,7 @@ public class MainActivity extends BaseActivity implements NavigationListener, Vi
                     op.createNewFile();
                 } catch (IOException e) {
                     e.printStackTrace();
+                    FirebaseCrashlytics.getInstance().recordException(e);
                 }
             }
             CopyTaskParam copyTaskParam = new CopyTaskParam();
@@ -516,6 +501,7 @@ public class MainActivity extends BaseActivity implements NavigationListener, Vi
                 op.createNewFile();
             } catch (IOException e) {
                 e.printStackTrace();
+                FirebaseCrashlytics.getInstance().recordException(e);
             }
         }
 /*
@@ -545,6 +531,7 @@ public class MainActivity extends BaseActivity implements NavigationListener, Vi
                     op.createNewFile();
                 } catch (IOException e) {
                     e.printStackTrace();
+                    FirebaseCrashlytics.getInstance().recordException(e);
                 }
             }
             CopyTaskParam copyTaskParam = new CopyTaskParam();
@@ -556,30 +543,35 @@ public class MainActivity extends BaseActivity implements NavigationListener, Vi
     }
 
     public void sendFileToBlade(File file) {
-        DialogUtils.showSendFileDialog(this, "Do you want to send file to default folder, or change the Destination?",
-                (dialog, which) -> {
-                    Intent intent = new Intent(this, BladeFoldersActivity.class);
-                    intent.putExtra("inputExtra", "send");
-                    intent.putExtra("file", file);
-                    startActivityForResult(intent, AppConstants.REQUEST_BLADE_FOLDERS);
-                }, (dialog, which) -> {
-                    Intent serviceIntent = new Intent(this, RXConnectionFGService.class);
-                    serviceIntent.putExtra("inputExtra", "send");
-                    serviceIntent.putExtra("file", file);
-                    ContextCompat.startForegroundService(this, serviceIntent);
-                    activityMainBinding.bottomBar.setSelectedItemId(R.id.navTransfers);
-                });
+        if (StaticUtils.getConnectionType().equalsIgnoreCase(AppConstants.CONST_WIFI_DIRECT)) {
+            DialogUtils.showSendFileDialog(this, "Do you want to send file to default folder, or change the Destination?",
+                    (dialog, which) -> {
+                        Intent intent = new Intent(this, BladeFoldersActivity.class);
+                        intent.putExtra("inputExtra", "send");
+                        intent.putExtra("file", file);
+                        startActivityForResult(intent, AppConstants.REQUEST_BLADE_FOLDERS);
+                    }, (dialog, which) -> {
+                        Intent serviceIntent = new Intent(this, RXConnectionFGService.class);
+                        serviceIntent.putExtra("inputExtra", "send");
+                        serviceIntent.putExtra("file", file);
+                        ContextCompat.startForegroundService(this, serviceIntent);
+                        activityMainBinding.bottomBar.setSelectedItemId(R.id.navTransfers);
+                    });
+        } else {
+            DialogUtils.showSendFileDialogBT(this, "Do you want to send the file to Blade?",
+                    (dialog, which) -> {
+                        Intent serviceIntent = new Intent(this, RXConnectionFGService.class);
+                        serviceIntent.putExtra("inputExtra", "send");
+                        serviceIntent.putExtra("file", file);
+                        ContextCompat.startForegroundService(this, serviceIntent);
+                        activityMainBinding.bottomBar.setSelectedItemId(R.id.navTransfers);
+                    });
+        }
     }
 
     public void sendFileToBladeBT(File file) {
-        DialogUtils.showSendFileDialog(this, "Do you want to send file to default folder, or change the Destination?",
+        DialogUtils.showSendFileDialogBT(this, "Send file via Bluetooth?",
                 (dialog, which) -> {
-                    Intent intent = new Intent(this, BladeFoldersActivity.class);
-                    intent.putExtra("inputExtra", "send");
-                    intent.putExtra("bt", true);
-                    intent.putExtra("file", file);
-                    startActivityForResult(intent, AppConstants.REQUEST_BLADE_FOLDERS);
-                }, (dialog, which) -> {
                     Intent serviceIntent = new Intent(this, RXConnectionFGService.class);
                     serviceIntent.putExtra("inputExtra", "send");
                     serviceIntent.putExtra("file", file);
@@ -589,38 +581,73 @@ public class MainActivity extends BaseActivity implements NavigationListener, Vi
                 });
     }
 
+    private void sendFileBT(File file) {
+        Intent i = new Intent();
+        i.setAction(Intent.ACTION_SEND);
+        i.setType("*/*");
+        if (Build.VERSION.SDK_INT >= 24) {
+            i.putExtra(Intent.EXTRA_STREAM, FileProvider.getUriForFile(this, BuildConfig.APPLICATION_ID + ".fileprovider", file));
+        } else i.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(file));
+        PackageManager pm = getPackageManager();
+        List<ResolveInfo> list = pm.queryIntentActivities(i, 0);
+        if (list.size() > 0) {
+            String packageName = null;
+            String className = null;
+            boolean found = false;
+            for (ResolveInfo info : list) {
+                packageName = info.activityInfo.packageName;
+                if (packageName.equals("com.android.bluetooth")) {
+                    className = info.activityInfo.name;
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                Toast.makeText(this, "Bluetooth not been found", Toast.LENGTH_LONG).show();
+            } else {
+                i.setClassName(packageName, className);
+                startActivity(i);
+            }
+        }
+
+    }
+
     public void sendFilesToBlade(String[] files) {
-        DialogUtils.showSendFileDialog(this, "Do you want to send files to default folder, or change the Destination?",
-                (dialog, which) -> {
-                    Intent intent = new Intent(this, BladeFoldersActivity.class);
-                    intent.putExtra("inputExtra", "send");
-                    intent.putExtra("files", files);
-                    startActivityForResult(intent, AppConstants.REQUEST_BLADE_FOLDERS);
-                }, (dialog, which) -> {
-                    Intent serviceIntent = new Intent(this, RXConnectionFGService.class);
-                    serviceIntent.putExtra("inputExtra", "send");
-                    serviceIntent.putExtra("files", files);
-                    ContextCompat.startForegroundService(this, serviceIntent);
-                    activityMainBinding.bottomBar.setSelectedItemId(R.id.navTransfers);
-                });
+        if (StaticUtils.getConnectionType().equalsIgnoreCase(AppConstants.CONST_WIFI_DIRECT)) {
+            DialogUtils.showSendFileDialog(this, "Do you want to send files to default folder, or change the Destination?",
+                    (dialog, which) -> {
+                        Intent intent = new Intent(this, BladeFoldersActivity.class);
+                        intent.putExtra("inputExtra", "send");
+                        intent.putExtra("files", files);
+                        startActivityForResult(intent, AppConstants.REQUEST_BLADE_FOLDERS);
+                    }, (dialog, which) -> {
+                        Intent serviceIntent = new Intent(this, RXConnectionFGService.class);
+                        serviceIntent.putExtra("inputExtra", "send");
+                        serviceIntent.putExtra("files", files);
+                        ContextCompat.startForegroundService(this, serviceIntent);
+                        activityMainBinding.bottomBar.setSelectedItemId(R.id.navTransfers);
+                    });
+        } else {
+            DialogUtils.showSendFileDialogBT(this, "Do you want to send file to Blade?",
+                    (dialog, which) -> {
+                        Intent serviceIntent = new Intent(this, RXConnectionFGService.class);
+                        serviceIntent.putExtra("inputExtra", "send");
+                        serviceIntent.putExtra("files", files);
+                        ContextCompat.startForegroundService(this, serviceIntent);
+                        activityMainBinding.bottomBar.setSelectedItemId(R.id.navTransfers);
+                    });
+        }
     }
 
     public void sendFilesToBladeBT(String[] files) {
-        DialogUtils.showSendFileDialog(this, "Do you want to send files to default folder, or change the Destination?",
-                (dialog, which) -> {
-                    Intent intent = new Intent(this, BladeFoldersActivity.class);
-                    intent.putExtra("inputExtra", "send");
-                    intent.putExtra("bt", true);
-                    intent.putExtra("files", files);
-                    startActivityForResult(intent, AppConstants.REQUEST_BLADE_FOLDERS);
-                }, (dialog, which) -> {
-                    Intent serviceIntent = new Intent(this, RXConnectionFGService.class);
-                    serviceIntent.putExtra("inputExtra", "send");
-                    serviceIntent.putExtra("files", files);
-                    serviceIntent.putExtra("bt", true);
-                    ContextCompat.startForegroundService(this, serviceIntent);
-                    activityMainBinding.bottomBar.setSelectedItemId(R.id.navTransfers);
-                });
+        DialogUtils.showSendFileDialogBT(this, "Send files via Bluetooth?", (dialog, which) -> {
+            Intent serviceIntent = new Intent(this, RXConnectionFGService.class);
+            serviceIntent.putExtra("inputExtra", "send");
+            serviceIntent.putExtra("files", files);
+            serviceIntent.putExtra("bt", true);
+            ContextCompat.startForegroundService(this, serviceIntent);
+            activityMainBinding.bottomBar.setSelectedItemId(R.id.navTransfers);
+        });
     }
 
     public void requestForFolderWOFrag(String folderPath) {
@@ -678,6 +705,7 @@ public class MainActivity extends BaseActivity implements NavigationListener, Vi
             }
         } catch (Exception e) {
             e.printStackTrace();
+            FirebaseCrashlytics.getInstance().recordException(e);
         }
     }
 
@@ -688,6 +716,7 @@ public class MainActivity extends BaseActivity implements NavigationListener, Vi
             activityMainBinding.imgBack.setVisibility(View.VISIBLE);
         } catch (Exception e) {
             e.printStackTrace();
+            FirebaseCrashlytics.getInstance().recordException(e);
         }
     }
 
@@ -746,6 +775,7 @@ public class MainActivity extends BaseActivity implements NavigationListener, Vi
                 activityMainBinding.sideNavigationView.getMenu().add(R.id.menuExternalDevices, counter, counter, device.getManufacturerName() + " " + device.getProductName()).setIcon(folder);
             } catch (Exception e) {
                 e.printStackTrace();
+                FirebaseCrashlytics.getInstance().recordException(e);
             }
         }
     }
@@ -808,7 +838,23 @@ public class MainActivity extends BaseActivity implements NavigationListener, Vi
         activityMainBinding.imgMore.setVisibility(View.VISIBLE);
     }
 
+    Memory internalMemory = null;
+
     private void setUpNavAndTopBar() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            internalMemory = FileUtils.showStorageVolumes(this);
+            if (internalMemory == null) {
+                long totalInternalValue = FileUtils.getTotalInternalMemorySize();
+                long freeInternalValue = FileUtils.getAvailableInternalMemorySize();
+                long usedInternalValue = totalInternalValue - freeInternalValue;
+                internalMemory = new Memory(FileUtils.getFileSize(usedInternalValue), FileUtils.getFileSize(freeInternalValue), FileUtils.getFileSize(totalInternalValue));
+            }
+        } else {
+            long totalInternalValue = FileUtils.getTotalInternalMemorySize();
+            long freeInternalValue = FileUtils.getAvailableInternalMemorySize();
+            long usedInternalValue = totalInternalValue - freeInternalValue;
+            internalMemory = new Memory(FileUtils.getFileSize(usedInternalValue), FileUtils.getFileSize(freeInternalValue), FileUtils.getFileSize(totalInternalValue));
+        }
         setSupportActionBar(activityMainBinding.relTopBar);
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(false);
@@ -833,6 +879,7 @@ public class MainActivity extends BaseActivity implements NavigationListener, Vi
         activityMainBinding.drawerLayout.addDrawerListener(drawerToggle);
         drawerToggle.syncState();
         activityMainBinding.relTopBar.setNavigationIcon(R.drawable.ic_ham_menu);
+//        activityMainBinding.sideNavigationView.getMenu().getItem(4).setTitle(Build.MANUFACTURER + " " + Build.MODEL);
         activityMainBinding.sideNavigationView.setNavigationItemSelectedListener(item -> {
             switch (item.getItemId()) {
                 case R.id.menuImages:
@@ -856,6 +903,7 @@ public class MainActivity extends BaseActivity implements NavigationListener, Vi
 //                    replaceFragment(FolderFragment.newInstance(AppConstants.CONST_RECENT), true);
 //                    break;
                 case R.id.menuInternalStorage:
+                    StaticUtils.showToast(this, "Used: " + internalMemory.getUsedSpace() + " out of " + internalMemory.getTotalSpace() + "\n Available Memory: " + internalMemory.getFreeSpace());
                     clearBackStackCompletely();
                     updateTitle(AppConstants.homeDirectory.getName());
                     replaceFragmentWithoutAnimation(FolderFragment.newInstance(), false);
@@ -880,6 +928,7 @@ public class MainActivity extends BaseActivity implements NavigationListener, Vi
                                 currentFs = device.getPartitions().get(0).getFileSystem();
                             } catch (IOException e) {
                                 e.printStackTrace();
+                                FirebaseCrashlytics.getInstance().recordException(e);
                             }
                         }
                         UsbFile root = currentFs.getRootDirectory();
@@ -962,6 +1011,7 @@ public class MainActivity extends BaseActivity implements NavigationListener, Vi
                 inputStream.close();
             } catch (IOException e) {
                 Log.e(TAG, "error copying!", e);
+                FirebaseCrashlytics.getInstance().recordException(e);
             }
             Log.d(TAG, "copy time: " + (System.currentTimeMillis() - time));
             return null;
@@ -976,6 +1026,7 @@ public class MainActivity extends BaseActivity implements NavigationListener, Vi
                     sendFileToBlade(file);
                 } catch (ActivityNotFoundException e) {
                     e.printStackTrace();
+                    FirebaseCrashlytics.getInstance().recordException(e);
                 }
             } else {
                 StaticUtils.showToast(MainActivity.this, "Copied to Downloads folder.");
@@ -1034,6 +1085,7 @@ public class MainActivity extends BaseActivity implements NavigationListener, Vi
                     inputStream.close();
                 } catch (IOException e) {
                     Log.e(TAG, "error copying!", e);
+                    FirebaseCrashlytics.getInstance().recordException(e);
                 }
                 Log.d(TAG, "copy time: " + (System.currentTimeMillis() - time));
             }
@@ -1057,6 +1109,7 @@ public class MainActivity extends BaseActivity implements NavigationListener, Vi
                     sendFilesToBlade(paths);
                 } catch (ActivityNotFoundException e) {
                     e.printStackTrace();
+                    FirebaseCrashlytics.getInstance().recordException(e);
                 }
             } else {
                 StaticUtils.showToast(MainActivity.this, "Copied files to Downloads folder.");

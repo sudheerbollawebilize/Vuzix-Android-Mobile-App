@@ -14,6 +14,7 @@ public class WiFiDirectUtils {
 
     public static final String SHARED_PREFERENCES_NAME = "TransferSDK";
     public static final String WIFI_DIRECT_DEVICE_NAME = "WF_DIRECT_DEV_NAME";
+    public static final String WIFI_DIRECT_DEVICE_ADDRESS = "WF_DIRECT_DEV_ADDRESS";
     public static final String WIFI_DIRECT_REMOTE_DEVICE_NAME = "WF_DIRECT_REMOTE_DEV_NAME";
 
     private static final String TAG = WiFiDirectUtils.class.getSimpleName();
@@ -22,7 +23,7 @@ public class WiFiDirectUtils {
         wiFiP2PInstance.getWifiP2pManager().clearServiceRequests(wiFiP2PInstance.getChannel(), listener);
     }
 
-    public static void  clearServiceRequest(WiFiP2PInstance wiFiP2PInstance) {
+    public static void clearServiceRequest(WiFiP2PInstance wiFiP2PInstance) {
         clearServiceRequest(wiFiP2PInstance, new WifiP2pManager.ActionListener() {
 
             @Override

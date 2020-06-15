@@ -4,7 +4,6 @@ import android.Manifest;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -14,6 +13,7 @@ import android.net.wifi.p2p.WifiP2pDevice;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,11 +22,11 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.webilize.vuzixfilemanager.R;
 import com.webilize.vuzixfilemanager.activities.BtDeviceListActivity;
 import com.webilize.vuzixfilemanager.activities.MainActivity;
@@ -55,7 +55,6 @@ public class ConnectivityFragment extends BaseFragment implements CompoundButton
     private MainActivity mainActivity;
     private boolean isBluetoothSupported;
     private BluetoothAdapter mBluetoothAdapter;
-    private BluetoothManager bluetoothManager;
     private WifiManager wifiMgr;
     private AvailableDevicesAdapter availableDevicesAdapter, connectedDevicesAdapter;
     private ArrayList<WifiP2pDevice> wifiP2pDeviceArrayList, connectedDevicesArrayList;
@@ -82,22 +81,48 @@ public class ConnectivityFragment extends BaseFragment implements CompoundButton
         if (mBluetoothAdapter.getScanMode() != BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE) {
             Intent discoverableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
             discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300);
-            startActivity(discoverableIntent);
+            startActivityForResult(discoverableIntent, 9);
         }
     }
 
     @Override
     void initComponents() {
+        if (!mLocationPermission) locationsPermission();
+
         wifiP2pDeviceArrayList = new ArrayList<>();
         connectedDevicesArrayList = new ArrayList<>();
         wifiP2pDeviceArrayList.addAll(mainActivity.viewModel.getAvailableWifiP2PDevices());
         connectedDevicesArrayList.addAll(mainActivity.viewModel.getConnectedWifiP2PDevices());
-        bluetoothManager = (BluetoothManager) mainActivity.getSystemService(Context.BLUETOOTH_SERVICE);
         updateBluetoothSwitch();
         updateWifiSwitch();
         setListeners();
         setAdapters();
         checkForControlsEnable();
+        checkForDisconnectButton();
+    }
+
+    private void checkForDisconnectButton() {
+        switch (StaticUtils.getConnectionType()) {
+            case AppConstants.CONST_WIFI_DIRECT:
+            case AppConstants.CONST_CONNECTION_EMPTY:
+                fragmentConnectivityBinding.relDisconnect.setVisibility(View.GONE);
+                fragmentConnectivityBinding.btnDisconnect.setEnabled(false);
+                break;
+            case AppConstants.CONST_QR_CODE:
+            case AppConstants.CONST_BLUETOOTH:
+            case AppConstants.CONST_WIFI_HOTSPOT:
+                String name = StaticUtils.getDeviceName(mainActivity);
+                if (TextUtils.isEmpty(name)) {
+                    fragmentConnectivityBinding.relDisconnect.setVisibility(View.GONE);
+                    fragmentConnectivityBinding.btnDisconnect.setEnabled(false);
+                } else {
+                    fragmentConnectivityBinding.relDisconnect.setVisibility(View.VISIBLE);
+                    fragmentConnectivityBinding.txtConnectedDevice.setText("Connected Device: " + StaticUtils.getDeviceName(mainActivity));
+                    fragmentConnectivityBinding.btnDisconnect.setEnabled(true);
+                }
+                break;
+        }
+//        Log.e("address: ", StaticUtils.getDeviceAddress(mainActivity));
     }
 
     private void setListeners() {
@@ -107,6 +132,7 @@ public class ConnectivityFragment extends BaseFragment implements CompoundButton
         fragmentConnectivityBinding.btnQRCode.setOnClickListener(this);
         fragmentConnectivityBinding.btnScanForBTDevices.setOnClickListener(this);
         fragmentConnectivityBinding.btnHotSpot.setOnClickListener(this);
+        fragmentConnectivityBinding.btnDisconnect.setOnClickListener(this);
     }
 
     private void checkForControlsEnable() {
@@ -215,8 +241,6 @@ public class ConnectivityFragment extends BaseFragment implements CompoundButton
         switch (v.getId()) {
             case R.id.btnScanForDevices:
                 if (!cp.isConnected()) {
-                    if (availableDevicesAdapter != null)
-                        availableDevicesAdapter.notifyDataSetChanged();
                     initWifiDirect();
                     DialogUtils.showProgressDialog(mainActivity, "Looking for devices...", v1 -> {
                         MainActivity.stopServiceManually(mainActivity);
@@ -226,32 +250,45 @@ public class ConnectivityFragment extends BaseFragment implements CompoundButton
                 break;
             case R.id.btnQRCode:
                 if (!cp.isConnected()) {
+                    resetWifiDevices();
                     initQRConnection();
                 } else
                     StaticUtils.showToast(mainActivity, getString(R.string.another_connection_is_active));
                 break;
             case R.id.btnHotSpot:
                 if (!cp.isConnected()) {
-                    initHPConnection();
+                    resetWifiDevices();
+                    proceedWithOreoHotSpot();
                 } else
                     StaticUtils.showToast(mainActivity, getString(R.string.another_connection_is_active));
                 break;
             case R.id.btnScanForBTDevices:
                 if (!cp.isConnected()) {
                     ensureDiscoverable();
-                    initBTConnection();
+//                    initBTConnection();
+                    resetWifiDevices();
                 } else
                     StaticUtils.showToast(mainActivity, getString(R.string.another_connection_is_active));
+                break;
+            case R.id.btnDisconnect:
+                if (cp.isConnected()) {
+                    MainActivity.stopServiceManually(mainActivity);
+                    fragmentConnectivityBinding.btnDisconnect.setEnabled(false);
+                    fragmentConnectivityBinding.linDevice.setVisibility(View.GONE);
+                } else
+                    StaticUtils.showToast(mainActivity, getString(R.string.no_dev_connected));
                 break;
             default:
                 break;
         }
     }
 
-    private void initBTConnection() {
-        initBTService();
-//        Intent serverIntent = new Intent(getActivity(), BtDeviceListActivity.class);
-//        startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE_SECURE);
+    private void resetWifiDevices() {
+        mainActivity.viewModel.clearAllWifiP2PDevices();
+        wifiP2pDeviceArrayList = mainActivity.viewModel.getAvailableWifiP2PDevices();
+        connectedDevicesArrayList = mainActivity.viewModel.getConnectedWifiP2PDevices();
+        setAdapters();
+
     }
 
     private void initWifiDirect() {
@@ -283,10 +320,6 @@ public class ConnectivityFragment extends BaseFragment implements CompoundButton
         ContextCompat.startForegroundService(mainActivity, serviceIntent);
     }
 
-    private void initHPConnection() {
-        proceedWithOreoHotSpot();
-    }
-
     private void settingPermission() {
         mSettingPermission = true;
 
@@ -301,15 +334,10 @@ public class ConnectivityFragment extends BaseFragment implements CompoundButton
 
     private void locationsPermission() {
         mLocationPermission = true;
-        if (ContextCompat.checkSelfPermission(mainActivity, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(mainActivity, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
+                ContextCompat.checkSelfPermission(mainActivity, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             mLocationPermission = false;
-            if (ActivityCompat.shouldShowRequestPermissionRationale(mainActivity, Manifest.permission.ACCESS_COARSE_LOCATION)) {
-                // Show an explanation to the user *asynchronously* -- don't block
-                // this thread waiting for the user's response! After the user
-                // sees the explanation, try again to request the permission.
-            } else {
-                requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, AppConstants.MY_PERMISSIONS_REQUEST_ACCESS_COARSE_LOCATION);
-            }
+            requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION}, AppConstants.MY_PERMISSIONS_REQUEST_ACCESS_COARSE_LOCATION);
         }
     }
 
@@ -362,6 +390,13 @@ public class ConnectivityFragment extends BaseFragment implements CompoundButton
             } else {
                 proceedWithOreoHotSpot();
             }
+        } else if (requestCode == 9) {
+            if (resultCode == 0) {
+                StaticUtils.showToast(mainActivity, "Need to allow for accessing bluetooth.");
+                fragmentConnectivityBinding.btnScanForBTDevices.callOnClick();
+            } else {
+                initBTService();
+            }
         }
         checkForControlsEnable();
     }
@@ -386,9 +421,12 @@ public class ConnectivityFragment extends BaseFragment implements CompoundButton
         super.onStop();
     }
 
-    public void onWifiDevicesListFound() {
-        if (wifiP2pDeviceArrayList != null) wifiP2pDeviceArrayList.clear();
-        wifiP2pDeviceArrayList.addAll(mainActivity.viewModel.getAvailableWifiP2PDevices());
+    public void onWifiDevicesListFound(ArrayList<WifiP2pDevice> wifiP2pDeviceArrayList) {
+        if (this.wifiP2pDeviceArrayList != null) this.wifiP2pDeviceArrayList.clear();
+        this.wifiP2pDeviceArrayList.addAll(wifiP2pDeviceArrayList);
+        if (connectedDevicesArrayList != null) connectedDevicesArrayList.clear();
+        else connectedDevicesArrayList = new ArrayList<>();
+        connectedDevicesArrayList.addAll(mainActivity.viewModel.getConnectedWifiP2PDevices());
         setAdapters();
         DialogUtils.dismissProgressDialog();
     }
@@ -413,22 +451,36 @@ public class ConnectivityFragment extends BaseFragment implements CompoundButton
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onConnectionError(OnConnectionError connectionError) {
+        FirebaseCrashlytics.getInstance().recordException(new Exception("Connection Error"));
         StaticUtils.showToast(mainActivity, "Error connecting to device");
         DialogUtils.dismissProgressDialog();
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onSocketConnected(OnSocketConnected onSocketConnected) {
-        if (onSocketConnected.isWififDirect) {
-            mainActivity.viewModel.updateConnectedWifiP2PDevices(selectedPos);
+        try {
+            if (onSocketConnected.isWififDirect) {
+                fragmentConnectivityBinding.relDisconnect.setVisibility(View.GONE);
+                mainActivity.viewModel.updateConnectedWifiP2PDevices(selectedPos);
+                fragmentConnectivityBinding.btnDisconnect.setEnabled(false);
+            } else {
+                String name = StaticUtils.getDeviceName(mainActivity);
+                if (TextUtils.isEmpty(name)) {
+                    fragmentConnectivityBinding.relDisconnect.setVisibility(View.GONE);
+                    fragmentConnectivityBinding.btnDisconnect.setEnabled(false);
+                } else {
+                    fragmentConnectivityBinding.relDisconnect.setVisibility(View.VISIBLE);
+                    fragmentConnectivityBinding.txtConnectedDevice.setText("Connected Device: " + name);
+                    fragmentConnectivityBinding.btnDisconnect.setEnabled(true);
+                }
+            }
             wifiP2pDeviceArrayList = mainActivity.viewModel.getAvailableWifiP2PDevices();
             connectedDevicesArrayList = mainActivity.viewModel.getConnectedWifiP2PDevices();
             setAdapters();
-        }
-        StaticUtils.showToast(mainActivity, "Connected");
-        fragmentConnectivityBinding.txtConnectionType.setText(StaticUtils.getConnectionType());
-        DialogUtils.dismissProgressDialog();
-        try {
+            StaticUtils.showToast(mainActivity, "Connected");
+            fragmentConnectivityBinding.txtConnectionType.setText(StaticUtils.getConnectionType());
+            DialogUtils.dismissProgressDialog();
+
             if (cp.isConnected()) {
                 fragmentConnectivityBinding.txtDeviceName.setText(StaticUtils.getDeviceName(mainActivity));
                 fragmentConnectivityBinding.btnQRCode.setEnabled(false);
@@ -444,6 +496,7 @@ public class ConnectivityFragment extends BaseFragment implements CompoundButton
             }
         } catch (Exception e) {
             e.printStackTrace();
+            FirebaseCrashlytics.getInstance().recordException(e);
         }
     }
 
@@ -458,16 +511,17 @@ public class ConnectivityFragment extends BaseFragment implements CompoundButton
                 fragmentConnectivityBinding.btnHotSpot.setEnabled(false);
                 fragmentConnectivityBinding.btnScanForBTDevices.setEnabled(false);
             } else {
-                fragmentConnectivityBinding.txtDeviceName.setText("");
+                fragmentConnectivityBinding.txtDeviceName.setText(getString(R.string.no_dev_connected));
                 fragmentConnectivityBinding.btnQRCode.setEnabled(true);
                 fragmentConnectivityBinding.btnScanForDevices.setEnabled(true);
                 fragmentConnectivityBinding.btnHotSpot.setEnabled(true);
                 fragmentConnectivityBinding.btnScanForBTDevices.setEnabled(true);
             }
+            fragmentConnectivityBinding.txtConnectionType.setText(StaticUtils.getConnectionType());
         } catch (Exception e) {
             e.printStackTrace();
+            FirebaseCrashlytics.getInstance().recordException(e);
         }
-        fragmentConnectivityBinding.txtConnectionType.setText(StaticUtils.getConnectionType());
     }
 
     @Override
@@ -479,14 +533,12 @@ public class ConnectivityFragment extends BaseFragment implements CompoundButton
                     connectToWifiDirect(wifiP2pDeviceArrayList.get(position));
                 } else {
                     MainActivity.stopServiceManually(mainActivity);
-                    mainActivity.viewModel.removeConnectedWifiP2PDevices(selectedPos);
-                    wifiP2pDeviceArrayList = mainActivity.viewModel.getAvailableWifiP2PDevices();
-                    connectedDevicesArrayList = mainActivity.viewModel.getConnectedWifiP2PDevices();
-                    setAdapters();
+                    resetWifiDevices();
                 }
             }
         } catch (Exception e) {
             e.printStackTrace();
+            FirebaseCrashlytics.getInstance().recordException(e);
         }
     }
 
@@ -497,6 +549,7 @@ public class ConnectivityFragment extends BaseFragment implements CompoundButton
         ContextCompat.startForegroundService(mainActivity, serviceIntent);
         DialogUtils.showProgressDialog(mainActivity, "Connecting to " + serviceSelected.deviceName + " ...", v1 -> {
             MainActivity.stopServiceManually(mainActivity);
+            resetWifiDevices();
         });
     }
 

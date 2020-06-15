@@ -30,9 +30,9 @@ public class BladeItem implements Parcelable {
         mimeType = StaticUtils.getMimeTypeFromExtension(extension);
         isFolder = jsonObject.optBoolean("isFolder");
         isFavourite = jsonObject.optBoolean("isFavourite");
-        if (isFolder)
+        if (isFolder) {
             fileInfo = size + " files ," + jsonObject.optString("fileInfo");
-        else fileInfo = FileUtils.getFileSize(size) + " " + jsonObject.optString("fileInfo");
+        } else fileInfo = FileUtils.getFileSize(size) + " " + jsonObject.optString("fileInfo");
         if (isSelected) imageRes = R.drawable.ic_select;
         else {
             if (isImageFile())
@@ -41,9 +41,12 @@ public class BladeItem implements Parcelable {
                 imageRes = R.drawable.ic_video;
             else if (isAudioFile())
                 imageRes = R.drawable.ic_music;
-            else if (isFolder)
-                imageRes = R.drawable.ic_folder;
-            else imageRes = R.drawable.ic_file;
+            else if (isFolder) {
+                if (size == 0) {
+                    imageRes = R.drawable.ic_folder_empty;
+                } else
+                    imageRes = R.drawable.ic_folder;
+            } else imageRes = R.drawable.ic_file;
         }
     }
 

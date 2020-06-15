@@ -44,7 +44,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         try {
-            if (oldVersion != DATABASE_VERSION) {
+            if (oldVersion != newVersion) {
                 db.execSQL("DROP TABLE IF EXISTS " + TableTransferModel.getInstance().TABLE_NAME);
                 db.execSQL("DROP TABLE IF EXISTS " + TableDevice.TABLE_NAME);
                 db.execSQL("DROP TABLE IF EXISTS " + TableDeviceFavorites.TABLE_NAME);

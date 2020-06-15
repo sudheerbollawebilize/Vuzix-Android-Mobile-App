@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.res.AssetManager;
 import android.util.Log;
 
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -21,6 +23,7 @@ public class AssetsHelper {
         } catch (IOException e) {
             files = new String[]{};
             Log.e("tag", "Failed to get asset file list.", e);
+            FirebaseCrashlytics.getInstance().recordException(e);
         }
         if (files == null || files.length == 0) return;
         for (String filename : files) {
@@ -51,6 +54,7 @@ public class AssetsHelper {
 
                 } catch (IOException e) {
                     Log.d("tag", "Failed to copy asset file: " + filename, e);
+                    FirebaseCrashlytics.getInstance().recordException(e);
                 }
             }
         }

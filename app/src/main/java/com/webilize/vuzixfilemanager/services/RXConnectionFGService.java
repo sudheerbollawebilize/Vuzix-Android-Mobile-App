@@ -18,6 +18,7 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.webilize.transfersdk.Certificate;
 import com.webilize.transfersdk.ConnectionHelper;
 import com.webilize.transfersdk.RXConnection;
@@ -57,8 +58,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -110,6 +109,7 @@ public class RXConnectionFGService extends Service implements ConnectionHelper.L
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
+                    FirebaseCrashlytics.getInstance().recordException(e);
                 }
             }
         }
@@ -179,10 +179,10 @@ public class RXConnectionFGService extends Service implements ConnectionHelper.L
                         initializeHPConnection();
                     }
                 } else if (intent.hasExtra("IsBle")) {
+                    StaticUtils.setConnectionType(AppConstants.CONST_BLUETOOTH);
                     if (intent.hasExtra("device")) {
                         BluetoothDevice device = intent.getParcelableExtra("device");
                         initialiseBTConnection(device, intent.getBooleanExtra("secure", false));
-                        StaticUtils.setConnectionType(AppConstants.CONST_BLUETOOTH);
                     } else {
                         initialiseBTConnection();
                     }
@@ -246,9 +246,11 @@ public class RXConnectionFGService extends Service implements ConnectionHelper.L
                 AppStorage.getInstance(this).setValue(AppStorage.SP_DEVICE_ADDRESS, "");
                 StaticUtils.setConnectionType(AppConstants.CONST_CONNECTION_EMPTY);
                 try {
-                    bluetoothChatService.stop();
+                    if (bluetoothChatService != null && bluetoothChatService.getState() == BluetoothChatService.STATE_CONNECTED)
+                        bluetoothChatService.stop();
                 } catch (Exception e) {
                     e.printStackTrace();
+                    FirebaseCrashlytics.getInstance().recordException(e);
                 }
                 stopForeground(true);
                 stopSelf();
@@ -273,31 +275,16 @@ public class RXConnectionFGService extends Service implements ConnectionHelper.L
             }
 
             @Override
-            public void onFilesReceived(File file) {
-                Log.e(TAG, "onFilesReceived");
-
-            }
-
-            @Override
             public void onDataReceived(byte[] data) {
                 Log.e(TAG, "onDataReceived");
-            }
-
-            @Override
-            public void onDataReceived(int data) {
-                Log.e(TAG, "onDataReceived");
-                File dir = new File(AppConstants.homeDirectory + "/Bluetooth");
+                File dir = new File(Environment.getExternalStorageDirectory() + "/Bluetooth");
                 if (!dir.exists()) dir.mkdirs();
-
-                File someFile = new File(dir, "testimg.jpg");
-                FileOutputStream fos = null;
+                File someFile = new File(dir, "File_" + System.currentTimeMillis() + ".jpg");
                 try {
-                    fos = new FileOutputStream(someFile);
-                    fos.write(data);
-                    fos.flush();
-                    fos.close();
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
+                    if (someFile.exists()) someFile.delete();
+                    someFile.createNewFile();
+                    FileUtils.writeByteArrayToFile(someFile, data);
+                    android.util.Log.e(TAG, "Done creating");
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -490,7 +477,8 @@ public class RXConnectionFGService extends Service implements ConnectionHelper.L
         } else if (e instanceof WifiP2pConnectionFailed) {
             toast("Connection failed");
             EventBus.getDefault().post(new OnConnectionError());
-        }
+        } else e.printStackTrace();
+        FirebaseCrashlytics.getInstance().recordException(e);
     }
 
     /**
@@ -554,6 +542,16 @@ public class RXConnectionFGService extends Service implements ConnectionHelper.L
         connectionHelper.initialize(this, this, false, true, CommunicationProtocol.DEAULT_PORT);
     }
 
+    private void initializeBTConnection() {
+        if (connectionHelper != null)
+            connectionHelper.destroy(this);
+
+        connectionHelper = new ConnectionHelper();
+        connectionHelper.setForceTCP(true);
+//        toast("Initializing connection...");
+        connectionHelper.initialize(this, this, CommunicationProtocol.DEAULT_PORT, true);
+    }
+
     private void initializeHPConnection() {
         if (connectionHelper != null)
             connectionHelper.destroy(this);
@@ -593,6 +591,7 @@ public class RXConnectionFGService extends Service implements ConnectionHelper.L
                 toast("Connection not available");
             }
         } catch (Exception e) {
+            FirebaseCrashlytics.getInstance().recordException(e);
             Log.e(TAG, "onCreateView: ", e);
         }
     }
@@ -626,7 +625,8 @@ public class RXConnectionFGService extends Service implements ConnectionHelper.L
                 toast("Connection not available");
             }
         } catch (Exception e) {
-            Log.e(TAG, "onCreateView: ", e);
+            e.printStackTrace();
+            FirebaseCrashlytics.getInstance().recordException(e);
         }
     }
 
@@ -679,7 +679,7 @@ public class RXConnectionFGService extends Service implements ConnectionHelper.L
                 long finalFileSize = fileSize;
                 transferModel = new TransferModel();
                 try {
-                    transferModel.name = "File Transfer " + fileArrayList.get(0).getName() + " " + DateUtils.getCurrentDate();
+                    transferModel.name = fileArrayList.get(0).getName() + " " + DateUtils.getCurrentDate();
                     transferModel.progress = 0;
                     transferModel.status = AppConstants.CONST_TRANSFER_ONGOING;
                     transferModel.folderLocation = parentFolderPath;
@@ -689,6 +689,7 @@ public class RXConnectionFGService extends Service implements ConnectionHelper.L
                     EventBus.getDefault().post(new OnProgressUpdated(transferModel));
                 } catch (Exception e) {
                     e.printStackTrace();
+                    FirebaseCrashlytics.getInstance().recordException(e);
                 }
                 sendFilesDisposable = SocialBladeProtocol.sendOriginals(communicationProtocol.getConnection(), fileArrayList, progressObservable)
                         .subscribeOn(Schedulers.io())
@@ -696,7 +697,7 @@ public class RXConnectionFGService extends Service implements ConnectionHelper.L
                         .subscribe(jsonObject -> {
                             isAllowNewRequests = true;
                             toast("Sent files to blade.");
-                            transferModel.name = "Transfer " + fileArrayList.get(0).getName() + " " + DateUtils.getCurrentDate();
+                            transferModel.name = fileArrayList.get(0).getName() + " " + DateUtils.getCurrentDate();
                             transferModel.rawData = getJsonDataForFiles(files);
                             transferModel.status = AppConstants.CONST_TRANSFER_COMPLETED;
                             transferModel.size = finalFileSize;
@@ -716,18 +717,20 @@ public class RXConnectionFGService extends Service implements ConnectionHelper.L
                 toast("Connection not available");
             }
         } catch (Exception e) {
-            Log.e(TAG, "onCreateView: ", e);
+            e.printStackTrace();
+            FirebaseCrashlytics.getInstance().recordException(e);
         }
     }
 
     private void sendFileToBladeBt(File file) {
         try {
             byte[] bytes = FileUtils.readFileToByteArray(file);
+            Log.e("bt file size: ", bytes.length + "");
             bluetoothChatService.writeImg(bytes);
         } catch (Exception e) {
             e.printStackTrace();
+            FirebaseCrashlytics.getInstance().recordException(e);
         }
-
 //        sendFileToBlade(new String[]{file.getAbsolutePath()});
     }
 
@@ -774,7 +777,8 @@ public class RXConnectionFGService extends Service implements ConnectionHelper.L
                 toast("Connection not available");
             }
         } catch (Exception e) {
-            Log.e(TAG, "onCreateView: ", e);
+            e.printStackTrace();
+            FirebaseCrashlytics.getInstance().recordException(e);
         }
     }
 
@@ -795,7 +799,7 @@ public class RXConnectionFGService extends Service implements ConnectionHelper.L
                 toast("Started Fetching Originals from Blade");
                 transferModel = new TransferModel();
                 try {
-                    transferModel.name = "File Transfer " + DateUtils.getCurrentDate();
+                    transferModel.name = "File " + DateUtils.getCurrentDate();
                     transferModel.progress = 0;
                     transferModel.status = AppConstants.CONST_TRANSFER_ONGOING;
                     transferModel.size = size;
@@ -805,6 +809,7 @@ public class RXConnectionFGService extends Service implements ConnectionHelper.L
                     EventBus.getDefault().post(new OnProgressUpdated(transferModel));
                 } catch (Exception e) {
                     e.printStackTrace();
+                    FirebaseCrashlytics.getInstance().recordException(e);
                 }
                 getFilesDisposable = SocialBladeProtocol.requestOriginals(this, communicationProtocol.getConnection(), folderPaths, progressObservable)
                         .subscribeOn(Schedulers.io())
@@ -812,7 +817,7 @@ public class RXConnectionFGService extends Service implements ConnectionHelper.L
                         .subscribe(filesList -> {
                             isAllowNewRequests = true;
                             EventBus.getDefault().post(new OnThumbsReceived(filesList));
-                            transferModel.name = "Transfer " + (filesList.get(0) != null ? filesList.get(0).getName() : "") + " " + DateUtils.getCurrentDate();
+                            transferModel.name = (filesList.get(0) != null ? filesList.get(0).getName() : "") + " " + DateUtils.getCurrentDate();
                             transferModel.rawData = getJsonDataForFiles(filesList);
                             transferModel.status = AppConstants.CONST_TRANSFER_COMPLETED;
                             transferModel.size = getFilesSize(filesList);
@@ -833,7 +838,8 @@ public class RXConnectionFGService extends Service implements ConnectionHelper.L
                 toast("Connection not available");
             }
         } catch (Exception e) {
-            Log.e(TAG, "onCreateView: ", e);
+            e.printStackTrace();
+            FirebaseCrashlytics.getInstance().recordException(e);
         }
     }
 
@@ -866,6 +872,7 @@ public class RXConnectionFGService extends Service implements ConnectionHelper.L
                 jsonObject.put("path", file.getAbsolutePath());
             } catch (JSONException e) {
                 e.printStackTrace();
+                FirebaseCrashlytics.getInstance().recordException(e);
             }
             jsonArray.put(jsonObject);
         }
@@ -887,6 +894,7 @@ public class RXConnectionFGService extends Service implements ConnectionHelper.L
                 jsonObject.put("path", file);
             } catch (JSONException e) {
                 e.printStackTrace();
+                FirebaseCrashlytics.getInstance().recordException(e);
             }
             jsonArray.put(jsonObject);
         }
@@ -894,7 +902,12 @@ public class RXConnectionFGService extends Service implements ConnectionHelper.L
     }
 
     private void toast(String text) {
-        Toast.makeText(this, text, Toast.LENGTH_LONG).show();
+        try {
+            Toast.makeText(this, text, Toast.LENGTH_LONG).show();
+        } catch (Exception e) {
+            e.printStackTrace();
+            FirebaseCrashlytics.getInstance().recordException(e);
+        }
     }
 
 }

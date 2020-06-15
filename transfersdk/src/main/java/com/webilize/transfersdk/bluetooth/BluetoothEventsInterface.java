@@ -10,11 +10,7 @@ public interface BluetoothEventsInterface {
 
     void onJsonReceived(JSONObject jsonObject);
 
-    void onFilesReceived(File file);
-
     void onDataReceived(byte[] data);
-
-    void onDataReceived(int data);
 
     void onDeviceConnected(String deviceName, @Nullable String macAddress);
 

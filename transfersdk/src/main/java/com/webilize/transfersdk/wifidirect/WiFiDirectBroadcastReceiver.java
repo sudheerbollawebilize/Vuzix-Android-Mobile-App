@@ -139,6 +139,7 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
                         Log.d(TAG, "wifiP2pGroup ClientList 0: " + list.get(0).toString());
                         SharedPreferences sp = context.getApplicationContext().getSharedPreferences(WiFiDirectUtils.SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE);
                         sp.edit().putString(WiFiDirectUtils.WIFI_DIRECT_REMOTE_DEVICE_NAME, list.get(0).deviceName).apply();
+                        sp.edit().putString(WiFiDirectUtils.WIFI_DIRECT_DEVICE_ADDRESS, list.get(0).deviceAddress).apply();
                     }
                 } else {
                     WifiP2pDevice owner = wifiP2pGroup.getOwner();
@@ -146,6 +147,7 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
                     if (owner != null) {
                         SharedPreferences sp = context.getApplicationContext().getSharedPreferences(WiFiDirectUtils.SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE);
                         sp.edit().putString(WiFiDirectUtils.WIFI_DIRECT_REMOTE_DEVICE_NAME, owner.deviceName).apply();
+                        sp.edit().putString(WiFiDirectUtils.WIFI_DIRECT_DEVICE_ADDRESS, owner.deviceAddress).apply();
                     }
                 }
             }
@@ -167,6 +169,7 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
             SharedPreferences sp = context.getApplicationContext()
                     .getSharedPreferences(WiFiDirectUtils.SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE);
             sp.edit().putString(WiFiDirectUtils.WIFI_DIRECT_DEVICE_NAME, device.deviceName).apply();
+            sp.edit().putString(WiFiDirectUtils.WIFI_DIRECT_DEVICE_ADDRESS, device.deviceAddress).apply();
         }
     }
 

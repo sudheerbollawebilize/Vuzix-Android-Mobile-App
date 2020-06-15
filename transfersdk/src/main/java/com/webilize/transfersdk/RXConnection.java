@@ -1,5 +1,6 @@
 package com.webilize.transfersdk;
 
+import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.util.Log;
 
@@ -7,6 +8,8 @@ import com.webilize.transfersdk.helpers.StreamHelper;
 import com.webilize.transfersdk.read.FileReadStrategy;
 import com.webilize.transfersdk.read.JsonReadStrategy;
 import com.webilize.transfersdk.read.MultipleFilesReadStrategy;
+import com.webilize.transfersdk.socket.BluetoothClientSocket;
+import com.webilize.transfersdk.socket.BluetoothServerSocket;
 import com.webilize.transfersdk.socket.ClientSocket;
 import com.webilize.transfersdk.socket.DataWrapper;
 import com.webilize.transfersdk.socket.ISocket;
@@ -74,6 +77,14 @@ public class RXConnection {
             }
         }
         return new RXConnection(context, iSocket);
+    }
+
+    public static RXConnection createBTSocket(Context context, BluetoothSocket socketConfig) {
+        return new RXConnection(context, new BluetoothClientSocket(socketConfig));
+    }
+
+    public static RXConnection createBTServerSocket(Context context, android.bluetooth.BluetoothServerSocket socketConfig) {
+        return new RXConnection(context, new BluetoothServerSocket(socketConfig));
     }
 
     public static RXConnection createServerSocket(Context context, SocketConfig socketConfig) {

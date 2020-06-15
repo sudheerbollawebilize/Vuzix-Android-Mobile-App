@@ -12,6 +12,7 @@ import androidx.appcompat.widget.PopupMenu;
 import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.webilize.vuzixfilemanager.R;
 import com.webilize.vuzixfilemanager.activities.BladeFoldersActivity;
 import com.webilize.vuzixfilemanager.adapters.FavouriteFolderAdapter;
@@ -54,6 +55,7 @@ public class BladeFavFolderFragment extends BaseFragment implements IClickListen
             bladeFoldersActivity = (BladeFoldersActivity) context;
         } catch (Exception e) {
             e.printStackTrace();
+            FirebaseCrashlytics.getInstance().recordException(e);
         }
     }
 
@@ -107,6 +109,7 @@ public class BladeFavFolderFragment extends BaseFragment implements IClickListen
             }
         } catch (Exception e) {
             e.printStackTrace();
+            FirebaseCrashlytics.getInstance().recordException(e);
         }
     }
 

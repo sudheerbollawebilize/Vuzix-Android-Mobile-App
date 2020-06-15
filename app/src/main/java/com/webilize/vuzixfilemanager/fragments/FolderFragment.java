@@ -25,6 +25,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.webilize.vuzixfilemanager.BaseApplication;
 import com.webilize.vuzixfilemanager.R;
 import com.webilize.vuzixfilemanager.activities.MainActivity;
@@ -102,6 +103,7 @@ public class FolderFragment extends BaseFragment implements IClickListener, View
                 navigationListener = (NavigationListener) context;
         } catch (Exception e) {
             e.printStackTrace();
+            FirebaseCrashlytics.getInstance().recordException(e);
         }
     }
 
@@ -200,10 +202,11 @@ public class FolderFragment extends BaseFragment implements IClickListener, View
         try {
             if (cp.isConnected()) {
                 folderFragmentBinding.txtDeviceName.setText(StaticUtils.getDeviceName(mainActivity));
-            } else folderFragmentBinding.txtDeviceName.setText("");
+            } else folderFragmentBinding.txtDeviceName.setText(R.string.no_dev_connected);
             folderFragmentBinding.txtConnectionType.setText(StaticUtils.getConnectionType());
         } catch (Exception e) {
             e.printStackTrace();
+            FirebaseCrashlytics.getInstance().recordException(e);
         }
     }
 
@@ -214,6 +217,7 @@ public class FolderFragment extends BaseFragment implements IClickListener, View
             folderFragmentBinding.txtConnectionType.setText(StaticUtils.getConnectionType());
         } catch (Exception e) {
             e.printStackTrace();
+            FirebaseCrashlytics.getInstance().recordException(e);
         }
     }
 

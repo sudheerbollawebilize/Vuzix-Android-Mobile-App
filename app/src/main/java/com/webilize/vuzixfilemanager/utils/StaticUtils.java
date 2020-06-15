@@ -495,6 +495,16 @@ public class StaticUtils {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return context.getString(R.string.no_dev_connected);
+    }
+
+    public static String getDeviceAddress(Context context) {
+        try {
+            SharedPreferences sp = context.getSharedPreferences(WiFiDirectUtils.SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE);
+            return sp.getString(WiFiDirectUtils.WIFI_DIRECT_DEVICE_ADDRESS, "");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return "";
     }
 

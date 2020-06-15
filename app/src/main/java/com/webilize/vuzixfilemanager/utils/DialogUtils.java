@@ -333,6 +333,21 @@ public class DialogUtils {
         alertDialog.show();
     }
 
+    public static void showSendFileDialogBT(Context context, final String message,
+                                          final DialogInterface.OnClickListener proceedClickListener) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setMessage(message);
+        builder.setTitle(context.getString(R.string.app_name));
+        builder.setCancelable(false);
+        builder.setPositiveButton("Send", (dialog, which) -> {
+            proceedClickListener.onClick(dialog, which);
+            dialog.dismiss();
+        });
+        builder.setNeutralButton("Cancel", (dialog, which) -> dialog.dismiss());
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+    }
+
     public static void showHotSpotDialog(Context context, final DialogInterface.OnClickListener onClickListener,
                                          final DialogInterface.OnClickListener offClickListener) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);

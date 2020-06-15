@@ -38,6 +38,9 @@ public class FileFolderItem implements Parcelable {
             name = file.getName();
             size = (file.list() != null ? (file.list().length + " files") : "0 files");
             timeStamp = DateUtils.getDateTimeFromTimeStamp(file.lastModified(), DateUtils.DATE_FORMAT_0);
+            if (size.equalsIgnoreCase("0 files")) {
+                imageRes = R.drawable.ic_folder_empty;
+            } else imageRes = R.drawable.ic_folder;
             fileInfo = size + "\n" + timeStamp;
         }
     }

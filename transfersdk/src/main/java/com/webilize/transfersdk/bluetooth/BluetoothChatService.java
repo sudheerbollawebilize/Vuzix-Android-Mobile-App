@@ -57,6 +57,7 @@ public class BluetoothChatService {
     public static final int STATE_LISTEN = 1;     // now listening for incoming connections
     public static final int STATE_CONNECTING = 2; // now initiating an outgoing connection
     public static final int STATE_CONNECTED = 3;  // now connected to a remote device
+    Context context;
 
     /**
      * Constructor. Prepares a new BluetoothChat session.
@@ -72,6 +73,7 @@ public class BluetoothChatService {
     public BluetoothChatService(Context context, BluetoothEventsInterface bluetoothEventsInterface) {
         mAdapter = BluetoothAdapter.getDefaultAdapter();
         mState = STATE_NONE;
+        this.context = context;
         mNewState = mState;
         this.bluetoothEventsInterface = bluetoothEventsInterface;
     }
@@ -193,6 +195,9 @@ public class BluetoothChatService {
         mConnectedThread = new ConnectedThread(socket, socketType);
         mConnectedThread.start();
 
+//        RXConnection rxConnectionClient = RXConnection.createBTSocket(context, socket);
+//        rxConnectionClient.connect();
+//        Log.e(TAG, "rxConnectionClient: " + rxConnectionClient.isConnected() + "");
         // Send the name of the connected device back to the UI Activity
 //        Message msg = mHandler.obtainMessage(Constants.MESSAGE_DEVICE_NAME);
 //        Bundle bundle = new Bundle();
@@ -325,12 +330,13 @@ public class BluetoothChatService {
             // Create a new listening server socket
             try {
                 if (secure) {
-                    tmp = mAdapter.listenUsingRfcommWithServiceRecord(NAME_SECURE,
-                            MY_UUID_SECURE);
+                    tmp = mAdapter.listenUsingRfcommWithServiceRecord(NAME_SECURE, MY_UUID_SECURE);
                 } else {
-                    tmp = mAdapter.listenUsingInsecureRfcommWithServiceRecord(
-                            NAME_INSECURE, MY_UUID_INSECURE);
+                    tmp = mAdapter.listenUsingInsecureRfcommWithServiceRecord(NAME_INSECURE, MY_UUID_INSECURE);
                 }
+//                RXConnection rxConnectionServerBT = RXConnection.createBTServerSocket(context, tmp);
+//                rxConnectionServerBT.connect();
+//                Log.e(TAG, "rxConnectionServerBT: " + rxConnectionServerBT.isConnected() + "");
             } catch (IOException e) {
                 Log.e(TAG, "Socket Type: " + mSocketType + "listen() failed", e);
             }
@@ -363,8 +369,7 @@ public class BluetoothChatService {
                             case STATE_LISTEN:
                             case STATE_CONNECTING:
                                 // Situation normal. Start the connected thread.
-                                connected(socket, socket.getRemoteDevice(),
-                                        mSocketType);
+                                connected(socket, socket.getRemoteDevice(), mSocketType);
                                 break;
                             case STATE_NONE:
                             case STATE_CONNECTED:
@@ -505,34 +510,11 @@ public class BluetoothChatService {
                     // Read from the InputStream
 //                    (len = bis.read(buffer)) != -1
 //                    allBytes.length
-                    bytes = mmInStream.read(buffer);
-                    String readMessage = new String(buffer, 0, bytes);
-                    if (!TextUtils.isEmpty(readMessage)) {
-                        JSONObject jsonObject = null;
-                        try {
-                            jsonObject = new JSONObject(readMessage);
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                        if (jsonObject == null) {
-                            try {
-                                byte[] allBytes = IOUtils.toByteArray(mmInStream);
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-
-                            bluetoothEventsInterface.onDataReceived(bytes);
-//                            mHandler.obtainMessage(Constants.MESSAGE_READ_IMG, bytes, -1, buffer)
-//                                    .sendToTarget();
-                        } else {
-                            bluetoothEventsInterface.onJsonReceived(jsonObject);
-//                            mHandler.obtainMessage(Constants.MESSAGE_READ_JSON, bytes, -1, buffer)
-//                                    .sendToTarget();
-                        }
+                    if (mmInStream.available() > 0) {
+                        byte[] allbytes = new byte[mmInStream.available()];
+                        int bittt = mmInStream.read(allbytes, 0, mmInStream.available());
+                        bluetoothEventsInterface.onDataReceived(allbytes);
                     }
-                    // Send the obtained bytes to the UI Activity
-//                    mHandler.obtainMessage(Constants.MESSAGE_READ, bytes, -1, buffer)
-//                            .sendToTarget();
                 } catch (IOException e) {
                     Log.e(TAG, "disconnected", e);
                     connectionLost();

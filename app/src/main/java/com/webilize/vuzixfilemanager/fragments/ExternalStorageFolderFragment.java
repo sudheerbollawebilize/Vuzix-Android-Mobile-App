@@ -20,6 +20,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 import com.github.mjdev.libaums.fs.UsbFile;
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.webilize.vuzixfilemanager.BaseApplication;
 import com.webilize.vuzixfilemanager.R;
 import com.webilize.vuzixfilemanager.activities.MainActivity;
@@ -32,8 +33,8 @@ import com.webilize.vuzixfilemanager.utils.AppConstants;
 import com.webilize.vuzixfilemanager.utils.AppStorage;
 import com.webilize.vuzixfilemanager.utils.DialogUtils;
 import com.webilize.vuzixfilemanager.utils.StaticUtils;
-import com.webilize.vuzixfilemanager.utils.transferutils.CommunicationProtocol;
 import com.webilize.vuzixfilemanager.utils.eventbus.OnSocketConnected;
+import com.webilize.vuzixfilemanager.utils.transferutils.CommunicationProtocol;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -74,6 +75,7 @@ public class ExternalStorageFolderFragment extends BaseFragment implements IClic
                 navigationListener = (NavigationListener) context;
         } catch (Exception e) {
             e.printStackTrace();
+            FirebaseCrashlytics.getInstance().recordException(e);
         }
     }
 
@@ -383,10 +385,12 @@ public class ExternalStorageFolderFragment extends BaseFragment implements IClic
         try {
             if (cp.isConnected()) {
                 folderFragmentBinding.txtDeviceName.setText(StaticUtils.getDeviceName(mainActivity));
-            } else folderFragmentBinding.txtDeviceName.setText("");
+            } else folderFragmentBinding.txtDeviceName.setText(R.string.no_dev_connected);
+
             folderFragmentBinding.txtConnectionType.setText(StaticUtils.getConnectionType());
         } catch (Exception e) {
             e.printStackTrace();
+            FirebaseCrashlytics.getInstance().recordException(e);
         }
     }
 
@@ -397,6 +401,7 @@ public class ExternalStorageFolderFragment extends BaseFragment implements IClic
             folderFragmentBinding.txtConnectionType.setText(StaticUtils.getConnectionType());
         } catch (Exception e) {
             e.printStackTrace();
+            FirebaseCrashlytics.getInstance().recordException(e);
         }
     }
 

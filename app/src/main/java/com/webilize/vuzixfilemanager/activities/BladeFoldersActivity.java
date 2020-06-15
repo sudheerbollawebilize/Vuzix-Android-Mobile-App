@@ -7,6 +7,7 @@ import android.view.View;
 import androidx.core.content.ContextCompat;
 import androidx.databinding.DataBindingUtil;
 
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.webilize.vuzixfilemanager.R;
 import com.webilize.vuzixfilemanager.databinding.ActivityBladeFoldersBinding;
 import com.webilize.vuzixfilemanager.fragments.BladeFavFolderFragment;
@@ -91,10 +92,12 @@ public class BladeFoldersActivity extends BaseActivity implements View.OnClickLi
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
+                    FirebaseCrashlytics.getInstance().recordException(e);
                 }
             }
         } catch (Exception e) {
             e.printStackTrace();
+            FirebaseCrashlytics.getInstance().recordException(e);
         }
         if (bladeItemArrayList.isEmpty()) {
             StaticUtils.showToast(this, getString(R.string.folder_is_empty));

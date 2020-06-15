@@ -30,7 +30,7 @@
                     android:paddingStart="@dimen/seven_dp"
                     android:paddingEnd="@dimen/three_dp"
                     android:text="@string/device"
-                    android:textColor="@color/colorBlack"
+                    android:textColor="@color/colorGreyBlack"
                     android:textSize="@dimen/fourteen_sp" />
 
                 <com.webilize.vuzixfilemanager.utils.customviews.AppTextView

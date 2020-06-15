@@ -101,50 +101,6 @@ public class ConnectionHelper {
         initialize(context, listener, false, isServer, port);
     }
 
-    /*public void initialize(Context context, Listener listener, boolean isService, boolean isServer, int port) {
-
-        bag = new CompositeDisposable();
-        wifiDirectConnected = false;
-        findGroupsTry = 0;
-
-        if (!forceTCP && WifiHelper.isWifiDirectSupported(context)) {
-            if (WifiHelper.isEnabled(context)) {
-                wiFiP2PInstance = WiFiP2PInstance.getInstance(context, isService, port);
-                if (!isBroadcastReceiverRegistered) {
-                    wiFiP2PInstance.registerReceiver(context);
-                    isBroadcastReceiverRegistered = true;
-                }
-
-                wiFiP2PInstance.setPeerConnectedListener(ip -> {
-                            wifiDirectConnected = true;
-                            wiFiP2PInstance.setBroadcastListener(null);
-                            startTCPCommunication(context, listener, ip, port, isServer, true);
-                        }
-                );
-
-                //wiFiP2PInstance.initialize();
-
-                if (!isService) {
-                    findWifiDirectDevices(listener);
-                }
-//                getIP(context);
-            } else {
-                listener.onError(new WifiNotEnabledException());
-            }
-        } else {
-            if (WifiHelper.isConnected(context)) {
-                if (isServer) {
-                    startTCPCommunication(context, listener, "", 0, isServer, false);
-                } else {
-                    listener.onTCPClientReady();
-                }
-            } else {
-                getIP(context);
-                listener.onError(new WifiNotConnectedException());
-            }
-        }
-    }
-*/
     public void initialize(Context context, Listener listener, boolean isService, boolean isServer, int port) {
 
         bag = new CompositeDisposable();
@@ -185,16 +141,68 @@ public class ConnectionHelper {
                     listener.onTCPClientReady();
                 }
             } else {
-                if (WifiHelper.isEnabled(context)) {
+                String ip = "";
+                try {
+                    ip = getHostIpAddress();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+//                if (WifiHelper.isEnabled(context)) {
+                if (!TextUtils.isEmpty(ip))
+                    startTCPCommunication(context, listener, ip, port, isServer, false);
+                else listener.onError(new WifiNotConnectedException());
+//                } else
+//                    listener.onError(new WifiNotConnectedException());
+            }
+        }
+    }
+
+    public void initialize(Context context, Listener listener, int port, boolean isBt) {
+        bag = new CompositeDisposable();
+        String ip = "";
+        try {
+            ip = getHostIpAddress();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (!TextUtils.isEmpty(ip))
+            startTCPCommunication(context, listener, ip, port, false, false);
+        else listener.onError(new WifiNotConnectedException());
+    }
+/*
+
+    public void initialize(Context context, Listener listener) {
+
+        bag = new CompositeDisposable();
+        wifiDirectConnected = false;
+        findGroupsTry = 0;
+
+            if (WifiHelper.isConnected(context)) {
+                if (isServer) {
                     String ip = getHostIpAddress();
                     if (!TextUtils.isEmpty(ip))
                         startTCPCommunication(context, listener, ip, port, isServer, false);
                     else listener.onError(new WifiNotConnectedException());
-                } else
-                    listener.onError(new WifiNotConnectedException());
+//                    startTCPCommunication(context, listener, "", port, isServer, false);
+                } else {
+                    listener.onTCPClientReady();
+                }
+            } else {
+                String ip = "";
+                try {
+                    ip = getHostIpAddress();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+//                if (WifiHelper.isEnabled(context)) {
+                if (!TextUtils.isEmpty(ip))
+                    startTCPCommunication(context, listener, ip, port, isServer, false);
+                else listener.onError(new WifiNotConnectedException());
+//                } else
+//                    listener.onError(new WifiNotConnectedException());
             }
-        }
     }
+*/
 
     public static String getHostIpAddress() {
         try {

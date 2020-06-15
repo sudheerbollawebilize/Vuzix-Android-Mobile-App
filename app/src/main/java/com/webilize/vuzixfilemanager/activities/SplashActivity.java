@@ -14,6 +14,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.webilize.vuzixfilemanager.R;
 import com.webilize.vuzixfilemanager.utils.AppConstants;
 import com.webilize.vuzixfilemanager.utils.AppStorage;
@@ -31,6 +32,7 @@ public class SplashActivity extends BaseActivity {
 
     @Override
     void initComponents() {
+//        FirebaseCrashlytics.getInstance().recordException(new Throwable("testing non fatal exceptions"));
         appStorage = AppStorage.getInstance(this);
         if (checkForStoragePermissions()) {
             handler = new Handler();
@@ -45,16 +47,18 @@ public class SplashActivity extends BaseActivity {
     @Override
     protected void onStop() {
         super.onStop();
-        handler.removeCallbacks(runnable);
+        try {
+            if (handler != null && runnable != null) handler.removeCallbacks(runnable);
+        } catch (Exception e) {
+            e.printStackTrace();
+            FirebaseCrashlytics.getInstance().recordException(e);
+        }
     }
 
     private boolean checkForStoragePermissions() {
         boolean firstTime = appStorage.getValue(AppStorage.SP_IS_STORAGE_FIRST_TIME, true);
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                != PackageManager.PERMISSION_GRANTED &&
-                ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
-                        != PackageManager.PERMISSION_GRANTED) {
-
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED &&
+                ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             if (!ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_EXTERNAL_STORAGE)) {
                 if (firstTime) {
                     appStorage.setValue(AppStorage.SP_IS_STORAGE_FIRST_TIME, false);

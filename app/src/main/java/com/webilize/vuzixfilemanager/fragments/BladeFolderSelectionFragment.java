@@ -12,8 +12,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.databinding.DataBindingUtil;
-import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.webilize.vuzixfilemanager.R;
 import com.webilize.vuzixfilemanager.activities.BladeFoldersActivity;
 import com.webilize.vuzixfilemanager.adapters.BladeFileFoldersAdapter;
@@ -22,8 +23,6 @@ import com.webilize.vuzixfilemanager.interfaces.IClickListener;
 import com.webilize.vuzixfilemanager.models.BladeItem;
 import com.webilize.vuzixfilemanager.utils.StaticUtils;
 import com.webilize.vuzixfilemanager.utils.transferutils.CommunicationProtocol;
-
-import org.greenrobot.eventbus.EventBus;
 
 import java.util.ArrayList;
 
@@ -56,6 +55,7 @@ public class BladeFolderSelectionFragment extends BaseFragment implements IClick
             bladeFoldersActivity = (BladeFoldersActivity) context;
         } catch (Exception e) {
             e.printStackTrace();
+            FirebaseCrashlytics.getInstance().recordException(e);
         }
     }
 
@@ -95,6 +95,7 @@ public class BladeFolderSelectionFragment extends BaseFragment implements IClick
             }
         } catch (Exception e) {
             e.printStackTrace();
+            FirebaseCrashlytics.getInstance().recordException(e);
         }
     }
 
@@ -138,7 +139,7 @@ public class BladeFolderSelectionFragment extends BaseFragment implements IClick
     }
 
     private void setRecyclerViewAdapter() {
-        folderFragmentBinding.recyclerView.setLayoutManager(new LinearLayoutManager(bladeFoldersActivity));
+        folderFragmentBinding.recyclerView.setLayoutManager(new StaggeredGridLayoutManager(3, StaggeredGridLayoutManager.VERTICAL));
         fileFoldersAdapter = new BladeFileFoldersAdapter(bladeFoldersActivity, bladeItemArrayList, this);
         folderFragmentBinding.recyclerView.setAdapter(fileFoldersAdapter);
     }

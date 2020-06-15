@@ -1,13 +1,21 @@
 package com.webilize.vuzixfilemanager.utils;
 
+import android.app.usage.StorageStatsManager;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Environment;
+import android.os.StatFs;
+import android.os.storage.StorageManager;
+import android.os.storage.StorageVolume;
 import android.text.TextUtils;
+import android.text.format.Formatter;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 
+import androidx.annotation.RequiresApi;
 import androidx.core.content.FileProvider;
 
 import com.bumptech.glide.Glide;
@@ -17,12 +25,15 @@ import com.bumptech.glide.request.RequestOptions;
 import com.github.mjdev.libaums.fs.UsbFile;
 import com.webilize.vuzixfilemanager.BuildConfig;
 import com.webilize.vuzixfilemanager.R;
+import com.webilize.vuzixfilemanager.models.Memory;
 
 import java.io.File;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.util.Date;
+import java.util.List;
+import java.util.UUID;
 
 public class FileUtils {
 
@@ -329,8 +340,57 @@ public class FileUtils {
         context.startActivity(intent);
     }
 
+    public static long getAvailableInternalMemorySize() {
+        File path = Environment.getDataDirectory();
+       /* File path1 = Environment.getExternalStorageDirectory();
+        StatFs stat1 = new StatFs(path1.getPath());
+        long blockSize1 = stat1.getBlockSizeLong();
+        long availableBlocks1 = stat1.getAvailableBlocksLong();
+        Log.e("ava: ", FileUtils.getFileSize(availableBlocks1 * blockSize1) + "");*/
+        StatFs stat = new StatFs(path.getPath());
+        long blockSize = stat.getBlockSizeLong();
+        long availableBlocks = stat.getAvailableBlocksLong();
+        return availableBlocks * blockSize;
+    }
+
+    public static long getTotalInternalMemorySize() {
+        File path = Environment.getDataDirectory();
+        StatFs stat = new StatFs(path.getPath());
+        long blockSize = stat.getBlockSizeLong();
+        long totalBlocks = stat.getBlockCountLong();
+        return totalBlocks * blockSize;
+    }
+
     public static boolean isAPKFile(String file) {
         return file.toLowerCase().endsWith(".apk");
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    public static Memory showStorageVolumes(Context context) {
+        Memory internalMemory = null;
+        StorageStatsManager storageStatsManager = (StorageStatsManager) context.getSystemService(Context.STORAGE_STATS_SERVICE);
+        StorageManager storageManager = (StorageManager) context.getSystemService(Context.STORAGE_SERVICE);
+        if (storageManager == null || storageStatsManager == null) {
+            return null;
+        }
+        List<StorageVolume> storageVolumes = storageManager.getStorageVolumes();
+        for (StorageVolume storageVolume : storageVolumes) {
+            final String uuidStr = storageVolume.getUuid();
+            final UUID uuid = uuidStr == null ? StorageManager.UUID_DEFAULT : UUID.fromString(uuidStr);
+            try {
+                long free = storageStatsManager.getFreeBytes(uuid);
+                long total = storageStatsManager.getTotalBytes(uuid);
+                Log.d("AppLog", "storage:" + uuid + " : " + storageVolume.getDescription(context) + " : " + storageVolume.getState());
+                Log.d("AppLog", "getFreeBytes:" + Formatter.formatShortFileSize(context, free));
+                Log.d("AppLog", "getTotalBytes:" + Formatter.formatShortFileSize(context, total));
+
+                internalMemory = new Memory(FileUtils.getFileSize(total - free),
+                        Formatter.formatShortFileSize(context, free),
+                        Formatter.formatShortFileSize(context, total));
+            } catch (Exception e) {
+                // IGNORED
+            }
+        }
+        return internalMemory;
+    }
 }

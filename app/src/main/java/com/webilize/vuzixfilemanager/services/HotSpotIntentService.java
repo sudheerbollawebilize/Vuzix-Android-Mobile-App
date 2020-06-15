@@ -17,6 +17,7 @@ import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.webilize.transfersdk.wifidirect.MyOnStartTetheringCallback;
 import com.webilize.transfersdk.wifidirect.MyOreoWifiManager;
 import com.webilize.vuzixfilemanager.R;
@@ -118,6 +119,8 @@ public class HotSpotIntentService extends IntentService {
                         return true;
                     }
                 } catch (Exception e) {
+                    e.printStackTrace();
+                    FirebaseCrashlytics.getInstance().recordException(e);
                     return false;
                 }
             }

@@ -1,7 +1,6 @@
 package com.webilize.vuzixfilemanager.fragments;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,6 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.PagerAdapter;
 
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.webilize.vuzixfilemanager.R;
 import com.webilize.vuzixfilemanager.activities.MainActivity;
 import com.webilize.vuzixfilemanager.adapters.TransfersAdapter;
@@ -65,6 +65,7 @@ public class TransfersFragment extends BaseFragment implements IClickListener, V
             dbHelper = new DBHelper(mainActivity);
         } catch (Exception e) {
             e.printStackTrace();
+            FirebaseCrashlytics.getInstance().recordException(e);
         }
     }
 
@@ -86,10 +87,12 @@ public class TransfersFragment extends BaseFragment implements IClickListener, V
         try {
             if (cp.isConnected()) {
                 fragmentTransfersBinding.txtDeviceName.setText(StaticUtils.getDeviceName(mainActivity));
-            } else fragmentTransfersBinding.txtDeviceName.setText("");
+            } else
+                fragmentTransfersBinding.txtDeviceName.setText(getString(R.string.no_dev_connected));
             fragmentTransfersBinding.txtConnectionType.setText(StaticUtils.getConnectionType());
         } catch (Exception e) {
             e.printStackTrace();
+            FirebaseCrashlytics.getInstance().recordException(e);
         }
     }
 
@@ -110,10 +113,12 @@ public class TransfersFragment extends BaseFragment implements IClickListener, V
 
     @Override
     public void onClick(View view, int position) {
-        selectedFile = transferModelArrayListOutGoing.get(position);
+        if (fragmentTransfersBinding.tabLayout.getSelectedTabPosition() == 0)
+            selectedFile = transferModelArrayListIncoming.get(position);
+        else selectedFile = transferModelArrayListOutGoing.get(position);
         switch (view.getId()) {
             case R.id.imgMore:
-                prepareItemPopUpMenu(view, transferModelArrayListOutGoing.get(position));
+                prepareItemPopUpMenu(view, selectedFile);
                 break;
         }
     }
@@ -127,10 +132,14 @@ public class TransfersFragment extends BaseFragment implements IClickListener, V
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onSocketConnected(OnSocketConnected onSocketConnected) {
         try {
-            fragmentTransfersBinding.txtDeviceName.setText(StaticUtils.getDeviceName(mainActivity));
+            if (cp.isConnected())
+                fragmentTransfersBinding.txtDeviceName.setText(StaticUtils.getDeviceName(mainActivity));
+            else
+                fragmentTransfersBinding.txtDeviceName.setText(getString(R.string.no_dev_connected));
             fragmentTransfersBinding.txtConnectionType.setText(StaticUtils.getConnectionType());
         } catch (Exception e) {
             e.printStackTrace();
+            FirebaseCrashlytics.getInstance().recordException(e);
         }
     }
 
@@ -138,15 +147,27 @@ public class TransfersFragment extends BaseFragment implements IClickListener, V
     public void onProgressUpdated(OnProgressUpdated onProgressUpdated) {
         try {
             if (onProgressUpdated.transferModel != null) {
-                if (transferModelArrayListOutGoing.contains(onProgressUpdated.transferModel)) {
-                    getIndex(onProgressUpdated.transferModel);
+                if (onProgressUpdated.transferModel.isIncoming) {
+                    if (transferModelArrayListIncoming.contains(onProgressUpdated.transferModel)) {
+                        getIndex(true, onProgressUpdated.transferModel);
+                    } else {
+                        transferModelArrayListIncoming.add(0, onProgressUpdated.transferModel);
+                        setAdapter();
+                    }
+                    fragmentTransfersBinding.tabLayout.selectTab(fragmentTransfersBinding.tabLayout.getTabAt(0));
                 } else {
-                    transferModelArrayListOutGoing.add(0, onProgressUpdated.transferModel);
-                    setAdapter();
+                    if (transferModelArrayListOutGoing.contains(onProgressUpdated.transferModel)) {
+                        getIndex(false, onProgressUpdated.transferModel);
+                    } else {
+                        transferModelArrayListOutGoing.add(0, onProgressUpdated.transferModel);
+                        setAdapter();
+                    }
+                    fragmentTransfersBinding.tabLayout.selectTab(fragmentTransfersBinding.tabLayout.getTabAt(1));
                 }
             }
         } catch (Exception e) {
             e.printStackTrace();
+            FirebaseCrashlytics.getInstance().recordException(e);
         }
     }
 
@@ -160,17 +181,29 @@ public class TransfersFragment extends BaseFragment implements IClickListener, V
         }
     }
 
-    private void getIndex(TransferModel transferModel) {
-        if (transferModelArrayListOutGoing != null && !transferModelArrayListOutGoing.isEmpty()) {
-            for (int i = 0; i < transferModelArrayListOutGoing.size(); i++) {
-                if (transferModel.id == transferModelArrayListOutGoing.get(i).id) {
-                    transferModelArrayListOutGoing.set(i, transferModel);
-                    if (transfersAdapter != null) transfersAdapter.notifyItemChanged(i);
-//                    fragmentTransfersBinding.recyclerView.smoothScrollToPosition(i);
-                    return;
+    private void getIndex(boolean isIncoming, TransferModel transferModel) {
+        if (isIncoming) {
+            if (transferModelArrayListIncoming != null && !transferModelArrayListIncoming.isEmpty()) {
+                for (int i = 0; i < transferModelArrayListIncoming.size(); i++) {
+                    if (transferModel.id == transferModelArrayListIncoming.get(i).id) {
+                        transferModelArrayListIncoming.set(i, transferModel);
+                        if (transfersAdapter != null) transfersAdapter.notifyItemChanged(i);
+                        return;
+                    }
                 }
+                getTransfersData();
             }
-            getTransfersData();
+        } else {
+            if (transferModelArrayListOutGoing != null && !transferModelArrayListOutGoing.isEmpty()) {
+                for (int i = 0; i < transferModelArrayListOutGoing.size(); i++) {
+                    if (transferModel.id == transferModelArrayListOutGoing.get(i).id) {
+                        transferModelArrayListOutGoing.set(i, transferModel);
+                        if (transfersAdapter != null) transfersAdapter.notifyItemChanged(i);
+                        return;
+                    }
+                }
+                getTransfersData();
+            }
         }
     }
 
@@ -185,7 +218,7 @@ public class TransfersFragment extends BaseFragment implements IClickListener, V
         popupMenu.setOnMenuItemClickListener(item -> {
             switch (item.getItemId()) {
                 case R.id.menuCancelAllDownloads:
-                    mainActivity.cancelTransfers(getOnGoingTransfers());
+                    mainActivity.cancelTransfers(getOnGoingTransfers(fragmentTransfersBinding.tabLayout.getSelectedTabPosition() == 0));
                     return false;
                 case R.id.menuShowFinished:
                     if (item.isChecked()) item.setChecked(false);
@@ -199,13 +232,22 @@ public class TransfersFragment extends BaseFragment implements IClickListener, V
         });
     }
 
-    private ArrayList<TransferModel> getOnGoingTransfers() {
+    private ArrayList<TransferModel> getOnGoingTransfers(boolean isIncoming) {
         ArrayList<TransferModel> onGoingTransfersArrayList = new ArrayList<>();
-        for (TransferModel transferModel : transferModelArrayListOutGoing) {
-            if (transferModel.status == AppConstants.CONST_TRANSFER_ONGOING) {
-                onGoingTransfersArrayList.add(transferModel);
+        if (isIncoming) {
+            for (TransferModel transferModel : transferModelArrayListIncoming) {
+                if (transferModel.status == AppConstants.CONST_TRANSFER_ONGOING) {
+                    onGoingTransfersArrayList.add(transferModel);
+                }
+            }
+        } else {
+            for (TransferModel transferModel : transferModelArrayListOutGoing) {
+                if (transferModel.status == AppConstants.CONST_TRANSFER_ONGOING) {
+                    onGoingTransfersArrayList.add(transferModel);
+                }
             }
         }
+
         return onGoingTransfersArrayList;
     }
 
@@ -223,13 +265,10 @@ public class TransfersFragment extends BaseFragment implements IClickListener, V
                     mainActivity.open(new FileFolderItem(new File(transferModel.folderLocation)));
                     return false;
                 case R.id.menuRemove:
-                    DialogUtils.showDeleteDialog(mainActivity, getString(R.string.are_you_sure_you_want_to_delete_the_files), new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dbHelper.deleteTransferModel(selectedFile.id + "");
-                            transferModelArrayListOutGoing.remove(selectedFile);
-                            transfersAdapter.notifyDataSetChanged();
-                        }
+                    DialogUtils.showDeleteDialog(mainActivity, getString(R.string.are_you_sure_you_want_to_clear_the_files), getString(R.string.clear), (dialog, which) -> {
+                        dbHelper.deleteTransferModel(selectedFile.id + "");
+                        transferModelArrayListOutGoing.remove(selectedFile);
+                        transfersAdapter.notifyDataSetChanged();
                     });
                     return false;
                 default:

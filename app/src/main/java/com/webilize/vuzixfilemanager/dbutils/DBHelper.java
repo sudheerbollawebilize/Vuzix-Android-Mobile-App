@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.webilize.vuzixfilemanager.BaseApplication;
 import com.webilize.vuzixfilemanager.models.DeviceFavouritesModel;
 import com.webilize.vuzixfilemanager.models.DeviceModel;
@@ -45,6 +46,7 @@ public class DBHelper {
                 return databaseHandler.insertData(TableTransferModel.getInstance().TABLE_NAME, values);
         } catch (Exception e) {
             e.printStackTrace();
+            FirebaseCrashlytics.getInstance().recordException(e);
         }
         return -1;
     }
@@ -66,6 +68,7 @@ public class DBHelper {
                 return databaseHandler.insertData(TableDevice.TABLE_NAME, values);
         } catch (Exception e) {
             e.printStackTrace();
+            FirebaseCrashlytics.getInstance().recordException(e);
         }
         return -1;
     }
@@ -89,6 +92,7 @@ public class DBHelper {
                 return databaseHandler.insertData(TableDeviceFavorites.TABLE_NAME, values);
         } catch (Exception e) {
             e.printStackTrace();
+            FirebaseCrashlytics.getInstance().recordException(e);
         }
         return -1;
     }
@@ -100,7 +104,7 @@ public class DBHelper {
                 "select * FROM " + TableDevice.TABLE_NAME + " WHERE " + TableDevice.macAdrress + "='" + macAddress + "'";
         databaseHandler.getReadableDatabase();
         Cursor cursor = databaseHandler.selectData(selectQuery, true);
-        if (cursor.moveToFirst()) {
+        if (cursor != null && cursor.moveToFirst()) {
             DeviceModel deviceModel = new DeviceModel();
             deviceModel.name = cursor.getString(cursor.getColumnIndex(TableDevice.name));
             deviceModel.deviceAddress = cursor.getString(cursor.getColumnIndex(TableDevice.macAdrress));
@@ -121,7 +125,7 @@ public class DBHelper {
                 "select * FROM " + TableDeviceFavorites.TABLE_NAME + " WHERE " + TableDeviceFavorites.folderPath + "='" + path + "'";
         databaseHandler.getReadableDatabase();
         Cursor cursor = databaseHandler.selectData(selectQuery, true);
-        if (cursor.moveToFirst()) {
+        if (cursor != null && cursor.moveToFirst()) {
             return cursor.getLong(cursor.getColumnIndex(TableDeviceFavorites.id));
         }
         if (!cursor.isClosed()) {
@@ -138,7 +142,7 @@ public class DBHelper {
 
         databaseHandler.getReadableDatabase();
         Cursor cursor = databaseHandler.selectData(selectQuery, true);
-        if (cursor.moveToFirst()) {
+        if (cursor != null && cursor.moveToFirst()) {
             do {
                 DeviceFavouritesModel deviceFavouritesModel = new DeviceFavouritesModel();
                 deviceFavouritesModel.name = cursor.getString(cursor.getColumnIndex(TableDeviceFavorites.name));
@@ -185,7 +189,7 @@ public class DBHelper {
         }
         databaseHandler.getReadableDatabase();
         Cursor cursor = databaseHandler.selectData(selectQuery, true);
-        if (cursor.moveToFirst()) {
+        if (cursor != null && cursor.moveToFirst()) {
             do {
                 TransferModel salesReportsModel = new TransferModel();
                 salesReportsModel.name =
@@ -216,18 +220,23 @@ public class DBHelper {
     @Synchronized
     public ArrayList<Long> getTransferModelsListIds() {
         ArrayList<Long> arrayList = new ArrayList<>();
-        String selectQuery = "";
-        selectQuery =
-                "select * FROM " + TableTransferModel.getInstance().TABLE_NAME + " ORDER BY " + TableTransferModel.getInstance().id + " DESC";
-        databaseHandler.getReadableDatabase();
-        Cursor cursor = databaseHandler.selectData(selectQuery, true);
-        if (cursor.moveToFirst()) {
-            do {
-                arrayList.add(cursor.getLong(cursor.getColumnIndex(TableTransferModel.getInstance().id)));
-            } while (cursor.moveToNext());
-        }
-        if (!cursor.isClosed()) {
-            cursor.close();
+        try {
+            String selectQuery = "";
+            selectQuery =
+                    "select * FROM " + TableTransferModel.getInstance().TABLE_NAME + " ORDER BY " + TableTransferModel.getInstance().id + " DESC";
+            databaseHandler.getReadableDatabase();
+            Cursor cursor = databaseHandler.selectData(selectQuery, true);
+            if (cursor != null && cursor.moveToFirst()) {
+                do {
+                    arrayList.add(cursor.getLong(cursor.getColumnIndex(TableTransferModel.getInstance().id)));
+                } while (cursor.moveToNext());
+            }
+            if (!cursor.isClosed()) {
+                cursor.close();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            FirebaseCrashlytics.getInstance().recordException(e);
         }
         return arrayList;
     }
@@ -279,6 +288,7 @@ public class DBHelper {
             }
         } catch (Exception e) {
             e.printStackTrace();
+            FirebaseCrashlytics.getInstance().recordException(e);
         }
     }
 

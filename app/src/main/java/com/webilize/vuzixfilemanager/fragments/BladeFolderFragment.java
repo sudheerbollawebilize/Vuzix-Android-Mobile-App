@@ -22,6 +22,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.webilize.vuzixfilemanager.BaseApplication;
 import com.webilize.vuzixfilemanager.R;
 import com.webilize.vuzixfilemanager.activities.BladeFoldersActivity;
@@ -93,6 +94,7 @@ public class BladeFolderFragment extends BaseFragment implements IClickListener,
                 navigationListener = (NavigationListener) context;
         } catch (Exception e) {
             e.printStackTrace();
+            FirebaseCrashlytics.getInstance().recordException(e);
         }
     }
 
@@ -176,6 +178,7 @@ public class BladeFolderFragment extends BaseFragment implements IClickListener,
                 }
             } catch (Exception e) {
                 e.printStackTrace();
+                FirebaseCrashlytics.getInstance().recordException(e);
             }
         }
     }
@@ -229,11 +232,12 @@ public class BladeFolderFragment extends BaseFragment implements IClickListener,
             if (cp.isConnected()) {
                 folderFragmentBinding.txtDeviceName.setText(StaticUtils.getDeviceName(mainActivity));
             } else {
-                folderFragmentBinding.txtDeviceName.setText("");
+                folderFragmentBinding.txtDeviceName.setText(R.string.no_dev_connected);
             }
             folderFragmentBinding.txtConnectionType.setText(StaticUtils.getConnectionType());
         } catch (Exception e) {
             e.printStackTrace();
+            FirebaseCrashlytics.getInstance().recordException(e);
         }
     }
 
@@ -245,6 +249,7 @@ public class BladeFolderFragment extends BaseFragment implements IClickListener,
             mainActivity.requestForFolder("");
         } catch (Exception e) {
             e.printStackTrace();
+            FirebaseCrashlytics.getInstance().recordException(e);
         }
     }
 
@@ -401,13 +406,19 @@ public class BladeFolderFragment extends BaseFragment implements IClickListener,
     }
 
     private void showMenuOptions() {
-        if (counter == bladeItemArrayList.size()) {
-            popupMenu.getMenu().getItem(0).setTitle(R.string.de_select_all);
-        } else
-            popupMenu.getMenu().getItem(0).setTitle(R.string.select_all);
-        if (counter > 0) {
-            popupMenu.getMenu().getItem(1).setEnabled(true);
-        } else popupMenu.getMenu().getItem(1).setEnabled(false);
+        if (cp.isConnected()) {
+            if (counter == bladeItemArrayList.size()) {
+                popupMenu.getMenu().getItem(0).setTitle(R.string.de_select_all);
+            } else
+                popupMenu.getMenu().getItem(0).setTitle(R.string.select_all);
+            if (counter > 0) {
+                popupMenu.getMenu().getItem(1).setEnabled(true);
+            } else popupMenu.getMenu().getItem(1).setEnabled(false);
+        } else {
+            popupMenu.getMenu().getItem(0).setEnabled(false);
+            popupMenu.getMenu().getItem(1).setEnabled(false);
+
+        }
         popupMenu.show();
     }
 
@@ -493,23 +504,33 @@ public class BladeFolderFragment extends BaseFragment implements IClickListener,
     }
 
     private void removeBookMark() {
-        DBHelper dbHelper = new DBHelper(mainActivity);
-        dbHelper.deleteDeviceFav(dbHelper.getDeviceFavModel(selectedFile.path));
+        try {
+            DBHelper dbHelper = new DBHelper(mainActivity);
+            dbHelper.deleteDeviceFav(dbHelper.getDeviceFavModel(selectedFile.path));
+        } catch (Exception e) {
+            e.printStackTrace();
+            FirebaseCrashlytics.getInstance().recordException(e);
+        }
     }
 
     private void addBookMark() {
-        String dev = AppStorage.getInstance(mainActivity).getValue(AppStorage.SP_DEVICE_ADDRESS, "");
-        DBHelper dbHelper = new DBHelper(mainActivity);
-        DeviceModel deviceModel = dbHelper.getDeviceModel(dev);
-        if (deviceModel != null && deviceModel.id != -1) {
-            if (!TextUtils.isEmpty(selectedFile.path)) {
-                DeviceFavouritesModel deviceFavouritesModel = new DeviceFavouritesModel();
-                deviceFavouritesModel.deviceId = deviceModel.id;
-                deviceFavouritesModel.isDefault = false;
-                deviceFavouritesModel.path = selectedFile.path;
-                deviceFavouritesModel.name = selectedFile.name;
-                deviceFavouritesModel.id = dbHelper.addDeviceFavouritesModel(deviceFavouritesModel);
+        try {
+            String dev = AppStorage.getInstance(mainActivity).getValue(AppStorage.SP_DEVICE_ADDRESS, "");
+            DBHelper dbHelper = new DBHelper(mainActivity);
+            DeviceModel deviceModel = dbHelper.getDeviceModel(dev);
+            if (deviceModel != null && deviceModel.id != -1) {
+                if (!TextUtils.isEmpty(selectedFile.path)) {
+                    DeviceFavouritesModel deviceFavouritesModel = new DeviceFavouritesModel();
+                    deviceFavouritesModel.deviceId = deviceModel.id;
+                    deviceFavouritesModel.isDefault = false;
+                    deviceFavouritesModel.path = selectedFile.path;
+                    deviceFavouritesModel.name = selectedFile.name;
+                    deviceFavouritesModel.id = dbHelper.addDeviceFavouritesModel(deviceFavouritesModel);
+                }
             }
+        } catch (Exception e) {
+            e.printStackTrace();
+            FirebaseCrashlytics.getInstance().recordException(e);
         }
     }
 

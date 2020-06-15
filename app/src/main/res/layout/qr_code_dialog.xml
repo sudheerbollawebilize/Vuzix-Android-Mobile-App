@@ -14,7 +14,7 @@
         android:cropToPadding="false"
         android:scaleType="centerCrop"
         android:src="@drawable/ic_glasses"
-        android:tint="@color/green"
+        android:tint="@color/colorCyan"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

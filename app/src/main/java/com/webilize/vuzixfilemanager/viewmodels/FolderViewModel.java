@@ -483,6 +483,7 @@ public class FolderViewModel extends AndroidViewModel {
     public void updateAvailableWifiP2PDevices(ArrayList<WifiP2pDevice> newAvailableDevices) {
         if (availableDevices == null) availableDevices = new ArrayList<>();
         else availableDevices.clear();
+        if (newAvailableDevices == null || newAvailableDevices.isEmpty()) return;
         availableDevices.addAll(newAvailableDevices);
     }
 
@@ -498,8 +499,19 @@ public class FolderViewModel extends AndroidViewModel {
         }
     }
 
+    public void clearAllWifiP2PDevices() {
+        if (connectedDevices == null) connectedDevices = new ArrayList<>();
+        else connectedDevices.clear();
+        if (availableDevices == null) availableDevices = new ArrayList<>();
+        else availableDevices.clear();
+    }
+
     public void removeConnectedWifiP2PDevices(int position) {
         if (connectedDevices == null || connectedDevices.isEmpty()) return;
+        if (position == -1) {
+            connectedDevices.clear();
+            return;
+        }
         availableDevices.add(connectedDevices.get(position));
         connectedDevices.remove(connectedDevices.get(position));
     }

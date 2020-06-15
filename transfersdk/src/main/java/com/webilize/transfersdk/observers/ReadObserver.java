@@ -25,7 +25,6 @@ public abstract class ReadObserver extends DisposableObserver<DataWrapper> {
                         onConnected();
                         notifiedConnected = true;
                     }
-
                 }
                 break;
             case DISCONNECTED:

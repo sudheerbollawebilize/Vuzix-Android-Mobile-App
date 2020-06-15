@@ -77,7 +77,7 @@
                 android:inputType="textNoSuggestions"
                 android:visibility="gone"
                 android:padding="@dimen/five_dp"
-                android:textColor="@color/colorBlack"
+                android:textColor="@color/colorGreyBlack"
                 android:textSize="@dimen/fifteen_sp" />
 
             <com.webilize.vuzixfilemanager.utils.customviews.AppTextView
@@ -89,7 +89,7 @@
                 android:gravity="center_vertical"
                 android:inputType="textNoSuggestions"
                 android:padding="@dimen/five_dp"
-                android:textColor="@color/colorBlack"
+                android:textColor="@color/colorGreyBlack"
                 android:textSize="@dimen/fourteen_sp" />
 
         </RelativeLayout>

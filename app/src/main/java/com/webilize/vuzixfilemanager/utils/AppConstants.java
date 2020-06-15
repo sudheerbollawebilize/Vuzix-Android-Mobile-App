@@ -43,7 +43,7 @@ public class AppConstants {
 
     public static final File homeDirectory = Environment.getExternalStorageDirectory();
 
-    public static final String CONST_QR_CODE = "QR COde";
+    public static final String CONST_QR_CODE = "QR Code";
     public static final String CONST_WIFI_HOTSPOT = "Wifi Hotspot";
     public static final String CONST_BLUETOOTH = "Bluetooth";
     public static final String CONST_WIFI_DIRECT = "Wifi Direct";

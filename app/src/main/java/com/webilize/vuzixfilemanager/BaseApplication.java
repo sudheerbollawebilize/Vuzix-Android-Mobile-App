@@ -3,6 +3,7 @@ package com.webilize.vuzixfilemanager;
 import android.app.Application;
 import android.util.Log;
 
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.webilize.vuzixfilemanager.dbutils.DBHelper;
 import com.webilize.vuzixfilemanager.utils.AppStorage;
 import com.webilize.vuzixfilemanager.utils.AssetsHelper;
@@ -44,6 +45,7 @@ public class BaseApplication extends Application {
                 AssetsHelper.copyAssets(getApplicationContext());
             } catch (Exception ex) {
                 Log.d("Asset: ", "Error coping assets ", ex);
+                FirebaseCrashlytics.getInstance().recordException(ex);
             }
         });
         assetsThread.start();
