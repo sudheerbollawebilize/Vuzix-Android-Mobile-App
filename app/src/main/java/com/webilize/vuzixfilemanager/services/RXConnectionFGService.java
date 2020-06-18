@@ -30,6 +30,7 @@ import com.webilize.transfersdk.exceptions.WifiNotEnabledException;
 import com.webilize.transfersdk.exceptions.WifiP2pConnectionFailed;
 import com.webilize.transfersdk.socket.DataWrapper;
 import com.webilize.transfersdk.socket.SocketState;
+import com.webilize.transfersdk.wifidirect.direct.WiFiDirectUtils;
 import com.webilize.vuzixfilemanager.R;
 import com.webilize.vuzixfilemanager.activities.MainActivity;
 import com.webilize.vuzixfilemanager.dbutils.DBHelper;
@@ -390,6 +391,43 @@ public class RXConnectionFGService extends Service implements ConnectionHelper.L
         toast("Connected");
         communicationProtocol.setRXConnection(rxConnection);
         EventBus.getDefault().post(new OnSocketConnected(isWifiDirect));
+        if (!isWifiDirect) {
+            requestForDeviceDetails();
+        }
+    }
+
+    private void requestForDeviceDetails() {
+        try {
+            if (communicationProtocol.isConnected()) {
+//                isAllowNewRequests = false;
+                progressDisposable = progressObservable.subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(progressObserver);
+                Disposable getDeviceDetailsDisposable = SocialBladeProtocol.requestForDeviceDetails(
+                        communicationProtocol.getConnection(), progressObservable).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(jsonObject -> {
+//                            isAllowNewRequests = true;
+                            /*
+                            jsonObject.put("name", "");
+                            jsonObject.put("serialno", "");
+                            jsonObject.put("MacAddress", "");
+                            */
+                            AppStorage.getInstance(this).setValue(WiFiDirectUtils.WIFI_DIRECT_REMOTE_DEVICE_NAME, jsonObject.getString("name"));
+                            AppStorage.getInstance(this).setValue(WiFiDirectUtils.WIFI_DIRECT_DEVICE_ADDRESS, jsonObject.getString("MacAddress"));
+                            AppStorage.getInstance(this).setValue(AppStorage.SP_DEVICE_ADDRESS, jsonObject.getString("MacAddress"));
+                            updateDBWithDetails(jsonObject.getString("name"), jsonObject.getString("MacAddress"));
+                        }, error -> {
+//                            isAllowNewRequests = true;
+                            Log.e(TAG, "fetchThumbnails: ", error);
+                        });
+                communicationProtocol.addDisposable(getDeviceDetailsDisposable);
+            } else {
+                toast("Connection not available");
+            }
+        } catch (Exception e) {
+            FirebaseCrashlytics.getInstance().recordException(e);
+            Log.e(TAG, "onCreateView: ", e);
+        }
     }
 
     /**
@@ -399,6 +437,21 @@ public class RXConnectionFGService extends Service implements ConnectionHelper.L
         deviceModel = new DeviceModel();
         deviceModel.name = serviceSelected.deviceName;
         deviceModel.deviceAddress = serviceSelected.deviceAddress;
+        deviceModel.id = dbHelper.addDeviceModel(deviceModel);
+        if (deviceModel != null && deviceModel.id != -1) {
+            if (dbHelper.getDeviceFavouritesModelArrayList(deviceModel.id).isEmpty()) {
+                addDeviceFavModel(Environment.DIRECTORY_DOCUMENTS, false);
+                addDeviceFavModel(Environment.DIRECTORY_DCIM, false);
+                addDeviceFavModel(Environment.DIRECTORY_DOWNLOADS, false);
+                addDeviceFavModel(Environment.DIRECTORY_DOWNLOADS + "/FileManager", true);
+            }
+        }
+    }
+
+    private void updateDBWithDetails(String name, String deviceAddress) {
+        deviceModel = new DeviceModel();
+        deviceModel.name = name;
+        deviceModel.deviceAddress = deviceAddress;
         deviceModel.id = dbHelper.addDeviceModel(deviceModel);
         if (deviceModel != null && deviceModel.id != -1) {
             if (dbHelper.getDeviceFavouritesModelArrayList(deviceModel.id).isEmpty()) {
@@ -540,16 +593,6 @@ public class RXConnectionFGService extends Service implements ConnectionHelper.L
         connectionHelper.setForceTCP(true);
         toast("Initializing connection...");
         connectionHelper.initialize(this, this, false, true, CommunicationProtocol.DEAULT_PORT);
-    }
-
-    private void initializeBTConnection() {
-        if (connectionHelper != null)
-            connectionHelper.destroy(this);
-
-        connectionHelper = new ConnectionHelper();
-        connectionHelper.setForceTCP(true);
-//        toast("Initializing connection...");
-        connectionHelper.initialize(this, this, CommunicationProtocol.DEAULT_PORT, true);
     }
 
     private void initializeHPConnection() {

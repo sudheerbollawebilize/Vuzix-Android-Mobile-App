@@ -155,19 +155,15 @@ public class FileUtils {
     }
 
     public static boolean isWord(String name) {
-        return name.toLowerCase().endsWith(".doc") ||
-                name.toLowerCase().endsWith(".docx");
+        return name.toLowerCase().endsWith(".doc") || name.toLowerCase().endsWith(".docx");
     }
 
     public static boolean isSpreadSheet(String name) {
-        return name.toLowerCase().endsWith(".ppt")
-                || name.toLowerCase().endsWith(".pptx");
+        return name.toLowerCase().endsWith(".xls") || name.toLowerCase().endsWith(".xlsx") || name.toLowerCase().endsWith(".xlw") || name.toLowerCase().endsWith(".xlt");
     }
 
     public static boolean isPresentation(String name) {
-        return name.toLowerCase().endsWith(".xls")
-                || name.toLowerCase().endsWith(".xlw")
-                || name.toLowerCase().endsWith(".xlt");
+        return name.toLowerCase().endsWith(".ppt") || name.toLowerCase().endsWith(".pptx");
     }
 
     public static boolean isTextFile(String name) {
@@ -185,10 +181,6 @@ public class FileUtils {
         int exp = (int) (Math.log(bytes) / Math.log(unit));
         String pre = (si ? "kMGTPE" : "KMGTPE").charAt(exp - 1) + (si ? "" : "i");
         return String.format("%.1f %sB", bytes / Math.pow(unit, exp), pre);
-    }
-
-    public static boolean isMSFile(String path) {
-        return isPresentation(path) || isSpreadSheet(path) || isWord(path);
     }
 
     public static void performCopy(Context context, String pathWithExt, File dest) {
@@ -393,4 +385,5 @@ public class FileUtils {
         }
         return internalMemory;
     }
+
 }

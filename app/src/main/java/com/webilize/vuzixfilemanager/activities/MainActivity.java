@@ -543,30 +543,30 @@ public class MainActivity extends BaseActivity implements NavigationListener, Vi
     }
 
     public void sendFileToBlade(File file) {
-        if (StaticUtils.getConnectionType().equalsIgnoreCase(AppConstants.CONST_WIFI_DIRECT)) {
-            DialogUtils.showSendFileDialog(this, "Do you want to send file to default folder, or change the Destination?",
-                    (dialog, which) -> {
-                        Intent intent = new Intent(this, BladeFoldersActivity.class);
-                        intent.putExtra("inputExtra", "send");
-                        intent.putExtra("file", file);
-                        startActivityForResult(intent, AppConstants.REQUEST_BLADE_FOLDERS);
-                    }, (dialog, which) -> {
-                        Intent serviceIntent = new Intent(this, RXConnectionFGService.class);
-                        serviceIntent.putExtra("inputExtra", "send");
-                        serviceIntent.putExtra("file", file);
-                        ContextCompat.startForegroundService(this, serviceIntent);
-                        activityMainBinding.bottomBar.setSelectedItemId(R.id.navTransfers);
-                    });
-        } else {
-            DialogUtils.showSendFileDialogBT(this, "Do you want to send the file to Blade?",
-                    (dialog, which) -> {
-                        Intent serviceIntent = new Intent(this, RXConnectionFGService.class);
-                        serviceIntent.putExtra("inputExtra", "send");
-                        serviceIntent.putExtra("file", file);
-                        ContextCompat.startForegroundService(this, serviceIntent);
-                        activityMainBinding.bottomBar.setSelectedItemId(R.id.navTransfers);
-                    });
-        }
+//        if (StaticUtils.getConnectionType().equalsIgnoreCase(AppConstants.CONST_WIFI_DIRECT)) {
+        DialogUtils.showSendFileDialog(this, "Do you want to send file to default folder, or change the Destination?",
+                (dialog, which) -> {
+                    Intent intent = new Intent(this, BladeFoldersActivity.class);
+                    intent.putExtra("inputExtra", "send");
+                    intent.putExtra("file", file);
+                    startActivityForResult(intent, AppConstants.REQUEST_BLADE_FOLDERS);
+                }, (dialog, which) -> {
+                    Intent serviceIntent = new Intent(this, RXConnectionFGService.class);
+                    serviceIntent.putExtra("inputExtra", "send");
+                    serviceIntent.putExtra("file", file);
+                    ContextCompat.startForegroundService(this, serviceIntent);
+                    activityMainBinding.bottomBar.setSelectedItemId(R.id.navTransfers);
+                });
+//        } else {
+//            DialogUtils.showSendFileDialogBT(this, "Do you want to send the file to Blade?",
+//                    (dialog, which) -> {
+//                        Intent serviceIntent = new Intent(this, RXConnectionFGService.class);
+//                        serviceIntent.putExtra("inputExtra", "send");
+//                        serviceIntent.putExtra("file", file);
+//                        ContextCompat.startForegroundService(this, serviceIntent);
+//                        activityMainBinding.bottomBar.setSelectedItemId(R.id.navTransfers);
+//                    });
+//        }
     }
 
     public void sendFileToBladeBT(File file) {
@@ -613,30 +613,30 @@ public class MainActivity extends BaseActivity implements NavigationListener, Vi
     }
 
     public void sendFilesToBlade(String[] files) {
-        if (StaticUtils.getConnectionType().equalsIgnoreCase(AppConstants.CONST_WIFI_DIRECT)) {
-            DialogUtils.showSendFileDialog(this, "Do you want to send files to default folder, or change the Destination?",
-                    (dialog, which) -> {
-                        Intent intent = new Intent(this, BladeFoldersActivity.class);
-                        intent.putExtra("inputExtra", "send");
-                        intent.putExtra("files", files);
-                        startActivityForResult(intent, AppConstants.REQUEST_BLADE_FOLDERS);
-                    }, (dialog, which) -> {
-                        Intent serviceIntent = new Intent(this, RXConnectionFGService.class);
-                        serviceIntent.putExtra("inputExtra", "send");
-                        serviceIntent.putExtra("files", files);
-                        ContextCompat.startForegroundService(this, serviceIntent);
-                        activityMainBinding.bottomBar.setSelectedItemId(R.id.navTransfers);
-                    });
-        } else {
-            DialogUtils.showSendFileDialogBT(this, "Do you want to send file to Blade?",
-                    (dialog, which) -> {
-                        Intent serviceIntent = new Intent(this, RXConnectionFGService.class);
-                        serviceIntent.putExtra("inputExtra", "send");
-                        serviceIntent.putExtra("files", files);
-                        ContextCompat.startForegroundService(this, serviceIntent);
-                        activityMainBinding.bottomBar.setSelectedItemId(R.id.navTransfers);
-                    });
-        }
+//        if (StaticUtils.getConnectionType().equalsIgnoreCase(AppConstants.CONST_WIFI_DIRECT)) {
+        DialogUtils.showSendFileDialog(this, "Do you want to send files to default folder, or change the Destination?",
+                (dialog, which) -> {
+                    Intent intent = new Intent(this, BladeFoldersActivity.class);
+                    intent.putExtra("inputExtra", "send");
+                    intent.putExtra("files", files);
+                    startActivityForResult(intent, AppConstants.REQUEST_BLADE_FOLDERS);
+                }, (dialog, which) -> {
+                    Intent serviceIntent = new Intent(this, RXConnectionFGService.class);
+                    serviceIntent.putExtra("inputExtra", "send");
+                    serviceIntent.putExtra("files", files);
+                    ContextCompat.startForegroundService(this, serviceIntent);
+                    activityMainBinding.bottomBar.setSelectedItemId(R.id.navTransfers);
+                });
+//        } else {
+//            DialogUtils.showSendFileDialogBT(this, "Do you want to send file to Blade?",
+//                    (dialog, which) -> {
+//                        Intent serviceIntent = new Intent(this, RXConnectionFGService.class);
+//                        serviceIntent.putExtra("inputExtra", "send");
+//                        serviceIntent.putExtra("files", files);
+//                        ContextCompat.startForegroundService(this, serviceIntent);
+//                        activityMainBinding.bottomBar.setSelectedItemId(R.id.navTransfers);
+//                    });
+//        }
     }
 
     public void sendFilesToBladeBT(String[] files) {

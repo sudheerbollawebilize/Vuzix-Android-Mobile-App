@@ -200,6 +200,28 @@ public class SocialBladeProtocol {
         });
     }
 
+    public static Single<JSONObject> requestForDeviceDetails(final RXConnection rxConnection, PublishSubject<DataWrapper> publisher) {
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("deviceDetails", "deviceDetails");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return rxConnection.write(jsonObject, publisher).andThen(rxConnection.read(publisher)).map(dataWrapper -> {
+            if (dataWrapper.getSocketState() == SocketState.DISCONNECTED || dataWrapper.getSocketState() == SocketState.CLIENT_DISCONNECTED) {
+                rxConnection.clientDisconnected();
+                throw new Exception("Connection lost");
+            } else {
+                if (dataWrapper.getSocketState() == SocketState.JSON_RECEIVED) {
+                    return (JSONObject) dataWrapper.getData();
+                } else if (dataWrapper.getSocketState() == SocketState.MULTIPLE_FILES) {
+                    return jsonObject;
+                }
+                return jsonObject;
+            }
+        });
+    }
+
     private static Single<JSONObject> setDestinationFolder(final RXConnection rxConnection, JSONObject jsonObject, File folder, PublishSubject<DataWrapper> publisher) {
         rxConnection.setDefaultFolder(folder);
         return rxConnection.write(jsonObject, publisher).andThen(rxConnection.read(publisher)).map(dataWrapper -> {

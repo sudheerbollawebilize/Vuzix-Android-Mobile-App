@@ -102,6 +102,8 @@ public class StaticUtils {
                 drawable = R.drawable.ic_pdf;
             } else if (FileUtils.isPresentation(path)) {
                 drawable = R.drawable.ic_ppt;
+            } else if (FileUtils.isWord(path)) {
+                drawable = R.drawable.ic_word;
             } else if (FileUtils.isSpreadSheet(path)) {
                 drawable = R.drawable.ic_excel;
             } else if (FileUtils.isTextFile(path)) {
@@ -136,6 +138,8 @@ public class StaticUtils {
                 drawable = R.drawable.ic_ppt;
             } else if (FileUtils.isSpreadSheet(path)) {
                 drawable = R.drawable.ic_excel;
+            } else if (FileUtils.isWord(path)) {
+                drawable = R.drawable.ic_word;
             } else if (FileUtils.isTextFile(path)) {
                 drawable = R.drawable.ic_txt;
             }
@@ -347,11 +351,12 @@ public class StaticUtils {
     }
 
     public static boolean isInDeviceFavourites(Context context, String path) {
-        ArrayList<DeviceFavouritesModel> bladeItemArrayList = new ArrayList<>();
         String dev = AppStorage.getInstance(context).getValue(AppStorage.SP_DEVICE_ADDRESS, "");
         DBHelper dbHelper = new DBHelper(context);
+        if (TextUtils.isEmpty(dev)) return false;
         DeviceModel deviceModel = dbHelper.getDeviceModel(dev);
-        bladeItemArrayList.addAll(dbHelper.getDeviceFavouritesModelArrayList(deviceModel.id));
+        if (deviceModel == null) return false;
+        ArrayList<DeviceFavouritesModel> bladeItemArrayList = new ArrayList<>(dbHelper.getDeviceFavouritesModelArrayList(deviceModel.id));
         for (DeviceFavouritesModel deviceFavouritesModel : bladeItemArrayList) {
             if (deviceFavouritesModel.path.equalsIgnoreCase(path)) {
                 return true;

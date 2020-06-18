@@ -122,5 +122,11 @@
     <string name="clear">Clear</string>
     <string name="connect_via_wifi_direct">Connect Via Wifi-Direct</string>
     <string name="connect_via_bluetooth">Connect via Bluetooth</string>
+    <string name="connectivity_options">Connectivity Options</string>
+    <string name="scan">Scan</string>
+    <string name="wifi_direct">Wifi Direct</string>
+    <string name="hotspot">HotSpot</string>
+    <string name="get_code">Get Code</string>
+    <string name="local_network">Local Network</string>
 
 </resources>
