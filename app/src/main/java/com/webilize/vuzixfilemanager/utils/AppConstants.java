@@ -61,4 +61,17 @@ public class AppConstants {
     public static final String NEED_PERMISSIONS = BuildConfig.APPLICATION_ID + ".NEED_PERMISSION";
     // end region
 
+    //  popup menu home options
+    public static final int CONST_POPUP_NEW_FOLDER = 0;
+    public static final int CONST_POPUP_SELECT_ALL = 1;
+    public static final int CONST_POPUP_TRANSFER_SELECTED_FILES = 2;
+    public static final int CONST_POPUP_COPY = 3;
+    public static final int CONST_POPUP_PASTE = 4;
+    public static final int CONST_POPUP_DELETE = 5;
+    public static final int CONST_POPUP_SHOW_HIDDEN = 6;
+    public static final int CONST_POPUP_SHOW_EMPTY = 7;
+    public static final int CONST_POPUP_SHOW_ONLY_FILES = 8;
+    public static final int CONST_POPUP_SHOW_ONLY_FOLDERS = 9;
+    public static final int CONST_POPUP_SHOW_ONLY_FAVOURITES = 10;
+
 }

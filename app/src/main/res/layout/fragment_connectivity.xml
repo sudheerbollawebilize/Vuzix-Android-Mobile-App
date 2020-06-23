@@ -17,58 +17,12 @@
             android:background="@color/colorWhite"
             tools:context=".activities.MainActivity">
 
-            <RelativeLayout
+            <include
                 android:id="@+id/linDevice"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:background="@color/colorLightGrey"
-                android:padding="@dimen/six_dp"
+                layout="@layout/layout_connected_device_tab"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_toStartOf="@id/txtConnectionType">
-
-                    <com.webilize.vuzixfilemanager.utils.customviews.AppTextView
-                        android:id="@+id/txtDevice"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:paddingStart="@dimen/seven_dp"
-                        android:paddingEnd="@dimen/three_dp"
-                        android:text="@string/device"
-                        android:textColor="@color/colorGreyBlack"
-                        android:textSize="@dimen/fourteen_sp" />
-
-                    <com.webilize.vuzixfilemanager.utils.customviews.AppTextView
-                        android:id="@+id/txtDeviceName"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:paddingStart="@dimen/ten_dp"
-                        android:paddingEnd="@dimen/ten_dp"
-                        android:textColor="@color/colorBlack"
-                        android:textSize="@dimen/sixteen_sp"
-                        app:txt_font_type="bold" />
-
-                </LinearLayout>
-
-                <com.webilize.vuzixfilemanager.utils.customviews.AppTextView
-                    android:id="@+id/txtConnectionType"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:layout_gravity="center_vertical"
-                    android:paddingStart="@dimen/ten_dp"
-                    android:paddingEnd="@dimen/ten_dp"
-                    android:textColor="@color/colorBlack"
-                    android:textSize="@dimen/sixteen_sp"
-                    app:txt_font_type="bold" />
-
-            </RelativeLayout>
+                app:layout_constraintTop_toTopOf="parent" />
 
             <View
                 android:id="@+id/seperator"
@@ -200,6 +154,66 @@
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/recyclerViewAvailableDevices" />
 
+            <RelativeLayout
+                android:id="@+id/relDisconnect"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="@dimen/five_dp"
+                android:visibility="gone"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/seperatorGrey2">
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/imgFileSmall"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"
+                    android:layout_margin="@dimen/six_dp"
+                    android:padding="@dimen/seven_dp"
+                    android:tint="@color/colorCyan"
+                    app:srcCompat="@drawable/ic_glasses" />
+
+                <com.webilize.vuzixfilemanager.utils.customviews.AppTextView
+                    android:id="@+id/txtConnectedDevice"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:layout_toStartOf="@id/btnDisconnect"
+                    android:layout_toEndOf="@id/imgFileSmall"
+                    android:clickable="false"
+                    android:ellipsize="marquee"
+                    android:gravity="center_vertical"
+                    android:inputType="textNoSuggestions"
+                    android:longClickable="false"
+                    android:paddingStart="@dimen/five_dp"
+                    android:paddingEnd="@dimen/five_dp"
+                    android:selectAllOnFocus="false"
+                    android:singleLine="true"
+                    android:textAllCaps="true"
+                    android:textColor="@color/colorBlack"
+                    android:textIsSelectable="false"
+                    android:textSize="@dimen/sixteen_sp" />
+
+                <com.webilize.vuzixfilemanager.utils.customviews.AppTextView
+                    android:id="@+id/btnDisconnect"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerInParent="true"
+                    android:layout_margin="@dimen/five_dp"
+                    android:gravity="center"
+                    android:padding="@dimen/seven_dp"
+                    android:text="@string/disconnect"
+                    android:textAllCaps="true"
+                    android:textColor="@color/colorBlue"
+                    android:textSize="@dimen/seventeen_sp"
+                    android:textStyle="bold"
+                    app:txt_font_type="bold" />
+
+            </RelativeLayout>
+
             <com.webilize.vuzixfilemanager.utils.customviews.AppTextView
                 android:id="@+id/txtAvailableOptions"
                 android:layout_width="match_parent"
@@ -213,7 +227,7 @@
                 android:textSize="@dimen/sixteen_sp"
                 android:textStyle="bold"
                 android:visibility="visible"
-                app:layout_constraintTop_toBottomOf="@id/seperatorGrey2" />
+                app:layout_constraintTop_toBottomOf="@id/relDisconnect" />
 
             <RelativeLayout
                 android:id="@+id/relWifiDirect"
@@ -400,40 +414,6 @@
                     android:textSize="@dimen/seventeen_sp"
                     android:textStyle="bold"
                     app:txt_font_type="bold" />
-
-            </RelativeLayout>
-
-            <RelativeLayout
-                android:id="@+id/relDisconnect"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:visibility="gone"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/relQR">
-
-                <com.webilize.vuzixfilemanager.utils.customviews.AppTextView
-                    android:id="@+id/txtConnectedDevice"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentStart="true"
-                    android:layout_centerInParent="true"
-                    android:layout_margin="@dimen/five_dp"
-                    android:layout_toStartOf="@id/btnDisconnect"
-                    android:padding="@dimen/eight_dp"
-                    android:textColor="@color/colorBlack" />
-
-                <androidx.appcompat.widget.AppCompatButton
-                    android:id="@+id/btnDisconnect"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:layout_centerInParent="true"
-                    android:layout_margin="@dimen/five_dp"
-                    android:gravity="center"
-                    android:text="@string/disconnect"
-                    android:textAllCaps="true"
-                    android:textColor="@color/colorBlack" />
 
             </RelativeLayout>
 

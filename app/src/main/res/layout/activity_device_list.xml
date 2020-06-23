@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <TextView
+    <com.webilize.vuzixfilemanager.utils.customviews.AppTextView
         android:id="@+id/title_paired_devices"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -21,7 +21,7 @@
         android:layout_weight="1"
         android:stackFromBottom="true" />
 
-    <TextView
+    <com.webilize.vuzixfilemanager.utils.customviews.AppTextView
         android:id="@+id/title_new_devices"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

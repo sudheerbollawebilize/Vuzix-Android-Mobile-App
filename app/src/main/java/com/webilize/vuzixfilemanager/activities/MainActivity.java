@@ -230,26 +230,6 @@ public class MainActivity extends BaseActivity implements NavigationListener, Vi
     }
 
     @Override
-    public void openDetails(FileFolderItem currentFile) {
-
-    }
-
-    @Override
-    public void openQRScanner() {
-
-    }
-
-    @Override
-    public void openWifiDirect() {
-
-    }
-
-    @Override
-    public void openSendScreen() {
-
-    }
-
-    @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.imgBack:
@@ -385,11 +365,6 @@ public class MainActivity extends BaseActivity implements NavigationListener, Vi
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onSocketConnected(OnSocketConnected onSocketConnected) {
         StaticUtils.showToast(this, "Connected");
-//        Fragment fragment = getCurrentFragment();
-//        if ((fragment instanceof ConnectivityFragment)) {
-//            ConnectivityFragment connectivityFragment = (ConnectivityFragment) fragment;
-//            connectivityFragment.onSocketConnected(onSocketConnected);
-//        }
         if (qrCodeDialog != null && qrCodeDialog.isShowing()) qrCodeDialog.close();
     }
 
@@ -543,7 +518,6 @@ public class MainActivity extends BaseActivity implements NavigationListener, Vi
     }
 
     public void sendFileToBlade(File file) {
-//        if (StaticUtils.getConnectionType().equalsIgnoreCase(AppConstants.CONST_WIFI_DIRECT)) {
         DialogUtils.showSendFileDialog(this, "Do you want to send file to default folder, or change the Destination?",
                 (dialog, which) -> {
                     Intent intent = new Intent(this, BladeFoldersActivity.class);
@@ -557,16 +531,6 @@ public class MainActivity extends BaseActivity implements NavigationListener, Vi
                     ContextCompat.startForegroundService(this, serviceIntent);
                     activityMainBinding.bottomBar.setSelectedItemId(R.id.navTransfers);
                 });
-//        } else {
-//            DialogUtils.showSendFileDialogBT(this, "Do you want to send the file to Blade?",
-//                    (dialog, which) -> {
-//                        Intent serviceIntent = new Intent(this, RXConnectionFGService.class);
-//                        serviceIntent.putExtra("inputExtra", "send");
-//                        serviceIntent.putExtra("file", file);
-//                        ContextCompat.startForegroundService(this, serviceIntent);
-//                        activityMainBinding.bottomBar.setSelectedItemId(R.id.navTransfers);
-//                    });
-//        }
     }
 
     public void sendFileToBladeBT(File file) {
@@ -609,11 +573,9 @@ public class MainActivity extends BaseActivity implements NavigationListener, Vi
                 startActivity(i);
             }
         }
-
     }
 
     public void sendFilesToBlade(String[] files) {
-//        if (StaticUtils.getConnectionType().equalsIgnoreCase(AppConstants.CONST_WIFI_DIRECT)) {
         DialogUtils.showSendFileDialog(this, "Do you want to send files to default folder, or change the Destination?",
                 (dialog, which) -> {
                     Intent intent = new Intent(this, BladeFoldersActivity.class);
@@ -627,16 +589,6 @@ public class MainActivity extends BaseActivity implements NavigationListener, Vi
                     ContextCompat.startForegroundService(this, serviceIntent);
                     activityMainBinding.bottomBar.setSelectedItemId(R.id.navTransfers);
                 });
-//        } else {
-//            DialogUtils.showSendFileDialogBT(this, "Do you want to send file to Blade?",
-//                    (dialog, which) -> {
-//                        Intent serviceIntent = new Intent(this, RXConnectionFGService.class);
-//                        serviceIntent.putExtra("inputExtra", "send");
-//                        serviceIntent.putExtra("files", files);
-//                        ContextCompat.startForegroundService(this, serviceIntent);
-//                        activityMainBinding.bottomBar.setSelectedItemId(R.id.navTransfers);
-//                    });
-//        }
     }
 
     public void sendFilesToBladeBT(String[] files) {
@@ -656,15 +608,14 @@ public class MainActivity extends BaseActivity implements NavigationListener, Vi
             serviceIntent.putExtra("inputExtra", "folder");
             serviceIntent.putExtra("folderPath", folderPath);
             ContextCompat.startForegroundService(this, serviceIntent);
-            updateTitle(folderPath);
         } else
             replaceFragmentWithoutAnimation(BladeFolderFragment.newInstance(new ArrayList<>()), false);
+        updateTitle(TextUtils.isEmpty(folderPath) ? getString(R.string.blade_files) : folderPath);
     }
 
     public void requestForFolder(String folderPath) {
         showSearchInTopBar();
         showMenuInTopBar();
-        updateTitle(folderPath);
         requestForFolderWOFrag(folderPath);
     }
 
@@ -694,7 +645,7 @@ public class MainActivity extends BaseActivity implements NavigationListener, Vi
         isSelectionTopBar = false;
         try {
             if (TextUtils.isEmpty(folderName) || folderName.equalsIgnoreCase("0")) {
-                activityMainBinding.txtFolderName.setText(R.string.home);
+                activityMainBinding.txtFolderName.setText(R.string.phone_files);
                 activityMainBinding.imgBack.setVisibility(View.GONE);
             } else {
                 activityMainBinding.txtFolderName.setText(folderName);
@@ -801,7 +752,6 @@ public class MainActivity extends BaseActivity implements NavigationListener, Vi
                     replaceFragmentWithoutAnimation(new ConnectivityFragment(), false);
                     return true;
                 case R.id.navDeviceFiles:
-                    updateTitle(getString(R.string.blade_files));
                     hideSearchInTopBar();
                     showMenuInTopBar();
                     clearBackStackCompletely();

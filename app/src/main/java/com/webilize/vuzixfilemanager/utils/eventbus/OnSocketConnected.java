@@ -1,9 +1,9 @@
 package com.webilize.vuzixfilemanager.utils.eventbus;
 
 public class OnSocketConnected {
-    public boolean isWififDirect;
+    public boolean isWifiDirect;
 
-    public OnSocketConnected(boolean isWififDirect) {
-        this.isWififDirect = isWififDirect;
+    public OnSocketConnected(boolean isWifiDirect) {
+        this.isWifiDirect = isWifiDirect;
     }
 }

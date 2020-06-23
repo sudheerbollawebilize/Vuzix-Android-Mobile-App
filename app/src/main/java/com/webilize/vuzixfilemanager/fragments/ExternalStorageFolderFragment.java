@@ -3,7 +3,9 @@ package com.webilize.vuzixfilemanager.fragments;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -383,22 +385,29 @@ public class ExternalStorageFolderFragment extends BaseFragment implements IClic
     public void onResume() {
         super.onResume();
         try {
-            if (cp.isConnected()) {
-                folderFragmentBinding.txtDeviceName.setText(StaticUtils.getDeviceName(mainActivity));
-            } else folderFragmentBinding.txtDeviceName.setText(R.string.no_dev_connected);
-
-            folderFragmentBinding.txtConnectionType.setText(StaticUtils.getConnectionType());
+            setConnectedDeviceData();
         } catch (Exception e) {
             e.printStackTrace();
             FirebaseCrashlytics.getInstance().recordException(e);
         }
     }
 
+    private void setConnectedDeviceData() {
+        String name = StaticUtils.getDeviceName(mainActivity);
+        if (TextUtils.isEmpty(name) || name.equalsIgnoreCase(getString(R.string.no_dev_connected)) || !cp.isConnected()) {
+            folderFragmentBinding.linDevice.txtDeviceName.setTextColor(Color.LTGRAY);
+            folderFragmentBinding.linDevice.txtDeviceName.setText(getString(R.string.no_dev_connected));
+        } else {
+            folderFragmentBinding.linDevice.txtDeviceName.setTextColor(Color.BLACK);
+            folderFragmentBinding.linDevice.txtDeviceName.setText(name);
+        }
+        folderFragmentBinding.linDevice.txtConnectionType.setText(StaticUtils.getConnectionType());
+    }
+
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onSocketConnected(OnSocketConnected onSocketConnected) {
         try {
-            folderFragmentBinding.txtDeviceName.setText(StaticUtils.getDeviceName(mainActivity));
-            folderFragmentBinding.txtConnectionType.setText(StaticUtils.getConnectionType());
+            setConnectedDeviceData();
         } catch (Exception e) {
             e.printStackTrace();
             FirebaseCrashlytics.getInstance().recordException(e);

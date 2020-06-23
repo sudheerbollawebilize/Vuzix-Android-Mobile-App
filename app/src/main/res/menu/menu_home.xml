@@ -5,8 +5,11 @@
         android:id="@+id/menuNewFolder"
         android:title="@string/new_folder" />
     <item
-        android:id="@+id/menuDetails"
-        android:title="@string/details" />
+        android:id="@+id/menuSelectAll"
+        android:title="@string/select_all" />
+    <item
+        android:id="@+id/menuSendToBlade"
+        android:title="@string/send_to_blade" />
     <item
         android:id="@+id/menuCopy"
         android:title="@string/copy_path" />
@@ -14,18 +17,18 @@
         android:id="@+id/menuPaste"
         android:title="@string/paste" />
     <item
-        android:id="@+id/menuSelectAll"
-        android:title="@string/select_all" />
-    <item
         android:id="@+id/menuDelete"
         android:title="@string/delete" />
-    <item
-        android:id="@+id/menuSendToBlade"
-        android:title="@string/send_to_blade" />
     <item
         android:id="@+id/menuShowHiddenFiles"
         android:checkable="true"
         android:title="@string/show_hidden_files" />
+    <!--<item
+        android:id="@+id/menuShowHiddenFiles"
+        android:checkable="true"
+        android:title="@string/show_hidden_files"
+        app:actionLayout="@layout/menu_switch" />-->
+
     <item
         android:id="@+id/menuShowEmptyFolders"
         android:checkable="true"

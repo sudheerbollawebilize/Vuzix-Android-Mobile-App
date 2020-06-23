@@ -1,7 +1,9 @@
 package com.webilize.vuzixfilemanager.fragments;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -85,11 +87,24 @@ public class TransfersFragment extends BaseFragment implements IClickListener, V
     public void onResume() {
         super.onResume();
         try {
-            if (cp.isConnected()) {
-                fragmentTransfersBinding.txtDeviceName.setText(StaticUtils.getDeviceName(mainActivity));
-            } else
-                fragmentTransfersBinding.txtDeviceName.setText(getString(R.string.no_dev_connected));
-            fragmentTransfersBinding.txtConnectionType.setText(StaticUtils.getConnectionType());
+            setConnectedDeviceData();
+        } catch (Exception e) {
+            e.printStackTrace();
+            FirebaseCrashlytics.getInstance().recordException(e);
+        }
+    }
+
+    private void setConnectedDeviceData() {
+        try {
+            String name = StaticUtils.getDeviceName(mainActivity);
+            if (TextUtils.isEmpty(name) || name.equalsIgnoreCase(getString(R.string.no_dev_connected)) || !cp.isConnected()) {
+                fragmentTransfersBinding.linDevice.txtDeviceName.setTextColor(Color.LTGRAY);
+                fragmentTransfersBinding.linDevice.txtDeviceName.setText(getString(R.string.no_dev_connected));
+            } else {
+                fragmentTransfersBinding.linDevice.txtDeviceName.setTextColor(Color.BLACK);
+                fragmentTransfersBinding.linDevice.txtDeviceName.setText(name);
+            }
+            fragmentTransfersBinding.linDevice.txtConnectionType.setText(StaticUtils.getConnectionType());
         } catch (Exception e) {
             e.printStackTrace();
             FirebaseCrashlytics.getInstance().recordException(e);
@@ -125,18 +140,12 @@ public class TransfersFragment extends BaseFragment implements IClickListener, V
 
     @Override
     public void onLongClick(View view, int position) {
-//        if (navigationListener != null)
-//            navigationListener.openDetails(mainActivity.viewModel.getFile(position));
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onSocketConnected(OnSocketConnected onSocketConnected) {
         try {
-            if (cp.isConnected())
-                fragmentTransfersBinding.txtDeviceName.setText(StaticUtils.getDeviceName(mainActivity));
-            else
-                fragmentTransfersBinding.txtDeviceName.setText(getString(R.string.no_dev_connected));
-            fragmentTransfersBinding.txtConnectionType.setText(StaticUtils.getConnectionType());
+            setConnectedDeviceData();
         } catch (Exception e) {
             e.printStackTrace();
             FirebaseCrashlytics.getInstance().recordException(e);

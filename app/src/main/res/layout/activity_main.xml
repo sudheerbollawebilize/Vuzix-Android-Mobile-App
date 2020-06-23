@@ -109,8 +109,7 @@
                 android:layout_height="match_parent"
                 android:layout_above="@id/bottomBar"
                 android:layout_below="@id/relTopBar"
-                app:defaultNavHost="true"
-                app:navGraph="@navigation/mobile_navigation" />
+                app:defaultNavHost="true" />
 
             <com.google.android.material.bottomnavigation.BottomNavigationView
                 android:id="@+id/bottomBar"

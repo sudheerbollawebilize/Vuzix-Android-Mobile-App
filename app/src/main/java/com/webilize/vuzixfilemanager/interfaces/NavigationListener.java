@@ -8,14 +8,4 @@ public interface NavigationListener {
 
     void back();
 
-    void openDetails(FileFolderItem currentFile);
-
-//    void updateTitle(String folderName);
-
-    void openQRScanner();
-
-    void openWifiDirect();
-
-    void openSendScreen();
-
 }

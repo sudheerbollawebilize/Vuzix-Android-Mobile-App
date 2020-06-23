@@ -3,6 +3,7 @@ package com.webilize.vuzixfilemanager.fragments;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -200,10 +201,24 @@ public class FolderFragment extends BaseFragment implements IClickListener, View
     public void onResume() {
         super.onResume();
         try {
-            if (cp.isConnected()) {
-                folderFragmentBinding.txtDeviceName.setText(StaticUtils.getDeviceName(mainActivity));
-            } else folderFragmentBinding.txtDeviceName.setText(R.string.no_dev_connected);
-            folderFragmentBinding.txtConnectionType.setText(StaticUtils.getConnectionType());
+            setConnectedDeviceData();
+        } catch (Exception e) {
+            e.printStackTrace();
+            FirebaseCrashlytics.getInstance().recordException(e);
+        }
+    }
+
+    private void setConnectedDeviceData() {
+        try {
+            String name = StaticUtils.getDeviceName(mainActivity);
+            if (TextUtils.isEmpty(name) || name.equalsIgnoreCase(getString(R.string.no_dev_connected)) || !cp.isConnected()) {
+                folderFragmentBinding.linDevice.txtDeviceName.setTextColor(Color.LTGRAY);
+                folderFragmentBinding.linDevice.txtDeviceName.setText(getString(R.string.no_dev_connected));
+            } else {
+                folderFragmentBinding.linDevice.txtDeviceName.setTextColor(Color.BLACK);
+                folderFragmentBinding.linDevice.txtDeviceName.setText(name);
+            }
+            folderFragmentBinding.linDevice.txtConnectionType.setText(StaticUtils.getConnectionType());
         } catch (Exception e) {
             e.printStackTrace();
             FirebaseCrashlytics.getInstance().recordException(e);
@@ -213,8 +228,7 @@ public class FolderFragment extends BaseFragment implements IClickListener, View
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onSocketConnected(OnSocketConnected onSocketConnected) {
         try {
-            folderFragmentBinding.txtDeviceName.setText(StaticUtils.getDeviceName(mainActivity));
-            folderFragmentBinding.txtConnectionType.setText(StaticUtils.getConnectionType());
+            setConnectedDeviceData();
         } catch (Exception e) {
             e.printStackTrace();
             FirebaseCrashlytics.getInstance().recordException(e);
@@ -498,10 +512,10 @@ public class FolderFragment extends BaseFragment implements IClickListener, View
     private void preparePopUpMenu() {
         popupMenu = new PopupMenu(mainActivity, mainActivity.activityMainBinding.imgMore);
         popupMenu.getMenuInflater().inflate(R.menu.menu_home, popupMenu.getMenu());
-        popupMenu.getMenu().getItem(7).setChecked(AppStorage.getInstance(mainActivity).getValue(AppStorage.SP_SHOW_HIDDEN, false));
-        popupMenu.getMenu().getItem(8).setChecked(AppStorage.getInstance(mainActivity).getValue(AppStorage.SP_SHOW_EMPTY_FOLDERS, true));
-        popupMenu.getMenu().getItem(9).setChecked(AppStorage.getInstance(mainActivity).getValue(AppStorage.SP_SHOW_ONLY_FILES, false));
-        popupMenu.getMenu().getItem(10).setChecked(AppStorage.getInstance(mainActivity).getValue(AppStorage.SP_SHOW_ONLY_FOLDERS, false));
+        popupMenu.getMenu().getItem(AppConstants.CONST_POPUP_SHOW_HIDDEN).setChecked(AppStorage.getInstance(mainActivity).getValue(AppStorage.SP_SHOW_HIDDEN, false));
+        popupMenu.getMenu().getItem(AppConstants.CONST_POPUP_SHOW_EMPTY).setChecked(AppStorage.getInstance(mainActivity).getValue(AppStorage.SP_SHOW_EMPTY_FOLDERS, true));
+        popupMenu.getMenu().getItem(AppConstants.CONST_POPUP_SHOW_ONLY_FILES).setChecked(AppStorage.getInstance(mainActivity).getValue(AppStorage.SP_SHOW_ONLY_FILES, false));
+        popupMenu.getMenu().getItem(AppConstants.CONST_POPUP_SHOW_ONLY_FOLDERS).setChecked(AppStorage.getInstance(mainActivity).getValue(AppStorage.SP_SHOW_ONLY_FOLDERS, false));
         popupMenu.setOnMenuItemClickListener(item -> {
             switch (item.getItemId()) {
                 case R.id.menuShowHiddenFiles:
@@ -584,32 +598,26 @@ public class FolderFragment extends BaseFragment implements IClickListener, View
     }
 
     private void showMenuOptions() {
-        popupMenu.getMenu().getItem(3).setEnabled(StaticUtils.isPrimaryUriAvailableInClipboard(mainActivity));
-        popupMenu.getMenu().getItem(7).setChecked(AppStorage.getInstance(mainActivity).getValue(AppStorage.SP_SHOW_HIDDEN, false));
+        popupMenu.getMenu().getItem(AppConstants.CONST_POPUP_PASTE).setEnabled(StaticUtils.isPrimaryUriAvailableInClipboard(mainActivity));
+        popupMenu.getMenu().getItem(AppConstants.CONST_POPUP_SHOW_HIDDEN).setChecked(AppStorage.getInstance(mainActivity).getValue(AppStorage.SP_SHOW_HIDDEN, false));
         if (isLongPressed) {
-            popupMenu.getMenu().getItem(0).setEnabled(false);
-            popupMenu.getMenu().getItem(1).setEnabled(false);
-            popupMenu.getMenu().getItem(2).setTitle(R.string.copy);
-            popupMenu.getMenu().getItem(5).setEnabled(true);
-            if (cp.isConnected()) {
-                popupMenu.getMenu().getItem(6).setEnabled(true);
-            } else {
-                popupMenu.getMenu().getItem(6).setEnabled(false);
-            }
+            popupMenu.getMenu().getItem(AppConstants.CONST_POPUP_NEW_FOLDER).setEnabled(false);
+            popupMenu.getMenu().getItem(AppConstants.CONST_POPUP_COPY).setTitle(R.string.copy);
+            popupMenu.getMenu().getItem(AppConstants.CONST_POPUP_DELETE).setEnabled(true);
+            popupMenu.getMenu().getItem(AppConstants.CONST_POPUP_TRANSFER_SELECTED_FILES).setEnabled(cp.isConnected());
         } else {
-            popupMenu.getMenu().getItem(0).setEnabled(true);
-            popupMenu.getMenu().getItem(1).setEnabled(true);
-            popupMenu.getMenu().getItem(2).setTitle(R.string.copy_path);
-            popupMenu.getMenu().getItem(5).setEnabled(false);
-            popupMenu.getMenu().getItem(6).setEnabled(false);
+            popupMenu.getMenu().getItem(AppConstants.CONST_POPUP_NEW_FOLDER).setEnabled(true);
+            popupMenu.getMenu().getItem(AppConstants.CONST_POPUP_COPY).setTitle(R.string.copy_path);
+            popupMenu.getMenu().getItem(AppConstants.CONST_POPUP_DELETE).setEnabled(false);
+            popupMenu.getMenu().getItem(AppConstants.CONST_POPUP_TRANSFER_SELECTED_FILES).setEnabled(false);
         }
         if (counter == mainActivity.viewModel.getCurrentFiles().size()) {
-            popupMenu.getMenu().getItem(4).setTitle(R.string.de_select_all);
+            popupMenu.getMenu().getItem(AppConstants.CONST_POPUP_SELECT_ALL).setTitle(R.string.de_select_all);
         } else
-            popupMenu.getMenu().getItem(4).setTitle(R.string.select_all);
-        popupMenu.getMenu().getItem(8).setChecked(AppStorage.getInstance(mainActivity).getValue(AppStorage.SP_SHOW_EMPTY_FOLDERS, true));
-        popupMenu.getMenu().getItem(9).setChecked(AppStorage.getInstance(mainActivity).getValue(AppStorage.SP_SHOW_ONLY_FILES, false));
-        popupMenu.getMenu().getItem(10).setChecked(AppStorage.getInstance(mainActivity).getValue(AppStorage.SP_SHOW_ONLY_FOLDERS, false));
+            popupMenu.getMenu().getItem(AppConstants.CONST_POPUP_SELECT_ALL).setTitle(R.string.select_all);
+        popupMenu.getMenu().getItem(AppConstants.CONST_POPUP_SHOW_EMPTY).setChecked(AppStorage.getInstance(mainActivity).getValue(AppStorage.SP_SHOW_EMPTY_FOLDERS, true));
+        popupMenu.getMenu().getItem(AppConstants.CONST_POPUP_SHOW_ONLY_FILES).setChecked(AppStorage.getInstance(mainActivity).getValue(AppStorage.SP_SHOW_ONLY_FILES, false));
+        popupMenu.getMenu().getItem(AppConstants.CONST_POPUP_SHOW_ONLY_FOLDERS).setChecked(AppStorage.getInstance(mainActivity).getValue(AppStorage.SP_SHOW_ONLY_FOLDERS, false));
 
         popupMenu.show();
     }

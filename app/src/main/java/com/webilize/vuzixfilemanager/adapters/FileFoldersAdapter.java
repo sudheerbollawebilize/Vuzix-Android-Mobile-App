@@ -61,7 +61,6 @@ public class FileFoldersAdapter extends RecyclerView.Adapter<FileFoldersAdapter.
             holder.itemFileBinding.txtFileDetails.setText(fileFolderItem.size + " " + fileFolderItem.timeStamp);
         } else {
             holder.itemFileBinding.txtFileDetails.setText(fileFolderItem.size + "\n" + fileFolderItem.timeStamp);
-
             holder.itemFileBinding.imgFile.setVisibility(View.VISIBLE);
             holder.itemFileBinding.imgFileSmall.setVisibility(View.GONE);
             int thumb;

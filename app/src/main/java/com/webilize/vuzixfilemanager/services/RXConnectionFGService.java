@@ -170,26 +170,28 @@ public class RXConnectionFGService extends Service implements ConnectionHelper.L
                     .build();
             communicationProtocol = CommunicationProtocol.getInstance();
             if (input.equalsIgnoreCase("start")) {
-                startForeground(1, notification);
-                if (intent.hasExtra("IsQr")) {
-                    if (intent.getBooleanExtra("IsQr", true)) {
-                        StaticUtils.setConnectionType(AppConstants.CONST_QR_CODE);
-                        initializeQRConnection();
+                if (isAllowNewRequests) {
+                    isAllowNewRequests = false;
+                    startForeground(1, notification);
+                    if (intent.hasExtra("IsQr")) {
+                        if (intent.getBooleanExtra("IsQr", true)) {
+                            initializeQRConnection();
+                        } else {
+                            StaticUtils.setConnectionType(AppConstants.CONST_WIFI_HOTSPOT);
+                            initializeHPConnection();
+                        }
+                    } else if (intent.hasExtra("IsBle")) {
+                        StaticUtils.setConnectionType(AppConstants.CONST_BLUETOOTH);
+                        if (intent.hasExtra("device")) {
+                            BluetoothDevice device = intent.getParcelableExtra("device");
+                            initialiseBTConnection(device, intent.getBooleanExtra("secure", false));
+                        } else {
+                            initialiseBTConnection();
+                        }
                     } else {
-                        StaticUtils.setConnectionType(AppConstants.CONST_WIFI_HOTSPOT);
-                        initializeHPConnection();
+                        StaticUtils.setConnectionType(AppConstants.CONST_WIFI_DIRECT);
+                        initializeRXConnection();
                     }
-                } else if (intent.hasExtra("IsBle")) {
-                    StaticUtils.setConnectionType(AppConstants.CONST_BLUETOOTH);
-                    if (intent.hasExtra("device")) {
-                        BluetoothDevice device = intent.getParcelableExtra("device");
-                        initialiseBTConnection(device, intent.getBooleanExtra("secure", false));
-                    } else {
-                        initialiseBTConnection();
-                    }
-                } else {
-                    StaticUtils.setConnectionType(AppConstants.CONST_WIFI_DIRECT);
-                    initializeRXConnection();
                 }
             } else if (input.equalsIgnoreCase("connect")) {
                 startForeground(1, notification);
@@ -347,8 +349,8 @@ public class RXConnectionFGService extends Service implements ConnectionHelper.L
                 getFoldersDisposable.dispose();
             if (progressDisposable != null && !progressDisposable.isDisposed())
                 progressDisposable.dispose();
-            isAllowNewRequests = true;
         }
+        isAllowNewRequests = true;
     }
 
     /**
@@ -358,6 +360,7 @@ public class RXConnectionFGService extends Service implements ConnectionHelper.L
     @Override
     public void availablePeers(ArrayList<WifiP2pDevice> wifiP2pDevices) {
         EventBus.getDefault().post(new WifiDevicesList(wifiP2pDevices));
+        isAllowNewRequests = true;
     }
 
     /**
@@ -375,6 +378,7 @@ public class RXConnectionFGService extends Service implements ConnectionHelper.L
      */
     @Override
     public void onTCPServerReady(String ip, Integer port) {
+        isAllowNewRequests = true;
         EventBus.getDefault().post(new OnTCPInitialized(ip, port));
     }
 
@@ -384,6 +388,7 @@ public class RXConnectionFGService extends Service implements ConnectionHelper.L
      */
     @Override
     public void onConnected(RXConnection rxConnection, boolean isWifiDirect) {
+        isAllowNewRequests = true;
         if (serviceSelected != null) {
             AppStorage.getInstance(this).setValue(AppStorage.SP_DEVICE_ADDRESS, serviceSelected.deviceAddress);
             updateDBWithDetails();
@@ -399,14 +404,14 @@ public class RXConnectionFGService extends Service implements ConnectionHelper.L
     private void requestForDeviceDetails() {
         try {
             if (communicationProtocol.isConnected()) {
-//                isAllowNewRequests = false;
+                isAllowNewRequests = false;
                 progressDisposable = progressObservable.subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(progressObserver);
                 Disposable getDeviceDetailsDisposable = SocialBladeProtocol.requestForDeviceDetails(
                         communicationProtocol.getConnection(), progressObservable).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
                         .subscribe(jsonObject -> {
-//                            isAllowNewRequests = true;
+                            isAllowNewRequests = true;
                             /*
                             jsonObject.put("name", "");
                             jsonObject.put("serialno", "");
@@ -417,14 +422,15 @@ public class RXConnectionFGService extends Service implements ConnectionHelper.L
                             AppStorage.getInstance(this).setValue(AppStorage.SP_DEVICE_ADDRESS, jsonObject.getString("MacAddress"));
                             updateDBWithDetails(jsonObject.getString("name"), jsonObject.getString("MacAddress"));
                         }, error -> {
-//                            isAllowNewRequests = true;
-                            Log.e(TAG, "fetchThumbnails: ", error);
+                            isAllowNewRequests = true;
                         });
                 communicationProtocol.addDisposable(getDeviceDetailsDisposable);
             } else {
+                isAllowNewRequests = true;
                 toast("Connection not available");
             }
         } catch (Exception e) {
+            isAllowNewRequests = true;
             FirebaseCrashlytics.getInstance().recordException(e);
             Log.e(TAG, "onCreateView: ", e);
         }
@@ -586,6 +592,7 @@ public class RXConnectionFGService extends Service implements ConnectionHelper.L
      * This method is for initialising the Socket for connection using QRCode
      */
     private void initializeQRConnection() {
+        StaticUtils.setConnectionType(AppConstants.CONST_QR_CODE);
         if (connectionHelper != null)
             connectionHelper.destroy(this);
 

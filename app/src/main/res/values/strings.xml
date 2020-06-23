@@ -10,7 +10,7 @@
     <string name="rename">Rename</string>
     <string name="copy">Copy</string>
     <string name="share">Share</string>
-    <string name="send_to_blade">Send To Blade</string>
+    <string name="send_to_blade">Transfer Selected Files</string>
     <string name="folder_is_empty">Folder is Empty</string>
     <string name="title_activity_main2">Main2Activity</string>
 
@@ -88,7 +88,7 @@
     <string name="follow_system">Follow System</string>
     <string name="ui_mode">UI Mode</string>
     <string name="dark_mode">Dark Mode</string>
-    <string name="currently_no_device_is_connected_nplease_connect_to_blade_to_view_data">Currently no device is connected.\nPlease Connect to Blade to view data.</string>
+    <string name="currently_no_device_is_connected_nplease_connect_to_blade_to_view_data">You are not connected to a device at the moment</string>
     <string name="open_files_location">Open Files Location</string>
     <string name="light_mode">Light Mode</string>
     <string name="blade_files">Blade Files</string>

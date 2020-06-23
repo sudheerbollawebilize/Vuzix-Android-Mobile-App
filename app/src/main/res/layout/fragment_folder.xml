@@ -7,58 +7,12 @@
         android:layout_height="match_parent"
         android:background="@color/colorWhite">
 
-        <RelativeLayout
+        <include
             android:id="@+id/linDevice"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:background="@color/colorLightGrey"
-            android:padding="@dimen/six_dp"
+            layout="@layout/layout_connected_device_tab"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_toStartOf="@id/txtConnectionType">
-
-                <com.webilize.vuzixfilemanager.utils.customviews.AppTextView
-                    android:id="@+id/txtDevice"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:paddingStart="@dimen/seven_dp"
-                    android:paddingEnd="@dimen/three_dp"
-                    android:text="@string/device"
-                    android:textColor="@color/colorGreyBlack"
-                    android:textSize="@dimen/fourteen_sp" />
-
-                <com.webilize.vuzixfilemanager.utils.customviews.AppTextView
-                    android:id="@+id/txtDeviceName"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:paddingStart="@dimen/ten_dp"
-                    android:paddingEnd="@dimen/ten_dp"
-                    android:textColor="@color/colorBlack"
-                    android:textSize="@dimen/sixteen_sp"
-                    app:txt_font_type="bold" />
-
-            </LinearLayout>
-
-            <com.webilize.vuzixfilemanager.utils.customviews.AppTextView
-                android:id="@+id/txtConnectionType"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_gravity="center_vertical"
-                android:paddingStart="@dimen/ten_dp"
-                android:paddingEnd="@dimen/ten_dp"
-                android:textColor="@color/colorBlack"
-                android:textSize="@dimen/sixteen_sp"
-                app:txt_font_type="bold" />
-
-        </RelativeLayout>
+            app:layout_constraintTop_toTopOf="parent" />
 
         <View
             android:id="@+id/seperator"
