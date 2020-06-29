@@ -496,7 +496,12 @@ public class StaticUtils {
     public static String getDeviceName(Context context) {
         try {
             SharedPreferences sp = context.getSharedPreferences(WiFiDirectUtils.SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE);
-            return sp.getString(WiFiDirectUtils.WIFI_DIRECT_REMOTE_DEVICE_NAME, "");
+            String deviceName = "";
+            deviceName = sp.getString(WiFiDirectUtils.WIFI_DIRECT_REMOTE_DEVICE_NAME, "");
+            if (TextUtils.isEmpty(deviceName)) {
+                deviceName = AppStorage.getInstance(context).getValue(WiFiDirectUtils.WIFI_DIRECT_REMOTE_DEVICE_NAME, "");
+            }
+            return deviceName;
         } catch (Exception e) {
             e.printStackTrace();
         }

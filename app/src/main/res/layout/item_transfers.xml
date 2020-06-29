@@ -75,17 +75,31 @@
                 android:layout_below="@id/progressBar"
                 android:layout_toEndOf="@id/imgFileSmall"
                 android:inputType="textNoSuggestions"
-                android:visibility="gone"
                 android:padding="@dimen/five_dp"
                 android:textColor="@color/colorGreyBlack"
-                android:textSize="@dimen/fifteen_sp" />
+                android:textSize="@dimen/fifteen_sp"
+                android:visibility="gone" />
 
             <com.webilize.vuzixfilemanager.utils.customviews.AppTextView
                 android:id="@+id/txtFileSize"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/progressBar"
+                android:layout_toStartOf="@id/txtTimeStamp"
                 android:layout_toEndOf="@id/imgFileSmall"
+                android:gravity="center_vertical"
+                android:inputType="textNoSuggestions"
+                android:padding="@dimen/five_dp"
+                android:textColor="@color/colorGreyBlack"
+                android:textSize="@dimen/fourteen_sp" />
+
+            <com.webilize.vuzixfilemanager.utils.customviews.AppTextView
+                android:id="@+id/txtTimeStamp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/progressBar"
+                android:layout_alignParentEnd="true"
+                android:layout_marginEnd="@dimen/fifteen_dp"
                 android:gravity="center_vertical"
                 android:inputType="textNoSuggestions"
                 android:padding="@dimen/five_dp"

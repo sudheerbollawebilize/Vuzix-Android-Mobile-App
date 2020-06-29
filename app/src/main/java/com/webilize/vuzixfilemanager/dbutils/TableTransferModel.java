@@ -10,6 +10,7 @@ public class TableTransferModel {
 
     public String name = null;
     public String progress = null;
+    public String timeStamp = null;
     public String status = null;
     public String rawData = null;
     public String isIncoming = null;
@@ -25,13 +26,14 @@ public class TableTransferModel {
         size = "zSize";
         progress = "zprogress";
         folderPath = "zFolderPath";
+        timeStamp = "zTimeStamp";
         status = "zstatus";
         id = "zid";
         isIncoming = "zisIncoming";
         rawData = "zrawData";
 
         CREATE_TABLE = "create table if not exists " + TABLE_NAME + " ( " + id + " INTEGER PRIMARY KEY NOT NULL, " + name +
-                " TEXT, " + folderPath + " TEXT, " + progress + " INTEGER, " + status + " INTEGER, " + size + " TEXT, " + isIncoming + " INTEGER, " + rawData + " TEXT, UNIQUE (" + id + ") ON CONFLICT REPLACE);";
+                " TEXT, " + timeStamp + " TEXT, " + folderPath + " TEXT, " + progress + " INTEGER, " + status + " INTEGER, " + size + " TEXT, " + isIncoming + " INTEGER, " + rawData + " TEXT, UNIQUE (" + id + ") ON CONFLICT REPLACE);";
 
     }
 }

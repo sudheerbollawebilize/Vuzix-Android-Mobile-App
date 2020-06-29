@@ -7,7 +7,7 @@ import androidx.annotation.Nullable;
 
 public class TransferModel implements Parcelable {
 
-    public String name = "", rawData = "", folderLocation = "";
+    public String name = "", rawData = "", folderLocation = "", timeStamp = "";
     public int progress;
     //    Status - 0>ongoing, 1>completed, 2>cancelled
     public int status;
@@ -22,6 +22,7 @@ public class TransferModel implements Parcelable {
     protected TransferModel(Parcel in) {
         name = in.readString();
         folderLocation = in.readString();
+        timeStamp = in.readString();
         rawData = in.readString();
         status = in.readInt();
         progress = in.readInt();
@@ -34,6 +35,7 @@ public class TransferModel implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(name);
         dest.writeString(folderLocation);
+        dest.writeString(timeStamp);
         dest.writeString(rawData);
         dest.writeInt(progress);
         dest.writeInt(isIncoming ? 0 : 1);

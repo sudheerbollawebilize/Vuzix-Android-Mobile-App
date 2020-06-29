@@ -633,7 +633,9 @@ public class MainActivity extends BaseActivity implements NavigationListener, Vi
     }
 
     private void requestForOriginalFiles(long size, ArrayList<String> fileNames) {
-        activityMainBinding.bottomBar.setSelectedItemId(R.id.navTransfers);
+        if (fileNames.size() == 1) {
+        } else
+            activityMainBinding.bottomBar.setSelectedItemId(R.id.navTransfers);
         Intent serviceIntent = new Intent(MainActivity.this, RXConnectionFGService.class);
         serviceIntent.putExtra("inputExtra", "folder");
         serviceIntent.putExtra("fileNames", fileNames);

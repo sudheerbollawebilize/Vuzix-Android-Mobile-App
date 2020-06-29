@@ -415,6 +415,7 @@ public class BladeFolderFragment extends BaseFragment implements IClickListener,
         ArrayList<String> selectedPaths = new ArrayList<>();
         selectedPaths.add(selectedFile.path);
         mainActivity.requestForFilesOriginal(selectedFile.size, selectedPaths);
+//        mainActivity.requestForFilesOriginal(selectedFile.size, selectedFile.path);
         deselectAll();
     }
 

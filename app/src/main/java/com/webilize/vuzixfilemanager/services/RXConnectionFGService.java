@@ -87,7 +87,6 @@ public class RXConnectionFGService extends Service implements ConnectionHelper.L
         @Override
         public void accept(DataWrapper dataWrapper) {
             if (dataWrapper.getSocketState() == SocketState.PROGRESS) {
-//                Log.e("progress: ", ((Integer) dataWrapper.getData()) / 100 + " %");
                 try {
                     if (dataWrapper.getData() != null) {
                         printLogs();
@@ -130,12 +129,19 @@ public class RXConnectionFGService extends Service implements ConnectionHelper.L
     @Override
     public void onDestroy() {
         Log.e(TAG, "On Destroy");
-        AppStorage.getInstance(this).setValue(AppStorage.SP_DEVICE_ADDRESS, "");
+        clearDeviceData();
         communicationProtocol.destroy(this);
         if (connectionHelper != null) {
             connectionHelper.destroy(this);
         }
         super.onDestroy();
+    }
+
+    private void clearDeviceData() {
+        AppStorage.getInstance(this).setValue(WiFiDirectUtils.WIFI_DIRECT_REMOTE_DEVICE_NAME, "");
+        AppStorage.getInstance(this).setValue(WiFiDirectUtils.WIFI_DIRECT_DEVICE_ADDRESS, "");
+        AppStorage.getInstance(this).setValue(AppStorage.SP_DEVICE_ADDRESS, "");
+
     }
 
     @Override
@@ -246,7 +252,7 @@ public class RXConnectionFGService extends Service implements ConnectionHelper.L
                 } else
                     toast("Already another transaction is going on. Please wait till it is done.");
             } else if (input.equalsIgnoreCase("stop")) {
-                AppStorage.getInstance(this).setValue(AppStorage.SP_DEVICE_ADDRESS, "");
+                clearDeviceData();
                 StaticUtils.setConnectionType(AppConstants.CONST_CONNECTION_EMPTY);
                 try {
                     if (bluetoothChatService != null && bluetoothChatService.getState() == BluetoothChatService.STATE_CONNECTED)
@@ -421,6 +427,7 @@ public class RXConnectionFGService extends Service implements ConnectionHelper.L
                             AppStorage.getInstance(this).setValue(WiFiDirectUtils.WIFI_DIRECT_DEVICE_ADDRESS, jsonObject.getString("MacAddress"));
                             AppStorage.getInstance(this).setValue(AppStorage.SP_DEVICE_ADDRESS, jsonObject.getString("MacAddress"));
                             updateDBWithDetails(jsonObject.getString("name"), jsonObject.getString("MacAddress"));
+                            EventBus.getDefault().post(new OnSocketConnected(false));
                         }, error -> {
                             isAllowNewRequests = true;
                         });
@@ -729,7 +736,8 @@ public class RXConnectionFGService extends Service implements ConnectionHelper.L
                 long finalFileSize = fileSize;
                 transferModel = new TransferModel();
                 try {
-                    transferModel.name = fileArrayList.get(0).getName() + " " + DateUtils.getCurrentDate();
+                    transferModel.name = fileArrayList.get(0).getName();
+                    transferModel.timeStamp = DateUtils.getCurrentDate();
                     transferModel.progress = 0;
                     transferModel.status = AppConstants.CONST_TRANSFER_ONGOING;
                     transferModel.folderLocation = parentFolderPath;
@@ -747,8 +755,9 @@ public class RXConnectionFGService extends Service implements ConnectionHelper.L
                         .subscribe(jsonObject -> {
                             isAllowNewRequests = true;
                             toast("Sent files to blade.");
-                            transferModel.name = fileArrayList.get(0).getName() + " " + DateUtils.getCurrentDate();
+                            transferModel.name = fileArrayList.get(0).getName();
                             transferModel.rawData = getJsonDataForFiles(files);
+                            transferModel.timeStamp = DateUtils.getCurrentDate();
                             transferModel.status = AppConstants.CONST_TRANSFER_COMPLETED;
                             transferModel.size = finalFileSize;
                             dbHelper.addTransferModel(transferModel);
@@ -849,7 +858,8 @@ public class RXConnectionFGService extends Service implements ConnectionHelper.L
                 toast("Started Fetching Originals from Blade");
                 transferModel = new TransferModel();
                 try {
-                    transferModel.name = "File " + DateUtils.getCurrentDate();
+                    transferModel.name = "File ";
+                    transferModel.timeStamp = DateUtils.getCurrentDate();
                     transferModel.progress = 0;
                     transferModel.status = AppConstants.CONST_TRANSFER_ONGOING;
                     transferModel.size = size;
@@ -867,8 +877,9 @@ public class RXConnectionFGService extends Service implements ConnectionHelper.L
                         .subscribe(filesList -> {
                             isAllowNewRequests = true;
                             EventBus.getDefault().post(new OnThumbsReceived(filesList));
-                            transferModel.name = (filesList.get(0) != null ? filesList.get(0).getName() : "") + " " + DateUtils.getCurrentDate();
+                            transferModel.name = filesList.get(0) != null ? filesList.get(0).getName() : "File";
                             transferModel.rawData = getJsonDataForFiles(filesList);
+                            transferModel.timeStamp = DateUtils.getCurrentDate();
                             transferModel.status = AppConstants.CONST_TRANSFER_COMPLETED;
                             transferModel.size = getFilesSize(filesList);
                             dbHelper.addTransferModel(transferModel);

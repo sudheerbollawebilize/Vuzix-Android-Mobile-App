@@ -29,6 +29,7 @@ public class DBHelper {
         databaseHandler.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(TableTransferModel.getInstance().name, transferModel.name);
+        values.put(TableTransferModel.getInstance().timeStamp, transferModel.timeStamp);
         values.put(TableTransferModel.getInstance().size, transferModel.size + "");
         values.put(TableTransferModel.getInstance().rawData, transferModel.rawData);
         values.put(TableTransferModel.getInstance().folderPath, transferModel.folderLocation);
@@ -194,6 +195,8 @@ public class DBHelper {
                 TransferModel salesReportsModel = new TransferModel();
                 salesReportsModel.name =
                         cursor.getString(cursor.getColumnIndex(TableTransferModel.getInstance().name));
+                salesReportsModel.timeStamp =
+                        cursor.getString(cursor.getColumnIndex(TableTransferModel.getInstance().timeStamp));
                 salesReportsModel.folderLocation =
                         cursor.getString(cursor.getColumnIndex(TableTransferModel.getInstance().folderPath));
                 salesReportsModel.status =

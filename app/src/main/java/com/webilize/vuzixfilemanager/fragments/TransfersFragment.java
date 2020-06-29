@@ -24,6 +24,7 @@ import com.webilize.vuzixfilemanager.adapters.TransfersAdapter;
 import com.webilize.vuzixfilemanager.databinding.FragmentTransfersBinding;
 import com.webilize.vuzixfilemanager.dbutils.DBHelper;
 import com.webilize.vuzixfilemanager.interfaces.IClickListener;
+import com.webilize.vuzixfilemanager.interfaces.NavigationListener;
 import com.webilize.vuzixfilemanager.models.FileFolderItem;
 import com.webilize.vuzixfilemanager.models.TransferModel;
 import com.webilize.vuzixfilemanager.utils.AppConstants;
@@ -50,9 +51,10 @@ public class TransfersFragment extends BaseFragment implements IClickListener, V
     private DBHelper dbHelper;
     private CommunicationProtocol cp;
     private ArrayList<TransferModel> transferModelArrayListOutGoing, transferModelArrayListIncoming;
-    private TransfersAdapter transfersAdapter;
+    private TransfersAdapter transfersAdapterIncoming, transfersAdapterOutGoing;
     private PopupMenu popupMenu, itemPopUpMenu;
     private TransferModel selectedFile;
+    private NavigationListener navigationListener;
 
     public static TransfersFragment newInstance() {
         return new TransfersFragment();
@@ -63,6 +65,8 @@ public class TransfersFragment extends BaseFragment implements IClickListener, V
         super.onAttach(context);
         try {
             mainActivity = (MainActivity) context;
+            if (context instanceof NavigationListener)
+                navigationListener = (NavigationListener) context;
             cp = CommunicationProtocol.getInstance();
             dbHelper = new DBHelper(mainActivity);
         } catch (Exception e) {
@@ -161,7 +165,7 @@ public class TransfersFragment extends BaseFragment implements IClickListener, V
                         getIndex(true, onProgressUpdated.transferModel);
                     } else {
                         transferModelArrayListIncoming.add(0, onProgressUpdated.transferModel);
-                        setAdapter();
+                        transfersAdapterIncoming.notifyItemInserted(0);
                     }
                     fragmentTransfersBinding.tabLayout.selectTab(fragmentTransfersBinding.tabLayout.getTabAt(0));
                 } else {
@@ -169,7 +173,7 @@ public class TransfersFragment extends BaseFragment implements IClickListener, V
                         getIndex(false, onProgressUpdated.transferModel);
                     } else {
                         transferModelArrayListOutGoing.add(0, onProgressUpdated.transferModel);
-                        setAdapter();
+                        transfersAdapterOutGoing.notifyItemInserted(0);
                     }
                     fragmentTransfersBinding.tabLayout.selectTab(fragmentTransfersBinding.tabLayout.getTabAt(1));
                 }
@@ -196,7 +200,8 @@ public class TransfersFragment extends BaseFragment implements IClickListener, V
                 for (int i = 0; i < transferModelArrayListIncoming.size(); i++) {
                     if (transferModel.id == transferModelArrayListIncoming.get(i).id) {
                         transferModelArrayListIncoming.set(i, transferModel);
-                        if (transfersAdapter != null) transfersAdapter.notifyItemChanged(i);
+                        if (transfersAdapterIncoming != null)
+                            transfersAdapterIncoming.notifyItemChanged(i);
                         return;
                     }
                 }
@@ -207,7 +212,8 @@ public class TransfersFragment extends BaseFragment implements IClickListener, V
                 for (int i = 0; i < transferModelArrayListOutGoing.size(); i++) {
                     if (transferModel.id == transferModelArrayListOutGoing.get(i).id) {
                         transferModelArrayListOutGoing.set(i, transferModel);
-                        if (transfersAdapter != null) transfersAdapter.notifyItemChanged(i);
+                        if (transfersAdapterOutGoing != null)
+                            transfersAdapterOutGoing.notifyItemChanged(i);
                         return;
                     }
                 }
@@ -267,17 +273,25 @@ public class TransfersFragment extends BaseFragment implements IClickListener, V
             switch (item.getItemId()) {
                 case R.id.menuCancel:
                     if (transferModel.status == AppConstants.CONST_TRANSFER_ONGOING) {
-                        mainActivity.cancelTransfer(selectedFile);
+                        mainActivity.cancelTransfer(transferModel);
                     }
                     return false;
                 case R.id.menuShowLocation:
-                    mainActivity.open(new FileFolderItem(new File(transferModel.folderLocation)));
+                    mainActivity.activityMainBinding.bottomBar.setSelectedItemId(R.id.navFilesManager);
+                    navigationListener.open(new FileFolderItem(new File(transferModel.folderLocation)));
                     return false;
                 case R.id.menuRemove:
                     DialogUtils.showDeleteDialog(mainActivity, getString(R.string.are_you_sure_you_want_to_clear_the_files), getString(R.string.clear), (dialog, which) -> {
-                        dbHelper.deleteTransferModel(selectedFile.id + "");
-                        transferModelArrayListOutGoing.remove(selectedFile);
-                        transfersAdapter.notifyDataSetChanged();
+                        dbHelper.deleteTransferModel(transferModel.id + "");
+                        if (fragmentTransfersBinding.tabLayout.getSelectedTabPosition() == 0) {
+                            transferModelArrayListIncoming.remove(transferModel);
+                            transfersAdapterIncoming.notifyDataSetChanged();
+                            transfersPagerAdapter.checkForVisibility(true);
+                        } else {
+                            transferModelArrayListOutGoing.remove(transferModel);
+                            transfersAdapterOutGoing.notifyDataSetChanged();
+                            transfersPagerAdapter.checkForVisibility(false);
+                        }
                     });
                     return false;
                 default:
@@ -325,7 +339,7 @@ public class TransfersFragment extends BaseFragment implements IClickListener, V
             if (position == 0) {
                 recyclerView.addItemDecoration(new DividerItemDecoration(mainActivity, DividerItemDecoration.VERTICAL_LIST));
                 recyclerView.setLayoutManager(new LinearLayoutManager(mainActivity));
-                transfersAdapter = new TransfersAdapter(mainActivity, transferModelArrayListIncoming, new IClickListener() {
+                transfersAdapterIncoming = new TransfersAdapter(mainActivity, transferModelArrayListIncoming, new IClickListener() {
                     @Override
                     public void onClick(View view, int position) {
                         selectedFile = transferModelArrayListIncoming.get(position);
@@ -341,12 +355,12 @@ public class TransfersFragment extends BaseFragment implements IClickListener, V
 
                     }
                 });
-                recyclerView.setAdapter(transfersAdapter);
+                recyclerView.setAdapter(transfersAdapterIncoming);
                 checkForVisibility(true);
             } else {
                 recyclerView.addItemDecoration(new DividerItemDecoration(mainActivity, DividerItemDecoration.VERTICAL_LIST));
                 recyclerView.setLayoutManager(new LinearLayoutManager(mainActivity));
-                transfersAdapter = new TransfersAdapter(mainActivity, transferModelArrayListOutGoing, new IClickListener() {
+                transfersAdapterOutGoing = new TransfersAdapter(mainActivity, transferModelArrayListOutGoing, new IClickListener() {
                     @Override
                     public void onClick(View view, int position) {
                         selectedFile = transferModelArrayListOutGoing.get(position);
@@ -362,7 +376,7 @@ public class TransfersFragment extends BaseFragment implements IClickListener, V
 
                     }
                 });
-                recyclerView.setAdapter(transfersAdapter);
+                recyclerView.setAdapter(transfersAdapterOutGoing);
                 checkForVisibility(false);
             }
             collection.addView(layout);
@@ -393,9 +407,9 @@ public class TransfersFragment extends BaseFragment implements IClickListener, V
             }
         }
 
-        private void checkForVisibility(boolean isIncoming) {
+        public void checkForVisibility(boolean isIncoming) {
             if (isIncoming) {
-                if (transferModelArrayListOutGoing == null || transferModelArrayListOutGoing.isEmpty()) {
+                if (transferModelArrayListIncoming == null || transferModelArrayListIncoming.isEmpty()) {
                     txtNoDataFound.setVisibility(View.VISIBLE);
                     recyclerView.setVisibility(View.GONE);
                 } else {
@@ -403,7 +417,7 @@ public class TransfersFragment extends BaseFragment implements IClickListener, V
                     recyclerView.setVisibility(View.VISIBLE);
                 }
             } else {
-                if (transferModelArrayListIncoming == null || transferModelArrayListIncoming.isEmpty()) {
+                if (transferModelArrayListOutGoing == null || transferModelArrayListOutGoing.isEmpty()) {
                     txtNoDataFound.setVisibility(View.VISIBLE);
                     recyclerView.setVisibility(View.GONE);
                 } else {
@@ -415,8 +429,11 @@ public class TransfersFragment extends BaseFragment implements IClickListener, V
 
     }
 
+    TransfersPagerAdapter transfersPagerAdapter;
+
     private void setAdapter() {
-        fragmentTransfersBinding.viewPager.setAdapter(new TransfersPagerAdapter(mainActivity));
+        transfersPagerAdapter = new TransfersPagerAdapter(mainActivity);
+        fragmentTransfersBinding.viewPager.setAdapter(transfersPagerAdapter);
         fragmentTransfersBinding.tabLayout.setupWithViewPager(fragmentTransfersBinding.viewPager);
     }
 

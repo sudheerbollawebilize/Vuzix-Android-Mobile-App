@@ -31,7 +31,12 @@ public class BaseApplication extends Application {
         appStorage = AppStorage.getInstance(this);
         filterSortingMode = AppStorage.getInstance(this).getValue(AppStorage.SP_SORT_MODE, 0);
         StaticUtils.getBookMarkedLocations(this);
-        new DBHelper(this).cleanTransferModelRecordsPeriodically();
+        try {
+            new DBHelper(this).cleanTransferModelRecordsPeriodically();
+        } catch (Exception e) {
+            e.printStackTrace();
+            FirebaseCrashlytics.getInstance().recordException(e);
+        }
     }
 
     public static synchronized BaseApplication getInstance() {
