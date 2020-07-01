@@ -36,7 +36,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL(TableTransferModel.getInstance().CREATE_TABLE);
+        db.execSQL(TableTransferModel.CREATE_TABLE);
         db.execSQL(TableDevice.CREATE_TABLE);
         db.execSQL(TableDeviceFavorites.CREATE_TABLE);
     }
@@ -45,7 +45,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         try {
             if (oldVersion != newVersion) {
-                db.execSQL("DROP TABLE IF EXISTS " + TableTransferModel.getInstance().TABLE_NAME);
+                db.execSQL("DROP TABLE IF EXISTS " + TableTransferModel.TABLE_NAME);
                 db.execSQL("DROP TABLE IF EXISTS " + TableDevice.TABLE_NAME);
                 db.execSQL("DROP TABLE IF EXISTS " + TableDeviceFavorites.TABLE_NAME);
                 onCreate(db);
@@ -78,14 +78,14 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     @Synchronized
     public void clearDB() {
-        getWritableDatabase().execSQL("delete from " + TableTransferModel.getInstance().TABLE_NAME);
+        getWritableDatabase().execSQL("delete from " + TableTransferModel.TABLE_NAME);
         getWritableDatabase().execSQL("delete from " + TableDevice.TABLE_NAME);
         getWritableDatabase().execSQL("delete from " + TableDeviceFavorites.TABLE_NAME);
     }
 
     @Synchronized
     public void clearAllTables() {
-        getWritableDatabase().execSQL("delete from " + TableTransferModel.getInstance().TABLE_NAME);
+        getWritableDatabase().execSQL("delete from " + TableTransferModel.TABLE_NAME);
         getWritableDatabase().execSQL("delete from " + TableDevice.TABLE_NAME);
         getWritableDatabase().execSQL("delete from " + TableDeviceFavorites.TABLE_NAME);
     }
@@ -99,11 +99,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return getWritableDatabase().insert(tableName, null, values);
     }
 
-    public int updateData(
-            String tableName,
-            ContentValues values,
-            String where,
-            String[] args) {
+    public int updateData(String tableName, ContentValues values, String where, String[] args) {
         return getWritableDatabase().update(tableName, values, where, args);
     }
 

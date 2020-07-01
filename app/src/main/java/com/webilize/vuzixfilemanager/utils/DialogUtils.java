@@ -11,6 +11,8 @@ import android.view.WindowManager;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import androidx.appcompat.widget.AppCompatImageView;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -334,7 +336,7 @@ public class DialogUtils {
     }
 
     public static void showSendFileDialogBT(Context context, final String message,
-                                          final DialogInterface.OnClickListener proceedClickListener) {
+                                            final DialogInterface.OnClickListener proceedClickListener) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setMessage(message);
         builder.setTitle(context.getString(R.string.app_name));
@@ -658,6 +660,64 @@ public class DialogUtils {
         }
     }
 
+    public static void showCreateNewFolderInBladeDialog(final Context mContext, final View.OnClickListener positiveClick) {
+        try {
+            AppTextView txtHeading = null, txtPositiveButton = null, txtNegativeButton = null, txtErrorMessage;
+            AppEditText edtMessage;
+            final Dialog alertDialog = new Dialog(mContext, R.style.AlertDialogCustom);
+            alertDialog.setCancelable(false);
+            alertDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+            alertDialog.setContentView(R.layout.layout_edittext_dialog);
+            txtHeading = alertDialog.findViewById(R.id.txtHeading);
+            txtErrorMessage = alertDialog.findViewById(R.id.txtErrorMessage);
+            edtMessage = alertDialog.findViewById(R.id.edtMessage);
+            txtPositiveButton = alertDialog.findViewById(R.id.txtRename);
+            txtNegativeButton = alertDialog.findViewById(R.id.txtCancel);
+
+            txtPositiveButton.setText(R.string.create);
+            txtErrorMessage.setText(R.string.folder_already_exists);
+
+            alertDialog.getWindow().getAttributes().windowAnimations = R.style.AlertDialogCustom;
+
+            WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
+            Window window = alertDialog.getWindow();
+            lp.copyFrom(window.getAttributes());
+            lp.width = WindowManager.LayoutParams.MATCH_PARENT;
+            lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
+            window.setAttributes(lp);
+
+            txtPositiveButton.setOnClickListener(v -> {
+                String fileName = edtMessage.getText().toString().trim();
+                if (!TextUtils.isEmpty(fileName)) {
+                    if (fileName.matches(AppConstants.ReservedChars)) {
+                        txtErrorMessage.setVisibility(View.VISIBLE);
+                        txtErrorMessage.setText("Special Characters " + AppConstants.ReservedChars + " are Not Allowed");
+                    } else {
+                        v.setTag(fileName);
+                        if (positiveClick != null) {
+                            positiveClick.onClick(v);
+                        }
+                        txtErrorMessage.setVisibility(View.INVISIBLE);
+                        alertDialog.dismiss();
+                    }
+                } else {
+                    txtErrorMessage.setVisibility(View.VISIBLE);
+                    txtErrorMessage.setText("Folder name cannot be empty");
+                }
+            });
+
+            txtNegativeButton.setOnClickListener(v -> {
+                alertDialog.dismiss();
+            });
+
+            alertDialog.setCancelable(false);
+            alertDialog.setCanceledOnTouchOutside(false);
+            alertDialog.show();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public static void showFileInfoDialog(Context context, final FileFolderItem fileFolderItem) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle(fileFolderItem.file.getName().equalsIgnoreCase("0") ? "Home" : fileFolderItem.file.getName());
@@ -691,6 +751,70 @@ public class DialogUtils {
         });
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
+    }
+
+    public static void showConnectionInfoDialog(Context context, String type) {
+        try {
+            AppTextView txtHeading = null, txtPositiveButton = null, txtContent1, txtContent2;
+            AppCompatImageView imageView1, imageView2;
+            final Dialog alertDialog = new Dialog(context, R.style.DialogActivity);
+            alertDialog.setCancelable(false);
+            alertDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+            alertDialog.setContentView(R.layout.dialog_info);
+            txtHeading = alertDialog.findViewById(R.id.txtHeading);
+            imageView1 = alertDialog.findViewById(R.id.imageView1);
+            txtContent1 = alertDialog.findViewById(R.id.txtContent1);
+            txtContent2 = alertDialog.findViewById(R.id.txtContent2);
+            imageView2 = alertDialog.findViewById(R.id.imageView2);
+            txtPositiveButton = alertDialog.findViewById(R.id.txtOk);
+            txtPositiveButton.setText(R.string.ok);
+//            alertDialog.getWindow().getAttributes().windowAnimations = R.style.AlertDialogCustom;
+
+//            WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
+//            Window window = alertDialog.getWindow();
+//            lp.copyFrom(window.getAttributes());
+//            lp.width = WindowManager.LayoutParams.MATCH_PARENT;
+//            lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
+//            window.setAttributes(lp);
+
+            txtPositiveButton.setOnClickListener(v -> {
+                alertDialog.dismiss();
+            });
+            String content1 = "", content2 = "";
+            int image = 0;
+            switch (type) {
+                case AppConstants.CONST_QR_CODE:
+                    content1 = context.getString(R.string.qrcode_step1);
+                    content2 = context.getString(R.string.qrcode_step2);
+                    image = R.drawable.connecr_qr_code;
+                    break;
+                case AppConstants.CONST_WIFI_DIRECT:
+                    content1 = context.getString(R.string.wifidirect_step1);
+                    content2 = context.getString(R.string.wifidirect_step2);
+                    image = R.drawable.connect_wifi_direct;
+                    break;
+                case AppConstants.CONST_WIFI_HOTSPOT:
+                    content1 = context.getString(R.string.hotspot_step1);
+                    content2 = context.getString(R.string.hotspot_step2);
+                    image = R.drawable.connect_hotspot;
+                    break;
+                case AppConstants.CONST_BLUETOOTH:
+                    content1 = context.getString(R.string.bluetooth_step1);
+                    content2 = context.getString(R.string.bluetooth_step2);
+                    image = R.drawable.connect_bluetooth;
+                    break;
+                default:
+                    break;
+            }
+            txtContent1.setText(content1);
+            txtContent2.setText(content2);
+            imageView2.setImageDrawable(ContextCompat.getDrawable(context, image));
+            alertDialog.setCancelable(false);
+            alertDialog.setCanceledOnTouchOutside(false);
+            alertDialog.show();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 

@@ -65,8 +65,7 @@ public class TransfersFragment extends BaseFragment implements IClickListener, V
         super.onAttach(context);
         try {
             mainActivity = (MainActivity) context;
-            if (context instanceof NavigationListener)
-                navigationListener = (NavigationListener) context;
+            navigationListener = (NavigationListener) context;
             cp = CommunicationProtocol.getInstance();
             dbHelper = new DBHelper(mainActivity);
         } catch (Exception e) {

@@ -135,6 +135,12 @@ public class ConnectivityFragment extends BaseFragment implements CompoundButton
         fragmentConnectivityBinding.btnQRCode.setOnClickListener(this);
         fragmentConnectivityBinding.btnScanForBTDevices.setOnClickListener(this);
         fragmentConnectivityBinding.btnHotSpot.setOnClickListener(this);
+
+        fragmentConnectivityBinding.txtBluetooth.setOnClickListener(this);
+        fragmentConnectivityBinding.txtHotSpot.setOnClickListener(this);
+        fragmentConnectivityBinding.txtLocalNetwork.setOnClickListener(this);
+        fragmentConnectivityBinding.txtWifiDirect.setOnClickListener(this);
+
         fragmentConnectivityBinding.btnDisconnect.setOnClickListener(this);
     }
 
@@ -288,6 +294,18 @@ public class ConnectivityFragment extends BaseFragment implements CompoundButton
                     showHideConnectivityOptions(true);
                 } else
                     StaticUtils.showToast(mainActivity, getString(R.string.no_dev_connected));
+                break;
+            case R.id.txtWifiDirect:
+                DialogUtils.showConnectionInfoDialog(mainActivity, AppConstants.CONST_WIFI_DIRECT);
+                break;
+            case R.id.txtHotSpot:
+                DialogUtils.showConnectionInfoDialog(mainActivity, AppConstants.CONST_WIFI_HOTSPOT);
+                break;
+            case R.id.txtBluetooth:
+                DialogUtils.showConnectionInfoDialog(mainActivity, AppConstants.CONST_BLUETOOTH);
+                break;
+            case R.id.txtLocalNetwork:
+                DialogUtils.showConnectionInfoDialog(mainActivity, AppConstants.CONST_QR_CODE);
                 break;
             default:
                 break;

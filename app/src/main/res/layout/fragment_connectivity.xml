@@ -239,13 +239,14 @@
                 app:layout_constraintTop_toBottomOf="@id/txtAvailableOptions">
 
                 <com.webilize.vuzixfilemanager.utils.customviews.AppTextView
+                    android:id="@+id/txtWifiDirect"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentStart="true"
                     android:layout_centerInParent="true"
                     android:layout_margin="@dimen/five_dp"
-                    android:layout_toStartOf="@id/btnScanForDevices"
                     android:drawableStart="@drawable/ic_wifi"
+                    android:drawableEnd="@drawable/ic_info"
                     android:drawablePadding="@dimen/fifteen_dp"
                     android:padding="@dimen/five_dp"
                     android:text="@string/wifi_direct"
@@ -288,13 +289,14 @@
                 app:layout_constraintTop_toBottomOf="@id/seperatorGrey3">
 
                 <com.webilize.vuzixfilemanager.utils.customviews.AppTextView
+                    android:id="@+id/txtHotSpot"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentStart="true"
                     android:layout_centerInParent="true"
                     android:layout_margin="@dimen/five_dp"
-                    android:layout_toStartOf="@id/btnHotSpot"
                     android:drawableStart="@drawable/ic_wifi"
+                    android:drawableEnd="@drawable/ic_info"
                     android:drawablePadding="@dimen/fifteen_dp"
                     android:padding="@dimen/five_dp"
                     android:text="@string/hotspot"
@@ -310,7 +312,7 @@
                     android:layout_margin="@dimen/five_dp"
                     android:gravity="center"
                     android:padding="@dimen/seven_dp"
-                    android:text="@string/scan"
+                    android:text="@string/get_code"
                     android:textAllCaps="true"
                     android:textColor="@color/colorBlue"
                     android:textSize="@dimen/seventeen_sp"
@@ -337,13 +339,14 @@
                 app:layout_constraintTop_toBottomOf="@id/seperatorGrey4">
 
                 <com.webilize.vuzixfilemanager.utils.customviews.AppTextView
+                    android:id="@+id/txtBluetooth"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentStart="true"
                     android:layout_centerInParent="true"
                     android:layout_margin="@dimen/five_dp"
-                    android:layout_toStartOf="@id/btnScanForBTDevices"
                     android:drawableStart="@drawable/ic_bluetooth"
+                    android:drawableEnd="@drawable/ic_info"
                     android:drawablePadding="@dimen/fifteen_dp"
                     android:padding="@dimen/five_dp"
                     android:text="@string/bluetooth"
@@ -386,13 +389,14 @@
                 app:layout_constraintTop_toBottomOf="@id/seperatorGrey5">
 
                 <com.webilize.vuzixfilemanager.utils.customviews.AppTextView
+                    android:id="@+id/txtLocalNetwork"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentStart="true"
                     android:layout_centerInParent="true"
                     android:layout_margin="@dimen/five_dp"
-                    android:layout_toStartOf="@id/btnQRCode"
                     android:drawableStart="@drawable/ic_qr"
+                    android:drawableEnd="@drawable/ic_info"
                     android:drawablePadding="@dimen/fifteen_dp"
                     android:padding="@dimen/five_dp"
                     android:text="@string/local_network"

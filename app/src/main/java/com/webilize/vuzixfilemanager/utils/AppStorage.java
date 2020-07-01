@@ -20,6 +20,7 @@ public class AppStorage {
     public static final String SP_SHOW_HIDDEN = "SP_SHOW_HIDDEN";
     public static final String SP_LIST_MODE = "SP_LIST_MODE";
     public static final String SP_SORT_MODE = "SP_SORT_MODE";
+    public static final String SP_SORT_DIR = "SP_SORT_DIR";
     public static final String SP_BOOKMARKED_FOLDERS = "SP_BOOKMARKED_FOLDERS";
     public static final String SP_CP_TEXT = "SP_CP_TEXT";
     public static final String SP_CP_FILE_PATHS = "SP_CP_FILE_PATHS";

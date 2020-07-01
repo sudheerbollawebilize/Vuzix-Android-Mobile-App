@@ -2,6 +2,7 @@ package com.webilize.vuzixfilemanager.fragments;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -39,6 +40,10 @@ import com.webilize.vuzixfilemanager.models.DeviceModel;
 import com.webilize.vuzixfilemanager.models.FileFolderItem;
 import com.webilize.vuzixfilemanager.utils.AppConstants;
 import com.webilize.vuzixfilemanager.utils.AppStorage;
+import com.webilize.vuzixfilemanager.utils.BladeLastModifiedComparator;
+import com.webilize.vuzixfilemanager.utils.BladeNameComparator;
+import com.webilize.vuzixfilemanager.utils.BladeSizeComparator;
+import com.webilize.vuzixfilemanager.utils.DialogUtils;
 import com.webilize.vuzixfilemanager.utils.StaticUtils;
 import com.webilize.vuzixfilemanager.utils.eventbus.OnSocketConnected;
 import com.webilize.vuzixfilemanager.utils.eventbus.OnThumbsReceived;
@@ -47,29 +52,34 @@ import com.webilize.vuzixfilemanager.utils.transferutils.CommunicationProtocol;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class BladeFolderFragment extends BaseFragment implements IClickListener, View.OnClickListener, AdapterView.OnItemSelectedListener {
 
     private FragmentBladeFolderBinding folderFragmentBinding;
-    private static final String ARG_FOLDER_ITEM = "ARG_FOLDER_ITEM";
+    //    private static final String ARG_FOLDER_ITEM = "ARG_FOLDER_ITEM";
     private static final String ARG_FOLDER_LIST = "ARG_FOLDER_LIST";
     private BladeFileFoldersAdapter fileFoldersAdapter;
     private RecyclerView.LayoutManager layoutManager;
     private MainActivity mainActivity;
     private NavigationListener navigationListener;
-    private String folderPath = "";
+    //    private String folderPath = "";
     private PopupMenu popupMenu;
     private BladeItem selectedFile;
     private boolean isLongPressed;
     private int counter = 0;
     private CommunicationProtocol cp;
-    private ArrayList<BladeItem> bladeItemArrayList;
+    private ArrayList<BladeItem> bladeItemArrayList, bladeItemArrayListOriginal;
     private Animation fabOpen, fabClose, fabClock, fabAnticlock;
     private boolean isOpen = false;
     private long size = 0;
 
+/*
     public static BladeFolderFragment newInstance(String folderPath) {
         BladeFolderFragment bladeFolderFragment = new BladeFolderFragment();
         Bundle bundle = new Bundle();
@@ -77,6 +87,7 @@ public class BladeFolderFragment extends BaseFragment implements IClickListener,
         bladeFolderFragment.setArguments(bundle);
         return bladeFolderFragment;
     }
+*/
 
     public static BladeFolderFragment newInstance(ArrayList<BladeItem> bladeItemArrayList) {
         BladeFolderFragment bladeFolderFragment = new BladeFolderFragment();
@@ -125,6 +136,24 @@ public class BladeFolderFragment extends BaseFragment implements IClickListener,
         setUpAnimation();
         setListeners();
         setUpSpinner();
+        setSortModeIcon(false);
+    }
+
+    private void setSortModeIcon(boolean change) {
+        int mode = AppStorage.getInstance(mainActivity).getValue(AppStorage.SP_SORT_DIR, AppConstants.CONST_SORT_ASC);
+        if (change) {
+            if (mode == AppConstants.CONST_SORT_ASC) {
+                folderFragmentBinding.imgSortMode.setImageDrawable(ContextCompat.getDrawable(mainActivity, R.drawable.ic_sort_desc));
+                AppStorage.getInstance(mainActivity).setValue(AppStorage.SP_SORT_DIR, AppConstants.CONST_SORT_DESC);
+            } else {
+                folderFragmentBinding.imgSortMode.setImageDrawable(ContextCompat.getDrawable(mainActivity, R.drawable.ic_sort_asc));
+                AppStorage.getInstance(mainActivity).setValue(AppStorage.SP_SORT_DIR, AppConstants.CONST_SORT_ASC);
+            }
+            updateMenuList();
+        } else {
+            folderFragmentBinding.imgSortMode.setImageDrawable(mode == AppConstants.CONST_SORT_ASC ? ContextCompat.getDrawable(mainActivity, R.drawable.ic_sort_asc) : ContextCompat.getDrawable(mainActivity, R.drawable.ic_sort_desc));
+        }
+
     }
 
     @Override
@@ -137,6 +166,9 @@ public class BladeFolderFragment extends BaseFragment implements IClickListener,
             case R.id.imgListMode:
                 AppStorage.getInstance(mainActivity).setValue(AppStorage.SP_LIST_MODE, AppStorage.getInstance(mainActivity).getValue(AppStorage.SP_LIST_MODE, AppConstants.SHOW_GRID) == AppConstants.SHOW_GRID ? AppConstants.SHOW_LIST : AppConstants.SHOW_GRID);
                 updateImageIconAndLayoutManager();
+                break;
+            case R.id.imgSortMode:
+                setSortModeIcon(true);
                 break;
             case R.id.btnConnect:
                 mainActivity.activityMainBinding.bottomBar.setSelectedItemId(R.id.navConnectivity);
@@ -282,6 +314,7 @@ public class BladeFolderFragment extends BaseFragment implements IClickListener,
         folderFragmentBinding.layoutFab.txtAllFolders.setOnClickListener(this);
         folderFragmentBinding.layoutFab.txtFavourites.setOnClickListener(this);
         folderFragmentBinding.imgListMode.setOnClickListener(this);
+        folderFragmentBinding.imgSortMode.setOnClickListener(this);
         mainActivity.activityMainBinding.imgMore.setOnClickListener(this);
         folderFragmentBinding.btnConnect.setOnClickListener(this);
     }
@@ -316,21 +349,83 @@ public class BladeFolderFragment extends BaseFragment implements IClickListener,
 
     private void getBundleData() {
         bladeItemArrayList = new ArrayList<>();
+        bladeItemArrayListOriginal = new ArrayList<>();
         if (getArguments() != null) {
             Bundle bundle = getArguments();
+/*
             if (bundle.containsKey(ARG_FOLDER_ITEM)) {
                 folderPath = bundle.getString(ARG_FOLDER_ITEM, "");
             }
+*/
             if (bundle.containsKey(ARG_FOLDER_LIST)) {
-                bladeItemArrayList = bundle.getParcelableArrayList(ARG_FOLDER_LIST);
+                bladeItemArrayListOriginal = bundle.getParcelableArrayList(ARG_FOLDER_LIST);
+                bladeItemArrayList.addAll(bladeItemArrayListOriginal);
             }
         }
 //        if (cp.isConnected()) mainActivity.requestForFolderWOFrag(folderPath);
     }
 
+    private void updateMenuList() {
+        boolean showHidden = AppStorage.getInstance(mainActivity).getValue(AppStorage.SP_SHOW_HIDDEN, false);
+        boolean showEmpty = AppStorage.getInstance(mainActivity).getValue(AppStorage.SP_SHOW_EMPTY_FOLDERS, true);
+        boolean showOnlyFiles = AppStorage.getInstance(mainActivity).getValue(AppStorage.SP_SHOW_ONLY_FILES, false);
+        boolean showOnlyFolders = AppStorage.getInstance(mainActivity).getValue(AppStorage.SP_SHOW_ONLY_FOLDERS, false);
+        int mode = AppStorage.getInstance(mainActivity).getValue(AppStorage.SP_SORT_DIR, AppConstants.CONST_SORT_ASC);
+        bladeItemArrayList.clear();
+        /*for (BladeItem bladeItem : bladeItemArrayListOriginal) {
+            if (showHidden)
+                if (!showHidden) {
+                    if (!bladeItem.isHidden) {
+                        bladeItemArrayList.add(bladeItem);
+                    }
+                } else bladeItemArrayList.addAll(bladeItemArrayListOriginal);
+        }*/
+        if (bladeItemArrayListOriginal != null && bladeItemArrayListOriginal.size() > 0) {
+//            BladeItem[] bladeItems = bladeItemArrayListOriginal.toArray(new BladeItem[]{});
+//            Arrays.sort(bladeItems);
+            switch (BaseApplication.filterSortingMode) {
+                case AppConstants.CONST_NAME:
+//                    Arrays.sort(bladeItems, new BladeNameComparator());
+                    Collections.sort(bladeItemArrayListOriginal, new BladeNameComparator(mode));
+                    break;
+                case AppConstants.CONST_MODIFIED:
+                    Collections.sort(bladeItemArrayListOriginal, new BladeLastModifiedComparator(mode));
+                    break;
+                case AppConstants.CONST_SIZE:
+                    Collections.sort(bladeItemArrayListOriginal, new BladeSizeComparator(mode));
+                    break;
+                default:
+                    break;
+            }
+            if (showOnlyFiles) {
+                for (BladeItem file : bladeItemArrayListOriginal) {
+                    if ((showHidden || !file.isHidden) && !file.isFolder) {
+                        bladeItemArrayList.add(file);
+                    }
+                }
+            } else if (showOnlyFolders) {
+                for (BladeItem file : bladeItemArrayListOriginal) {
+                    if ((showEmpty || file.size != 0) && (showHidden || !file.isHidden) && file.isFolder) {
+                        bladeItemArrayList.add(file);
+                    }
+                }
+            } else {
+                for (BladeItem file : bladeItemArrayListOriginal) {
+                    if (!file.isFolder) {
+                        if ((showHidden || !file.isHidden)) {
+                            bladeItemArrayList.add(file);
+                        }
+                    } else if ((showEmpty || file.size != 0) && (showHidden || !file.isHidden)) {
+                        bladeItemArrayList.add(file);
+                    }
+                }
+            }
+        }
+        fileFoldersAdapter.notifyDataSetChanged();
+    }
+
     private void setUpSpinner() {
-        ArrayAdapter<CharSequence> spinnerAdapter = ArrayAdapter.createFromResource(mainActivity, R.array.files_filter,
-                android.R.layout.simple_spinner_item);
+        ArrayAdapter<CharSequence> spinnerAdapter = ArrayAdapter.createFromResource(mainActivity, R.array.blade_files_filter, android.R.layout.simple_spinner_item);
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         folderFragmentBinding.spinnerFilter.setAdapter(spinnerAdapter);
         folderFragmentBinding.spinnerFilter.setOnItemSelectedListener(null);
@@ -343,7 +438,6 @@ public class BladeFolderFragment extends BaseFragment implements IClickListener,
         folderFragmentBinding.recyclerView.setLayoutManager(layoutManager);
         fileFoldersAdapter = new BladeFileFoldersAdapter(mainActivity, bladeItemArrayList, this);
         folderFragmentBinding.recyclerView.setAdapter(fileFoldersAdapter);
-
         updateListVisibility();
     }
 
@@ -364,7 +458,8 @@ public class BladeFolderFragment extends BaseFragment implements IClickListener,
     private void updateListVisibility() {
         if (cp.isConnected()) {
             folderFragmentBinding.btnConnect.setVisibility(View.GONE);
-            folderFragmentBinding.layoutFab.getRoot().setVisibility(TextUtils.isEmpty(folderPath) ? View.VISIBLE : View.GONE);
+//            folderFragmentBinding.layoutFab.getRoot().setVisibility(TextUtils.isEmpty(folderPath) ? View.VISIBLE : View.GONE);
+            folderFragmentBinding.layoutFab.getRoot().setVisibility(View.VISIBLE);
             if (bladeItemArrayList == null || bladeItemArrayList.isEmpty()) {
                 folderFragmentBinding.relFilter.setVisibility(View.GONE);
                 folderFragmentBinding.recyclerView.setVisibility(View.GONE);
@@ -388,8 +483,72 @@ public class BladeFolderFragment extends BaseFragment implements IClickListener,
     private void preparePopUpMenu() {
         popupMenu = new PopupMenu(mainActivity, mainActivity.activityMainBinding.imgMore);
         popupMenu.getMenuInflater().inflate(R.menu.menu_blade, popupMenu.getMenu());
+        popupMenu.getMenu().getItem(AppConstants.CONST_SHOW_HIDDEN).setChecked(AppStorage.getInstance(mainActivity).getValue(AppStorage.SP_SHOW_HIDDEN, false));
+        popupMenu.getMenu().getItem(AppConstants.CONST_SHOW_EMPTY).setChecked(AppStorage.getInstance(mainActivity).getValue(AppStorage.SP_SHOW_EMPTY_FOLDERS, true));
+        popupMenu.getMenu().getItem(AppConstants.CONST_SHOW_ONLY_FILES).setChecked(AppStorage.getInstance(mainActivity).getValue(AppStorage.SP_SHOW_ONLY_FILES, false));
+        popupMenu.getMenu().getItem(AppConstants.CONST_SHOW_ONLY_FOLDERS).setChecked(AppStorage.getInstance(mainActivity).getValue(AppStorage.SP_SHOW_ONLY_FOLDERS, false));
         popupMenu.setOnMenuItemClickListener(item -> {
             switch (item.getItemId()) {
+                case R.id.menuNewFolder:
+                    DialogUtils.showCreateNewFolderInBladeDialog(mainActivity, v -> {
+                        JSONObject jsonObject = new JSONObject();
+                        try {
+                            jsonObject.put("command", AppConstants.NEW_FOLDER);
+                            jsonObject.put("folderName", v.getTag());
+                            jsonObject.put("rootPath", "");
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        mainActivity.passCommandToBlade(jsonObject);
+                    });
+                    return false;
+                case R.id.menuDelete:
+                    DialogUtils.showDeleteDialog(mainActivity, getString(R.string.are_you_sure_you_want_to_delete_the_files), (dialog, which) -> {
+                        JSONObject jsonObject = new JSONObject();
+                        try {
+                            jsonObject.put("command", AppConstants.DELETE);
+                            JSONArray jsonArray = new JSONArray();
+                            for (String path : getSelectedFiles()) {
+                                jsonArray.put(path);
+                            }
+                            jsonObject.put("fileNames", jsonArray);
+                            jsonObject.put("rootPath", "");
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        mainActivity.passCommandToBlade(jsonObject);
+                    });
+                    return false;
+                case R.id.menuShowHiddenFiles:
+                    if (item.isChecked()) item.setChecked(false);
+                    else item.setChecked(true);
+                    AppStorage.getInstance(mainActivity).setValue(AppStorage.SP_SHOW_HIDDEN, item.isChecked());
+                    updateMenuList();
+                    return false;
+                case R.id.menuShowEmptyFolders:
+                    if (item.isChecked()) item.setChecked(false);
+                    else item.setChecked(true);
+                    AppStorage.getInstance(mainActivity).setValue(AppStorage.SP_SHOW_EMPTY_FOLDERS, item.isChecked());
+                    updateMenuList();
+                    return false;
+                case R.id.menuShowOnlyFolders:
+                    if (item.isChecked()) item.setChecked(false);
+                    else item.setChecked(true);
+                    if (AppStorage.getInstance(mainActivity).getValue(AppStorage.SP_SHOW_ONLY_FILES, false)) {
+                        AppStorage.getInstance(mainActivity).setValue(AppStorage.SP_SHOW_ONLY_FILES, false);
+                    }
+                    AppStorage.getInstance(mainActivity).setValue(AppStorage.SP_SHOW_ONLY_FOLDERS, item.isChecked());
+                    updateMenuList();
+                    return false;
+                case R.id.menuShowFilesOnly:
+                    if (item.isChecked()) item.setChecked(false);
+                    else item.setChecked(true);
+                    if (AppStorage.getInstance(mainActivity).getValue(AppStorage.SP_SHOW_ONLY_FOLDERS, false)) {
+                        AppStorage.getInstance(mainActivity).setValue(AppStorage.SP_SHOW_ONLY_FOLDERS, false);
+                    }
+                    AppStorage.getInstance(mainActivity).setValue(AppStorage.SP_SHOW_ONLY_FILES, item.isChecked());
+                    updateMenuList();
+                    return false;
                 case R.id.menuSelectAll:
                     if (item.getTitle().toString().equalsIgnoreCase(getString(R.string.select_all)))
                         doAllListSelection();
@@ -415,25 +574,25 @@ public class BladeFolderFragment extends BaseFragment implements IClickListener,
         ArrayList<String> selectedPaths = new ArrayList<>();
         selectedPaths.add(selectedFile.path);
         mainActivity.requestForFilesOriginal(selectedFile.size, selectedPaths);
-//        mainActivity.requestForFilesOriginal(selectedFile.size, selectedFile.path);
         deselectAll();
     }
 
     private void showMenuOptions() {
         if (cp.isConnected()) {
             if (counter == bladeItemArrayList.size()) {
-                popupMenu.getMenu().getItem(0).setTitle(R.string.de_select_all);
+                popupMenu.getMenu().getItem(AppConstants.CONST_SELECT_ALL).setTitle(R.string.de_select_all);
             } else
-                popupMenu.getMenu().getItem(0).setTitle(R.string.select_all);
+                popupMenu.getMenu().getItem(AppConstants.CONST_SELECT_ALL).setTitle(R.string.select_all);
             if (counter > 0) {
-                popupMenu.getMenu().getItem(1).setEnabled(true);
-            } else popupMenu.getMenu().getItem(1).setEnabled(false);
-        } else {
-            popupMenu.getMenu().getItem(0).setEnabled(false);
-            popupMenu.getMenu().getItem(1).setEnabled(false);
-
+                popupMenu.getMenu().getItem(AppConstants.CONST_POPUP_TRANSFER_SELECTED_FILES).setEnabled(true);
+            } else
+                popupMenu.getMenu().getItem(AppConstants.CONST_POPUP_TRANSFER_SELECTED_FILES).setEnabled(false);
+            popupMenu.show();
+//        } else {
+//            popupMenu.getMenu().getItem(0).setEnabled(false);
+//            popupMenu.getMenu().getItem(1).setEnabled(false);
         }
-        popupMenu.show();
+
     }
 
     private ArrayList<String> getSelectedFiles() {

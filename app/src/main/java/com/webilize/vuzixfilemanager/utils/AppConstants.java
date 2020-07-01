@@ -30,6 +30,9 @@ public class AppConstants {
     public static final int CONST_NAME = 0;
     public static final int CONST_MODIFIED = 1;
     public static final int CONST_SIZE = 2;
+
+    public static final int CONST_SORT_ASC = 0;
+    public static final int CONST_SORT_DESC = 1;
 //    public static final int CONST_TYPE = 3;
 
     public static final String CONST_IMAGES = "IMAGES";
@@ -73,5 +76,24 @@ public class AppConstants {
     public static final int CONST_POPUP_SHOW_ONLY_FILES = 8;
     public static final int CONST_POPUP_SHOW_ONLY_FOLDERS = 9;
     public static final int CONST_POPUP_SHOW_ONLY_FAVOURITES = 10;
+
+    //  popup menu blade options
+    public static final int CONST_NEW_FOLDER = 0;
+    public static final int CONST_SELECT_ALL = 1;
+    public static final int CONST_TRANSFER_SELECTED_FILES = 2;
+    //    public static final int CONST_COPY = 3;
+//    public static final int CONST_PASTE = 4;
+    public static final int CONST_DELETE = 3;
+    public static final int CONST_SHOW_HIDDEN = 4;
+    public static final int CONST_SHOW_EMPTY = 5;
+    public static final int CONST_SHOW_ONLY_FILES = 6;
+    public static final int CONST_SHOW_ONLY_FOLDERS = 7;
+    public static final int CONST_SHOW_ONLY_FAVOURITES = 8;
+
+    public static final String NEW_FOLDER = "New Folder";
+    public static final String DELETE = "Delete";
+    public static final String COPY = "Copy";
+    public static final String PASTE = "Paste";
+
 
 }

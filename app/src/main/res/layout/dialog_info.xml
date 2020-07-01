@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorWhite"
+    android:padding="@dimen/fifteen_dp">
+
+    <com.webilize.vuzixfilemanager.utils.customviews.AppTextView
+        android:id="@+id/txtHeading"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:padding="@dimen/ten_dp"
+        android:text="@string/how_to_connect"
+        android:textColor="@color/colorBlack"
+        android:textSize="@dimen/twenty_sp"
+        app:txt_font_type="bold" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/txtOk"
+        android:layout_below="@id/txtHeading"
+        android:fillViewport="true"
+        android:fitsSystemWindows="true"
+        android:overScrollMode="never"
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <com.webilize.vuzixfilemanager.utils.customviews.AppTextView
+                android:id="@+id/txtContent1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:lineSpacingExtra="@dimen/five_dp"
+                android:padding="@dimen/ten_dp"
+                android:text="@string/wifidirect_step1"
+                android:textColor="@color/colorBlack"
+                android:textSize="@dimen/sixteen_sp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/imageView1"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:padding="@dimen/ten_dp"
+                    android:src="@drawable/vuzix_img_home" />
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/imageView2"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:padding="@dimen/ten_dp"
+                    android:src="@drawable/connect_wifi_direct" />
+
+            </LinearLayout>
+
+            <com.webilize.vuzixfilemanager.utils.customviews.AppTextView
+                android:id="@+id/txtContent2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:lineSpacingExtra="@dimen/five_dp"
+                android:padding="@dimen/ten_dp"
+                android:text="@string/wifidirect_step2"
+                android:textColor="@color/colorBlack"
+                android:textSize="@dimen/sixteen_sp" />
+
+        </LinearLayout>
+
+    </ScrollView>
+
+    <com.webilize.vuzixfilemanager.utils.customviews.AppTextView
+        android:id="@+id/txtOk"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:background="?attr/selectableItemBackground"
+        android:padding="@dimen/ten_dp"
+        android:text="@string/ok"
+        android:textColor="@color/colorBlue"
+        android:textSize="@dimen/sixteen_sp"
+        app:txt_font_type="bold" />
+
+</RelativeLayout>

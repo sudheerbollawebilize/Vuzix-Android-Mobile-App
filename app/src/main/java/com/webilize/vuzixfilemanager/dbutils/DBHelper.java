@@ -28,23 +28,22 @@ public class DBHelper {
     public long addTransferModel(TransferModel transferModel) {
         databaseHandler.getWritableDatabase();
         ContentValues values = new ContentValues();
-        values.put(TableTransferModel.getInstance().name, transferModel.name);
-        values.put(TableTransferModel.getInstance().timeStamp, transferModel.timeStamp);
-        values.put(TableTransferModel.getInstance().size, transferModel.size + "");
-        values.put(TableTransferModel.getInstance().rawData, transferModel.rawData);
-        values.put(TableTransferModel.getInstance().folderPath, transferModel.folderLocation);
-        values.put(TableTransferModel.getInstance().progress, transferModel.progress);
-        values.put(TableTransferModel.getInstance().isIncoming, transferModel.isIncoming ? 0 : 1);
-        values.put(TableTransferModel.getInstance().status, transferModel.status);
+        values.put(TableTransferModel.name, transferModel.name);
+        values.put(TableTransferModel.timeStamp, transferModel.timeStamp);
+        values.put(TableTransferModel.size, transferModel.size + "");
+        values.put(TableTransferModel.rawData, transferModel.rawData);
+        values.put(TableTransferModel.folderPath, transferModel.folderLocation);
+        values.put(TableTransferModel.progress, transferModel.progress);
+        values.put(TableTransferModel.isIncoming, transferModel.isIncoming ? 0 : 1);
+        values.put(TableTransferModel.status, transferModel.status);
         try {
             if (transferModel.id != -1) {
-                values.put(TableTransferModel.getInstance().id, transferModel.id);
+                values.put(TableTransferModel.id, transferModel.id);
                 return databaseHandler.updateData(
-                        TableTransferModel.getInstance().TABLE_NAME, values, TableTransferModel.getInstance().id + "=?",
-                        new String[]{transferModel.id + ""}
+                        TableTransferModel.TABLE_NAME, values, TableTransferModel.id + "=?", new String[]{transferModel.id + ""}
                 );
             } else
-                return databaseHandler.insertData(TableTransferModel.getInstance().TABLE_NAME, values);
+                return databaseHandler.insertData(TableTransferModel.TABLE_NAME, values);
         } catch (Exception e) {
             e.printStackTrace();
             FirebaseCrashlytics.getInstance().recordException(e);
@@ -60,10 +59,9 @@ public class DBHelper {
         values.put(TableDevice.macAdrress, deviceModel.deviceAddress);
         try {
             if (deviceModel.id != -1) {
-                values.put(TableTransferModel.getInstance().id, deviceModel.id);
+                values.put(TableTransferModel.id, deviceModel.id);
                 return databaseHandler.updateData(
-                        TableDevice.TABLE_NAME, values, TableDevice.id + "=?",
-                        new String[]{deviceModel.id + ""}
+                        TableDevice.TABLE_NAME, values, TableDevice.id + "=?", new String[]{deviceModel.id + ""}
                 );
             } else
                 return databaseHandler.insertData(TableDevice.TABLE_NAME, values);
@@ -84,10 +82,9 @@ public class DBHelper {
         values.put(TableDeviceFavorites.isDefault, deviceFavouritesModel.isDefault ? 0 : 1);
         try {
             if (deviceFavouritesModel.id != -1) {
-                values.put(TableTransferModel.getInstance().id, deviceFavouritesModel.id);
+                values.put(TableTransferModel.id, deviceFavouritesModel.id);
                 return databaseHandler.updateData(
-                        TableDeviceFavorites.TABLE_NAME, values, TableDeviceFavorites.id + "=?",
-                        new String[]{deviceFavouritesModel.id + ""}
+                        TableDeviceFavorites.TABLE_NAME, values, TableDeviceFavorites.id + "=?", new String[]{deviceFavouritesModel.id + ""}
                 );
             } else
                 return databaseHandler.insertData(TableDeviceFavorites.TABLE_NAME, values);
@@ -109,8 +106,7 @@ public class DBHelper {
             DeviceModel deviceModel = new DeviceModel();
             deviceModel.name = cursor.getString(cursor.getColumnIndex(TableDevice.name));
             deviceModel.deviceAddress = cursor.getString(cursor.getColumnIndex(TableDevice.macAdrress));
-            deviceModel.id =
-                    cursor.getLong(cursor.getColumnIndex(TableDevice.id));
+            deviceModel.id = cursor.getLong(cursor.getColumnIndex(TableDevice.id));
             return deviceModel;
         }
         if (!cursor.isClosed()) {
@@ -171,21 +167,21 @@ public class DBHelper {
         if (showFinished) {
             if (isIncoming) {
                 selectQuery =
-                        "select * FROM " + TableTransferModel.getInstance().TABLE_NAME + " WHERE " + TableTransferModel.getInstance().isIncoming + "='" + 0 + "'" + " ORDER BY " + TableTransferModel.getInstance().id + " DESC LIMIT 20";
+                        "select * FROM " + TableTransferModel.TABLE_NAME + " WHERE " + TableTransferModel.isIncoming + "='" + 0 + "'" + " ORDER BY " + TableTransferModel.id + " DESC LIMIT 20";
             } else {
                 selectQuery =
-                        "select * FROM " + TableTransferModel.getInstance().TABLE_NAME + " WHERE " + TableTransferModel.getInstance().isIncoming + "='" + 1 + "'" + " ORDER BY " + TableTransferModel.getInstance().id + " DESC LIMIT 20";
+                        "select * FROM " + TableTransferModel.TABLE_NAME + " WHERE " + TableTransferModel.isIncoming + "='" + 1 + "'" + " ORDER BY " + TableTransferModel.id + " DESC LIMIT 20";
             }
         } else {
             selectQuery =
-                    "select * FROM " + TableTransferModel.getInstance().TABLE_NAME + " WHERE " + TableTransferModel.getInstance().status + "='" + 0 + (isIncoming ? ("' AND " + TableTransferModel.getInstance().isIncoming + "='" + 0 + "'") : "'") + " ORDER BY " + TableTransferModel.getInstance().id + " DESC LIMIT 20";
+                    "select * FROM " + TableTransferModel.TABLE_NAME + " WHERE " + TableTransferModel.status + "='" + 0 + (isIncoming ? ("' AND " + TableTransferModel.isIncoming + "='" + 0 + "'") : "'") + " ORDER BY " + TableTransferModel.id + " DESC LIMIT 20";
 
 //            if (isIncoming) {
 //                selectQuery =
-//                        "select * FROM " + TableTransferModel.getInstance().TABLE_NAME + " WHERE " + TableTransferModel.getInstance().status + "='" + 0 + (isIncoming ? ("' AND" + TableTransferModel.getInstance().isIncoming + "='" + 0 + "'") : "'") + " ORDER BY " + TableTransferModel.getInstance().id + " DESC LIMIT 20";
+//                        "select * FROM " + TableTransferModel.TABLE_NAME + " WHERE " + TableTransferModel.status + "='" + 0 + (isIncoming ? ("' AND" + TableTransferModel.isIncoming + "='" + 0 + "'") : "'") + " ORDER BY " + TableTransferModel.id + " DESC LIMIT 20";
 //            } else {
 //                selectQuery =
-//                        "select * FROM " + TableTransferModel.getInstance().TABLE_NAME + " WHERE " + TableTransferModel.getInstance().status + "='" + 0 + "' AND" + TableTransferModel.getInstance().isIncoming + "='" + 1 + "'" + " ORDER BY " + TableTransferModel.getInstance().id + " DESC LIMIT 20";
+//                        "select * FROM " + TableTransferModel.TABLE_NAME + " WHERE " + TableTransferModel.status + "='" + 0 + "' AND" + TableTransferModel.isIncoming + "='" + 1 + "'" + " ORDER BY " + TableTransferModel.id + " DESC LIMIT 20";
 //            }
         }
         databaseHandler.getReadableDatabase();
@@ -193,24 +189,15 @@ public class DBHelper {
         if (cursor != null && cursor.moveToFirst()) {
             do {
                 TransferModel salesReportsModel = new TransferModel();
-                salesReportsModel.name =
-                        cursor.getString(cursor.getColumnIndex(TableTransferModel.getInstance().name));
-                salesReportsModel.timeStamp =
-                        cursor.getString(cursor.getColumnIndex(TableTransferModel.getInstance().timeStamp));
-                salesReportsModel.folderLocation =
-                        cursor.getString(cursor.getColumnIndex(TableTransferModel.getInstance().folderPath));
-                salesReportsModel.status =
-                        cursor.getInt(cursor.getColumnIndex(TableTransferModel.getInstance().status));
-                salesReportsModel.progress =
-                        cursor.getInt(cursor.getColumnIndex(TableTransferModel.getInstance().progress));
-                salesReportsModel.rawData =
-                        cursor.getString(cursor.getColumnIndex(TableTransferModel.getInstance().rawData));
-                salesReportsModel.id =
-                        cursor.getLong(cursor.getColumnIndex(TableTransferModel.getInstance().id));
-                salesReportsModel.size =
-                        Long.parseLong(cursor.getString(cursor.getColumnIndex(TableTransferModel.getInstance().size)));
-                salesReportsModel.isIncoming =
-                        cursor.getInt(cursor.getColumnIndex(TableTransferModel.getInstance().isIncoming)) == 0;
+                salesReportsModel.name = cursor.getString(cursor.getColumnIndex(TableTransferModel.name));
+                salesReportsModel.timeStamp = cursor.getString(cursor.getColumnIndex(TableTransferModel.timeStamp));
+                salesReportsModel.folderLocation = cursor.getString(cursor.getColumnIndex(TableTransferModel.folderPath));
+                salesReportsModel.status = cursor.getInt(cursor.getColumnIndex(TableTransferModel.status));
+                salesReportsModel.progress = cursor.getInt(cursor.getColumnIndex(TableTransferModel.progress));
+                salesReportsModel.rawData = cursor.getString(cursor.getColumnIndex(TableTransferModel.rawData));
+                salesReportsModel.id = cursor.getLong(cursor.getColumnIndex(TableTransferModel.id));
+                salesReportsModel.size = Long.parseLong(cursor.getString(cursor.getColumnIndex(TableTransferModel.size)));
+                salesReportsModel.isIncoming = cursor.getInt(cursor.getColumnIndex(TableTransferModel.isIncoming)) == 0;
                 arrayList.add(salesReportsModel);
             } while (cursor.moveToNext());
         }
@@ -226,12 +213,12 @@ public class DBHelper {
         try {
             String selectQuery = "";
             selectQuery =
-                    "select * FROM " + TableTransferModel.getInstance().TABLE_NAME + " ORDER BY " + TableTransferModel.getInstance().id + " DESC";
+                    "select * FROM " + TableTransferModel.TABLE_NAME + " ORDER BY " + TableTransferModel.id + " DESC";
             databaseHandler.getReadableDatabase();
             Cursor cursor = databaseHandler.selectData(selectQuery, true);
             if (cursor != null && cursor.moveToFirst()) {
                 do {
-                    arrayList.add(cursor.getLong(cursor.getColumnIndex(TableTransferModel.getInstance().id)));
+                    arrayList.add(cursor.getLong(cursor.getColumnIndex(TableTransferModel.id)));
                 } while (cursor.moveToNext());
             }
             if (!cursor.isClosed()) {
@@ -249,7 +236,7 @@ public class DBHelper {
      */
     @Synchronized
     public int deleteAllTransfersData() {
-        return databaseHandler.deleteData(TableTransferModel.getInstance().TABLE_NAME, "", null);
+        return databaseHandler.deleteData(TableTransferModel.TABLE_NAME, "", null);
     }
 
     /**
@@ -259,7 +246,7 @@ public class DBHelper {
     public void deleteTransferModel(String itemId) {
         databaseHandler.getWritableDatabase();
         databaseHandler.deleteData(
-                TableTransferModel.getInstance().TABLE_NAME, TableTransferModel.getInstance().id + "=?",
+                TableTransferModel.TABLE_NAME, TableTransferModel.id + "=?",
                 new String[]{itemId + ""}
         );
     }
@@ -285,8 +272,8 @@ public class DBHelper {
                 String[] itemIds = arrayListToDelete.toArray(new String[arrayListToDelete.size()]);
                 if (itemIds != null && itemIds.length > 0) {
                     databaseHandler.getWritableDatabase();
-                    databaseHandler.deleteData(TableTransferModel.getInstance().TABLE_NAME,
-                            TableTransferModel.getInstance().id + "=?", itemIds);
+                    databaseHandler.deleteData(TableTransferModel.TABLE_NAME,
+                            TableTransferModel.id + "=?", itemIds);
                 }
             }
         } catch (Exception e) {

@@ -100,8 +100,7 @@ public class FolderFragment extends BaseFragment implements IClickListener, View
         super.onAttach(context);
         try {
             mainActivity = (MainActivity) context;
-            if (context instanceof NavigationListener)
-                navigationListener = (NavigationListener) context;
+            navigationListener = (NavigationListener) context;
         } catch (Exception e) {
             e.printStackTrace();
             FirebaseCrashlytics.getInstance().recordException(e);
@@ -139,13 +138,15 @@ public class FolderFragment extends BaseFragment implements IClickListener, View
     @Override
     void initComponents() {
         folderFragmentBinding.layouFab.fabAdd.setOnClickListener(this);
-//        folderFragmentBinding.layouFab.txtFile.setOnClickListener(this);
         folderFragmentBinding.layouFab.txtFolder.setOnClickListener(this);
+//        folderFragmentBinding.layouFab.txtFile.setOnClickListener(this);
 //        folderFragmentBinding.layouFab.fabFile.setOnClickListener(this);
         folderFragmentBinding.layouFab.fabFolder.setOnClickListener(this);
         folderFragmentBinding.imgListMode.setOnClickListener(this);
+        folderFragmentBinding.imgSortMode.setOnClickListener(this);
         mainActivity.activityMainBinding.imgMore.setOnClickListener(this);
         setUpSpinner();
+        setSortModeIcon(false);
     }
 
     @Override
@@ -167,6 +168,9 @@ public class FolderFragment extends BaseFragment implements IClickListener, View
                 if (popupMenu == null) preparePopUpMenu();
                 showMenuOptions();
                 break;
+            case R.id.imgSortMode:
+                setSortModeIcon(true);
+                break;
             case R.id.imgListMode:
                 AppStorage.getInstance(mainActivity).setValue(AppStorage.SP_LIST_MODE, AppStorage.getInstance(mainActivity).getValue(AppStorage.SP_LIST_MODE, AppConstants.SHOW_GRID) == AppConstants.SHOW_GRID ? AppConstants.SHOW_LIST : AppConstants.SHOW_GRID);
                 updateImageIconAndLayoutManager();
@@ -174,6 +178,23 @@ public class FolderFragment extends BaseFragment implements IClickListener, View
             default:
                 break;
         }
+    }
+
+    private void setSortModeIcon(boolean change) {
+        int mode = AppStorage.getInstance(mainActivity).getValue(AppStorage.SP_SORT_DIR, AppConstants.CONST_SORT_ASC);
+        if (change) {
+            if (mode == AppConstants.CONST_SORT_ASC) {
+                folderFragmentBinding.imgSortMode.setImageDrawable(ContextCompat.getDrawable(mainActivity, R.drawable.ic_sort_desc));
+                AppStorage.getInstance(mainActivity).setValue(AppStorage.SP_SORT_DIR, AppConstants.CONST_SORT_DESC);
+            } else {
+                folderFragmentBinding.imgSortMode.setImageDrawable(ContextCompat.getDrawable(mainActivity, R.drawable.ic_sort_asc));
+                AppStorage.getInstance(mainActivity).setValue(AppStorage.SP_SORT_DIR, AppConstants.CONST_SORT_ASC);
+            }
+            getFilesData();
+        } else {
+            folderFragmentBinding.imgSortMode.setImageDrawable(mode == AppConstants.CONST_SORT_ASC ? ContextCompat.getDrawable(mainActivity, R.drawable.ic_sort_asc) : ContextCompat.getDrawable(mainActivity, R.drawable.ic_sort_desc));
+        }
+
     }
 
     @Override
@@ -527,7 +548,6 @@ public class FolderFragment extends BaseFragment implements IClickListener, View
                 case R.id.menuShowEmptyFolders:
                     if (item.isChecked()) item.setChecked(false);
                     else item.setChecked(true);
-
                     AppStorage.getInstance(mainActivity).setValue(AppStorage.SP_SHOW_EMPTY_FOLDERS, item.isChecked());
                     getFilesData();
                     return false;

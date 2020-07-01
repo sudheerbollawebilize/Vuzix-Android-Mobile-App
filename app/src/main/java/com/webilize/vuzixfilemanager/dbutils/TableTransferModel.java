@@ -1,39 +1,19 @@
 package com.webilize.vuzixfilemanager.dbutils;
 
 public class TableTransferModel {
-    private static TableTransferModel tableTransferModel;
 
-    public static TableTransferModel getInstance() {
-        if (tableTransferModel == null) tableTransferModel = new TableTransferModel();
-        return tableTransferModel;
-    }
+    public static String name = "zname";
+    public static String progress = "zprogress";
+    public static String timeStamp = "zTimeStamp";
+    public static String status = "zstatus";
+    public static String rawData = "zrawData";
+    public static String isIncoming = "zisIncoming";
+    public static String folderPath = "zFolderPath";
+    public static String size = "zSize";
+    public static String id = "zid";
 
-    public String name = null;
-    public String progress = null;
-    public String timeStamp = null;
-    public String status = null;
-    public String rawData = null;
-    public String isIncoming = null;
-    public String folderPath = null;
-    public String size = null;
-    public String id = null;
+    public static String TABLE_NAME = "TableAddress";
+    public static String CREATE_TABLE = "create table if not exists " + TABLE_NAME + " ( " + id + " INTEGER PRIMARY KEY NOT NULL, " + name +
+            " TEXT, " + timeStamp + " TEXT, " + folderPath + " TEXT, " + progress + " INTEGER, " + status + " INTEGER, " + size + " TEXT, " + isIncoming + " INTEGER, " + rawData + " TEXT, UNIQUE (" + id + ") ON CONFLICT REPLACE);";
 
-    public String TABLE_NAME = "TableAddress";
-    public String CREATE_TABLE;
-
-    public TableTransferModel() {
-        name = "zname";
-        size = "zSize";
-        progress = "zprogress";
-        folderPath = "zFolderPath";
-        timeStamp = "zTimeStamp";
-        status = "zstatus";
-        id = "zid";
-        isIncoming = "zisIncoming";
-        rawData = "zrawData";
-
-        CREATE_TABLE = "create table if not exists " + TABLE_NAME + " ( " + id + " INTEGER PRIMARY KEY NOT NULL, " + name +
-                " TEXT, " + timeStamp + " TEXT, " + folderPath + " TEXT, " + progress + " INTEGER, " + status + " INTEGER, " + size + " TEXT, " + isIncoming + " INTEGER, " + rawData + " TEXT, UNIQUE (" + id + ") ON CONFLICT REPLACE);";
-
-    }
 }

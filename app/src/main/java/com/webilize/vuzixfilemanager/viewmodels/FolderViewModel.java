@@ -150,19 +150,20 @@ public class FolderViewModel extends AndroidViewModel {
         boolean showOnlyFiles = AppStorage.getInstance(BaseApplication.getInstance()).getValue(AppStorage.SP_SHOW_ONLY_FILES, false);
         boolean showOnlyFolders = AppStorage.getInstance(BaseApplication.getInstance()).getValue(AppStorage.SP_SHOW_ONLY_FOLDERS, false);
         boolean showEmptyFolders = AppStorage.getInstance(BaseApplication.getInstance()).getValue(AppStorage.SP_SHOW_EMPTY_FOLDERS, true);
+        int mode = AppStorage.getInstance(BaseApplication.getInstance()).getValue(AppStorage.SP_SORT_DIR, AppConstants.CONST_SORT_ASC);
         return Completable.fromAction(() -> {
             if (currentFileFolderItem.file.list() != null && currentFileFolderItem.file.list().length > 0) {
                 File[] filesList = currentFileFolderItem.file.listFiles();
                 Arrays.sort(filesList);
                 switch (BaseApplication.filterSortingMode) {
                     case AppConstants.CONST_NAME:
-                        Arrays.sort(filesList, NameFileComparator.NAME_INSENSITIVE_COMPARATOR);
+                        Arrays.sort(filesList, mode == AppConstants.CONST_SORT_ASC ? NameFileComparator.NAME_INSENSITIVE_COMPARATOR : NameFileComparator.NAME_INSENSITIVE_REVERSE);
                         break;
                     case AppConstants.CONST_MODIFIED:
-                        Arrays.sort(filesList, LastModifiedFileComparator.LASTMODIFIED_REVERSE);
+                        Arrays.sort(filesList, mode == AppConstants.CONST_SORT_ASC ? LastModifiedFileComparator.LASTMODIFIED_COMPARATOR : LastModifiedFileComparator.LASTMODIFIED_REVERSE);
                         break;
                     case AppConstants.CONST_SIZE:
-                        Arrays.sort(filesList, SizeFileComparator.SIZE_COMPARATOR);
+                        Arrays.sort(filesList, mode == AppConstants.CONST_SORT_ASC ? SizeFileComparator.SIZE_COMPARATOR : SizeFileComparator.SIZE_REVERSE);
                         break;
                     default:
                         break;

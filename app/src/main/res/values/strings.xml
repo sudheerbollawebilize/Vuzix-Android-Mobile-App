@@ -73,7 +73,7 @@
     <string name="available_devices">Available Devices</string>
     <string name="connect">Connect</string>
     <string name="disconnect">DisConnect</string>
-    <string name="save_to_phone">Save To Phone</string>
+    <string name="save_to_phone">Transfer Selected Files</string>
     <string name="scan_qr_code">Scan Qr Code</string>
     <string name="generate_qr_code">Generate Qr Code</string>
     <string name="show_finished">Show Finished Files</string>
@@ -116,6 +116,12 @@
         <!--        <item>Type</item>-->
     </string-array>
 
+    <string-array name="blade_files_filter">
+        <item>Name</item>
+        <item>Modified</item>
+        <item>Size</item>
+    </string-array>
+
     <string name="notification_chnnl_location_descr">Keeps wifi hot spot persistent</string>
     <string name="send_via_bluetooth">Send via Bluetooth</string>
     <string name="no_dev_connected">NO DEVICES CONNECTED</string>
@@ -128,5 +134,38 @@
     <string name="hotspot">HotSpot</string>
     <string name="get_code">Get Code</string>
     <string name="local_network">Local Network</string>
+    <string name="how_to_connect">How to connect</string>
+    <string name="ok">OK</string>
+
+    <string name="wifidirect_step1">
+    1. Connect phone and device on the same Wifi.\n2. Open the FileManager App on your device.\n3. Select the 2nd screen on the app: Connect via Wifi-Direct.\n
+    </string>
+
+    <string name="wifidirect_step2">
+    4. On your phone tap SCAN for Wifi Direct.\n5. Your device should appear under Available Devices. Tap CONNECT.\n6. You should get a Invitation to Connect on your device. Simply hit ACCEPT.\n
+    </string>
+
+    <string name="hotspot_step1">
+    1. Enable your phone’s HotSpot.\n2. Open the File Manager app on the Connectivity tab.\n3. Tap on Get Code next to Hotspot under Connectivity Options.\n4. You phone should show a QR code to be scanned.\n5. Open the FileManager App on your device.\n6. Select the 4th screen on the app: HotSpot Connection.
+    </string>
+
+    <string name="hotspot_step2">
+    7. Scan the QR code on your phone with you device’s camera.
+    </string>
+
+    <string name="bluetooth_step1">1. Enable your phone’s Bluetooth.\n2. Open the FileManager App on your device.\n3. Select the 5th screen on the app: Bluetooth.</string>
+
+    <string name="bluetooth_step2">
+    4. On your phone tap SCAN for Bluetooth.\n5. Your device should appear under Available Devices. Tap CONNECT.\n6. You should get a Invitation to Connect on your device. Simply hit ACCEPT.
+    </string>
+
+    <string name="qrcode_step1">
+        1. Connect phone and device on the same Wifi.\n2. Open the File Manager app on the Connectivity tab.\n3. Tap on Get Code next to Local Network.\n4. You phone should show a QR code to be scanned.\n5. Open the FileManager App on your device.\n6. Select the 3rd screen on the app: Scan QR Code.
+    </string>
+
+    <string name="qrcode_step2">
+    7. Scan the QR code on your phone with you device’s camera.
+    </string>
+
 
 </resources>

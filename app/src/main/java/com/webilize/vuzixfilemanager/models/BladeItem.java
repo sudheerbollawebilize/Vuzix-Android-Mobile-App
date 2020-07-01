@@ -13,19 +13,17 @@ import org.json.JSONObject;
 public class BladeItem implements Parcelable {
 
     public String mimeType = "", extension = "", fileInfo = "", name = "", path = "";
-    public long size = 0;
+    public long size, lastModified;
     public int imageRes;
-    public boolean isSelected = false, isFolder = false, isOriginalFile = false, isFavourite = false;
-//    @Transient
-//    public JSONObject jsonObject;
+    public boolean isSelected = false, isFolder = false, isOriginalFile = false, isFavourite = false, isHidden = false;
 
-    //                    name, path, fileInfo, isFolder, size, isFavourite
+    //                    name, path, fileInfo, isFolder, size, isFavourite,isHidden
     public BladeItem(JSONObject jsonObject) {
 //        this.jsonObject = jsonObject;
         name = jsonObject.optString("name");
         path = jsonObject.optString("path");
         size = jsonObject.optLong("size");
-
+        lastModified = jsonObject.optLong("lastModified");
         extension = FileUtils.getExtensionByStringHandling(path);
         mimeType = StaticUtils.getMimeTypeFromExtension(extension);
         isFolder = jsonObject.optBoolean("isFolder");
@@ -56,16 +54,12 @@ public class BladeItem implements Parcelable {
         fileInfo = in.readString();
         name = in.readString();
         size = in.readLong();
+        lastModified = in.readLong();
         path = in.readString();
         isSelected = in.readByte() != 0;
         isFolder = in.readByte() != 0;
         isOriginalFile = in.readByte() != 0;
         isFavourite = in.readByte() != 0;
-//        try {
-//            jsonObject = new JSONObject(in.readString());
-//        } catch (JSONException e) {
-//            e.printStackTrace();
-//        }
         imageRes = in.readInt();
     }
 
@@ -89,11 +83,11 @@ public class BladeItem implements Parcelable {
         dest.writeString(fileInfo);
         dest.writeString(name);
         dest.writeLong(size);
+        dest.writeLong(lastModified);
         dest.writeByte((byte) (isFolder ? 1 : 0));
         dest.writeByte((byte) (isFavourite ? 1 : 0));
         dest.writeByte((byte) (isOriginalFile ? 1 : 0));
         dest.writeByte((byte) (isSelected ? 1 : 0));     //if myBoolean == true, byte == 1
-//        dest.writeString(jsonObject.toString());
         dest.writeInt(imageRes);
     }
 

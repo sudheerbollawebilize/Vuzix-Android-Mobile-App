@@ -619,6 +619,10 @@ public class MainActivity extends BaseActivity implements NavigationListener, Vi
         requestForFolderWOFrag(folderPath);
     }
 
+    public void passCommandToBlade(JSONObject jsonObject) {
+
+    }
+
     public void requestForFilesOriginal(long size, ArrayList<String> fileNames) {
         String defaultPath = AppStorage.getInstance(this).getValue(AppStorage.SP_DEFAULT_INCOMING_FOLDER, "");
         if (TextUtils.isEmpty(defaultPath)) {
