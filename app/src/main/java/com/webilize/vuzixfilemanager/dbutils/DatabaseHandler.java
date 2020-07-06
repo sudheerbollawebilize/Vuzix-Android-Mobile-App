@@ -12,7 +12,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     private static DatabaseHandler mInstance;
     private SQLiteDatabase writableDb = null;
-    private static int DATABASE_VERSION = 2;
+    private static int DATABASE_VERSION = 1;
 
     private static String DATABASE_NAME = "VuzixFileManager";
 

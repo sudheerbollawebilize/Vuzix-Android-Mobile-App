@@ -155,7 +155,6 @@ public class MainActivity extends BaseActivity implements NavigationListener, Vi
         }
     };
     private FileSystem currentFs;
-    private AlertDialog pickGroupDialog;
     /* end region */
 
     @Override
@@ -269,15 +268,21 @@ public class MainActivity extends BaseActivity implements NavigationListener, Vi
             ((FolderFragment) curr).deselectAll();
         } else if (curr instanceof FolderFragment && getSupportFragmentManager().getBackStackEntryCount() > 0) {
             popBackStack();
-        } else if (!(curr instanceof FolderFragment) && activityMainBinding.bottomBar.getSelectedItemId() != R.id.navFilesManager) {
-            activityMainBinding.bottomBar.setSelectedItemId(R.id.navFilesManager);
+        } else if (!(curr instanceof FolderFragment)) {
+            if (curr instanceof BladeFolderFragment) {
+                popBackStack();
+                updateTitle(getString(R.string.blade_files));
+            } else if (activityMainBinding.bottomBar.getSelectedItemId() != R.id.navFilesManager) {
+                activityMainBinding.bottomBar.setSelectedItemId(R.id.navFilesManager);
+            }
         } else if (back_pressed + AppConstants.BACK_PRESSED_TIME > System.currentTimeMillis())
             super.onBackPressed();
         else
             StaticUtils.showToast(getApplicationContext(), getString(R.string.press_once_again_to_exit));
         back_pressed = System.currentTimeMillis();
         try {
-            updateTitle(viewModel.getCurrentFileFolderItem().file == null ? viewModel.getCurrentFileFolderItem().usbFile.getName() : viewModel.getCurrentFileFolderItem().file.getName());
+            if (activityMainBinding.bottomBar.getSelectedItemId() != R.id.navFilesManager)
+                updateTitle(viewModel.getCurrentFileFolderItem().file == null ? (viewModel.getCurrentFileFolderItem().usbFile == null ? "" : viewModel.getCurrentFileFolderItem().usbFile.getName()) : viewModel.getCurrentFileFolderItem().file.getName());
         } catch (Exception e) {
             e.printStackTrace();
             FirebaseCrashlytics.getInstance().recordException(e);
@@ -840,28 +845,14 @@ public class MainActivity extends BaseActivity implements NavigationListener, Vi
         activityMainBinding.sideNavigationView.setNavigationItemSelectedListener(item -> {
             switch (item.getItemId()) {
                 case R.id.menuImages:
-                    clearBackStackCompletely();
-                    updateTitle(AppConstants.CONST_IMAGES);
-                    activityMainBinding.bottomBar.setSelectedItemId(R.id.navFilesManager);
-                    replaceFragment(FolderFragment.newInstance(AppConstants.CONST_IMAGES), true);
+                    selectEasyAccessMenu(AppConstants.CONST_IMAGES);
                     break;
                 case R.id.menuVideos:
-                    clearBackStackCompletely();
-                    updateTitle(AppConstants.CONST_VIDEOS);
-                    activityMainBinding.bottomBar.setSelectedItemId(R.id.navFilesManager);
-                    replaceFragment(FolderFragment.newInstance(AppConstants.CONST_VIDEOS), true);
+                    selectEasyAccessMenu(AppConstants.CONST_VIDEOS);
                     break;
                 case R.id.menuAudio:
-                    clearBackStackCompletely();
-                    updateTitle(AppConstants.CONST_AUDIO);
-                    activityMainBinding.bottomBar.setSelectedItemId(R.id.navFilesManager);
-                    replaceFragment(FolderFragment.newInstance(AppConstants.CONST_AUDIO), true);
+                    selectEasyAccessMenu(AppConstants.CONST_AUDIO);
                     break;
-//                case R.id.menuRecent:
-//                    clearBackStackCompletely();
-//                    updateTitle(AppConstants.CONST_RECENT);
-//                    replaceFragment(FolderFragment.newInstance(AppConstants.CONST_RECENT), true);
-//                    break;
                 case R.id.menuInternalStorage:
                     StaticUtils.showToast(this, "Used: " + internalMemory.getUsedSpace() + " out of " + internalMemory.getTotalSpace() + "\n Available Memory: " + internalMemory.getFreeSpace());
                     clearBackStackCompletely();
@@ -905,6 +896,13 @@ public class MainActivity extends BaseActivity implements NavigationListener, Vi
         });
     }
 
+    private void selectEasyAccessMenu(String constMenu) {
+        clearBackStackCompletely();
+        updateTitle(constMenu);
+        activityMainBinding.bottomBar.setSelectedItemId(R.id.navFilesManager);
+        replaceFragment(FolderFragment.newInstance(constMenu), true);
+    }
+
     private void setUpTheme() {
         ThemeHelper.applyTheme(this, appStorage.getValue(AppStorage.SP_DEVICE_MODE, ThemeHelper.defaultMode));
     }
@@ -913,8 +911,6 @@ public class MainActivity extends BaseActivity implements NavigationListener, Vi
         activityMainBinding.imgBack.setOnClickListener(this);
         activityMainBinding.imgSettings.setOnClickListener(this);
         activityMainBinding.imgSearch.setOnClickListener(this);
-//        activityMainBinding.imgTransfer.setOnClickListener(this);
-//        activityMainBinding.imgMore.setOnClickListener(this);
     }
 
     private void toggleHamMenu() {
