@@ -1,8 +1,10 @@
 package com.webilize.vuzixfilemanager.utils;
 
 import android.app.usage.StorageStatsManager;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
@@ -13,6 +15,7 @@ import android.text.TextUtils;
 import android.text.format.Formatter;
 import android.util.Log;
 import android.view.View;
+import android.webkit.MimeTypeMap;
 import android.widget.ImageView;
 
 import androidx.annotation.RequiresApi;
@@ -386,4 +389,26 @@ public class FileUtils {
         return internalMemory;
     }
 
+    public static void showFile(Context context, File file) {
+        MimeTypeMap myMime = MimeTypeMap.getSingleton();
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        String mimeType = myMime.getMimeTypeFromExtension(getExtensionByStringHandling(file.getName()));
+        if (android.os.Build.VERSION.SDK_INT >= 24) {
+            Uri fileURI = FileProvider.getUriForFile(context, BuildConfig.APPLICATION_ID + ".provider", file);
+            intent.setDataAndType(fileURI, mimeType);
+        } else {
+            intent.setDataAndType(Uri.fromFile(file), mimeType);
+        }
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        PackageManager packageManager = context.getPackageManager();
+        try {
+            if (intent.resolveActivity(packageManager) != null) {
+                context.startActivity(intent);
+            } else {
+                StaticUtils.showToast(context, context.getString(R.string.files_format_not_supported_yet));
+            }
+        } catch (ActivityNotFoundException e) {
+            StaticUtils.showToast(context, context.getString(R.string.files_format_not_supported_yet));
+        }
+    }
 }

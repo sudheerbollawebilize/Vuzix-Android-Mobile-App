@@ -199,7 +199,8 @@ public class MainActivity extends BaseActivity implements NavigationListener, Vi
                 } else if (FileUtils.isAPKFile(fileFolderItem.file.getAbsolutePath())) {
                     FileUtils.installApk(this, fileFolderItem.file);
                 } else {
-                    StaticUtils.showToast(this, "Files format not supported yet.");
+                    FileUtils.showFile(this,fileFolderItem.file);
+
                 }
             }
         } else {
