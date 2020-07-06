@@ -44,7 +44,7 @@ public class AppConstants {
     public static final int CONST_TRANSFER_COMPLETED = 1;
     public static final int CONST_TRANSFER_CANCELLED = 2;
 
-    public static final File homeDirectory = Environment.getExternalStorageDirectory();
+    public static final File HOME_DIRECTORY = Environment.getExternalStorageDirectory();
 
     public static final String CONST_QR_CODE = "QR Code";
     public static final String CONST_WIFI_HOTSPOT = "Wifi Hotspot";

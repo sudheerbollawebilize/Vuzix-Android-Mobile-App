@@ -2,7 +2,6 @@ package com.webilize.vuzixfilemanager.fragments;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -43,6 +42,7 @@ import com.webilize.vuzixfilemanager.utils.AppStorage;
 import com.webilize.vuzixfilemanager.utils.BladeLastModifiedComparator;
 import com.webilize.vuzixfilemanager.utils.BladeNameComparator;
 import com.webilize.vuzixfilemanager.utils.BladeSizeComparator;
+import com.webilize.vuzixfilemanager.utils.DateUtils;
 import com.webilize.vuzixfilemanager.utils.DialogUtils;
 import com.webilize.vuzixfilemanager.utils.StaticUtils;
 import com.webilize.vuzixfilemanager.utils.eventbus.OnSocketConnected;
@@ -57,18 +57,19 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Arrays;
+import java.util.Calendar;
 
 public class BladeFolderFragment extends BaseFragment implements IClickListener, View.OnClickListener, AdapterView.OnItemSelectedListener {
 
     private FragmentBladeFolderBinding folderFragmentBinding;
-    //    private static final String ARG_FOLDER_ITEM = "ARG_FOLDER_ITEM";
+    private static final String ARG_FOLDER_ITEM = "ARG_FOLDER_ITEM";
     private static final String ARG_FOLDER_LIST = "ARG_FOLDER_LIST";
     private BladeFileFoldersAdapter fileFoldersAdapter;
     private RecyclerView.LayoutManager layoutManager;
     private MainActivity mainActivity;
     private NavigationListener navigationListener;
-    //    private String folderPath = "";
+    private String folderPath = "";
     private PopupMenu popupMenu;
     private BladeItem selectedFile;
     private boolean isLongPressed;
@@ -79,19 +80,10 @@ public class BladeFolderFragment extends BaseFragment implements IClickListener,
     private boolean isOpen = false;
     private long size = 0;
 
-/*
-    public static BladeFolderFragment newInstance(String folderPath) {
+    public static BladeFolderFragment newInstance(ArrayList<BladeItem> bladeItemArrayList, String folderPath) {
         BladeFolderFragment bladeFolderFragment = new BladeFolderFragment();
         Bundle bundle = new Bundle();
         bundle.putString(ARG_FOLDER_ITEM, folderPath);
-        bladeFolderFragment.setArguments(bundle);
-        return bladeFolderFragment;
-    }
-*/
-
-    public static BladeFolderFragment newInstance(ArrayList<BladeItem> bladeItemArrayList) {
-        BladeFolderFragment bladeFolderFragment = new BladeFolderFragment();
-        Bundle bundle = new Bundle();
         bundle.putParcelableArrayList(ARG_FOLDER_LIST, bladeItemArrayList);
         bladeFolderFragment.setArguments(bundle);
         return bladeFolderFragment;
@@ -250,6 +242,7 @@ public class BladeFolderFragment extends BaseFragment implements IClickListener,
         if (i != AppStorage.getInstance(mainActivity).getValue(AppStorage.SP_SORT_MODE, 0)) {
             AppStorage.getInstance(mainActivity).setValue(AppStorage.SP_SORT_MODE, i);
             BaseApplication.filterSortingMode = i;
+            updateMenuList();
         }
     }
 
@@ -352,17 +345,14 @@ public class BladeFolderFragment extends BaseFragment implements IClickListener,
         bladeItemArrayListOriginal = new ArrayList<>();
         if (getArguments() != null) {
             Bundle bundle = getArguments();
-/*
             if (bundle.containsKey(ARG_FOLDER_ITEM)) {
                 folderPath = bundle.getString(ARG_FOLDER_ITEM, "");
             }
-*/
             if (bundle.containsKey(ARG_FOLDER_LIST)) {
                 bladeItemArrayListOriginal = bundle.getParcelableArrayList(ARG_FOLDER_LIST);
                 bladeItemArrayList.addAll(bladeItemArrayListOriginal);
             }
         }
-//        if (cp.isConnected()) mainActivity.requestForFolderWOFrag(folderPath);
     }
 
     private void updateMenuList() {
@@ -372,45 +362,35 @@ public class BladeFolderFragment extends BaseFragment implements IClickListener,
         boolean showOnlyFolders = AppStorage.getInstance(mainActivity).getValue(AppStorage.SP_SHOW_ONLY_FOLDERS, false);
         int mode = AppStorage.getInstance(mainActivity).getValue(AppStorage.SP_SORT_DIR, AppConstants.CONST_SORT_ASC);
         bladeItemArrayList.clear();
-        /*for (BladeItem bladeItem : bladeItemArrayListOriginal) {
-            if (showHidden)
-                if (!showHidden) {
-                    if (!bladeItem.isHidden) {
-                        bladeItemArrayList.add(bladeItem);
-                    }
-                } else bladeItemArrayList.addAll(bladeItemArrayListOriginal);
-        }*/
         if (bladeItemArrayListOriginal != null && bladeItemArrayListOriginal.size() > 0) {
-//            BladeItem[] bladeItems = bladeItemArrayListOriginal.toArray(new BladeItem[]{});
-//            Arrays.sort(bladeItems);
+            BladeItem[] bladeItems = bladeItemArrayListOriginal.toArray(new BladeItem[]{});
             switch (BaseApplication.filterSortingMode) {
                 case AppConstants.CONST_NAME:
-//                    Arrays.sort(bladeItems, new BladeNameComparator());
-                    Collections.sort(bladeItemArrayListOriginal, new BladeNameComparator(mode));
+                    Arrays.sort(bladeItems, new BladeNameComparator(mode));
                     break;
                 case AppConstants.CONST_MODIFIED:
-                    Collections.sort(bladeItemArrayListOriginal, new BladeLastModifiedComparator(mode));
+                    Arrays.sort(bladeItems, new BladeLastModifiedComparator(mode));
                     break;
                 case AppConstants.CONST_SIZE:
-                    Collections.sort(bladeItemArrayListOriginal, new BladeSizeComparator(mode));
+                    Arrays.sort(bladeItems, new BladeSizeComparator(mode));
                     break;
                 default:
                     break;
             }
             if (showOnlyFiles) {
-                for (BladeItem file : bladeItemArrayListOriginal) {
+                for (BladeItem file : bladeItems) {
                     if ((showHidden || !file.isHidden) && !file.isFolder) {
                         bladeItemArrayList.add(file);
                     }
                 }
             } else if (showOnlyFolders) {
-                for (BladeItem file : bladeItemArrayListOriginal) {
+                for (BladeItem file : bladeItems) {
                     if ((showEmpty || file.size != 0) && (showHidden || !file.isHidden) && file.isFolder) {
                         bladeItemArrayList.add(file);
                     }
                 }
             } else {
-                for (BladeItem file : bladeItemArrayListOriginal) {
+                for (BladeItem file : bladeItems) {
                     if (!file.isFolder) {
                         if ((showHidden || !file.isHidden)) {
                             bladeItemArrayList.add(file);
@@ -492,14 +472,19 @@ public class BladeFolderFragment extends BaseFragment implements IClickListener,
                 case R.id.menuNewFolder:
                     DialogUtils.showCreateNewFolderInBladeDialog(mainActivity, v -> {
                         JSONObject jsonObject = new JSONObject();
+                        String name = (String) v.getTag();
                         try {
                             jsonObject.put("command", AppConstants.NEW_FOLDER);
-                            jsonObject.put("folderName", v.getTag());
+                            jsonObject.put("folderName", name);
                             jsonObject.put("rootPath", "");
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
                         mainActivity.passCommandToBlade(jsonObject);
+                        BladeItem bladeItem = createNewBladeItem(name, folderPath);
+                        bladeItemArrayListOriginal.add(bladeItem);
+                        bladeItemArrayList.add(bladeItem);
+                        fileFoldersAdapter.notifyDataSetChanged();
                     });
                     return false;
                 case R.id.menuDelete:
@@ -512,11 +497,14 @@ public class BladeFolderFragment extends BaseFragment implements IClickListener,
                                 jsonArray.put(path);
                             }
                             jsonObject.put("fileNames", jsonArray);
-                            jsonObject.put("rootPath", "");
+                            jsonObject.put("rootPath", folderPath);
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
                         mainActivity.passCommandToBlade(jsonObject);
+                        bladeItemArrayListOriginal.remove(selectedFile);
+                        bladeItemArrayList.remove(selectedFile);
+                        fileFoldersAdapter.notifyDataSetChanged();
                     });
                     return false;
                 case R.id.menuShowHiddenFiles:
@@ -540,7 +528,7 @@ public class BladeFolderFragment extends BaseFragment implements IClickListener,
                     AppStorage.getInstance(mainActivity).setValue(AppStorage.SP_SHOW_ONLY_FOLDERS, item.isChecked());
                     updateMenuList();
                     return false;
-                case R.id.menuShowFilesOnly:
+                case R.id.menuShowOnlyFiles:
                     if (item.isChecked()) item.setChecked(false);
                     else item.setChecked(true);
                     if (AppStorage.getInstance(mainActivity).getValue(AppStorage.SP_SHOW_ONLY_FOLDERS, false)) {
@@ -561,6 +549,23 @@ public class BladeFolderFragment extends BaseFragment implements IClickListener,
                     return true;
             }
         });
+    }
+
+    private BladeItem createNewBladeItem(String name, String path) {
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("name", name);
+            jsonObject.put("path", path);
+            jsonObject.put("size", 0);
+            jsonObject.put("lastModified", Calendar.getInstance().getTimeInMillis());
+            jsonObject.put("isHidden", false);
+            jsonObject.put("isFavourite", false);
+            jsonObject.put("isFolder", true);
+            jsonObject.put("fileInfo", DateUtils.getDateTimeFromTimeStamp(Calendar.getInstance().getTimeInMillis(), DateUtils.DATE_FORMAT_0));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return new BladeItem(jsonObject);
     }
 
     private void requestForFiles() {
@@ -584,15 +589,19 @@ public class BladeFolderFragment extends BaseFragment implements IClickListener,
             } else
                 popupMenu.getMenu().getItem(AppConstants.CONST_SELECT_ALL).setTitle(R.string.select_all);
             if (counter > 0) {
-                popupMenu.getMenu().getItem(AppConstants.CONST_POPUP_TRANSFER_SELECTED_FILES).setEnabled(true);
-            } else
-                popupMenu.getMenu().getItem(AppConstants.CONST_POPUP_TRANSFER_SELECTED_FILES).setEnabled(false);
-            popupMenu.show();
-//        } else {
-//            popupMenu.getMenu().getItem(0).setEnabled(false);
-//            popupMenu.getMenu().getItem(1).setEnabled(false);
-        }
+                popupMenu.getMenu().getItem(AppConstants.CONST_TRANSFER_SELECTED_FILES).setEnabled(true);
+                popupMenu.getMenu().getItem(AppConstants.CONST_DELETE).setEnabled(true);
+            } else {
+                popupMenu.getMenu().getItem(AppConstants.CONST_TRANSFER_SELECTED_FILES).setEnabled(false);
+                popupMenu.getMenu().getItem(AppConstants.CONST_DELETE).setEnabled(false);
+            }
+            popupMenu.getMenu().getItem(AppConstants.CONST_SHOW_EMPTY).setChecked(AppStorage.getInstance(mainActivity).getValue(AppStorage.SP_SHOW_EMPTY_FOLDERS, true));
+            popupMenu.getMenu().getItem(AppConstants.CONST_SHOW_ONLY_FILES).setChecked(AppStorage.getInstance(mainActivity).getValue(AppStorage.SP_SHOW_ONLY_FILES, false));
+            popupMenu.getMenu().getItem(AppConstants.CONST_SHOW_ONLY_FOLDERS).setChecked(AppStorage.getInstance(mainActivity).getValue(AppStorage.SP_SHOW_ONLY_FOLDERS, false));
+            popupMenu.getMenu().getItem(AppConstants.CONST_SHOW_HIDDEN).setChecked(AppStorage.getInstance(mainActivity).getValue(AppStorage.SP_SHOW_HIDDEN, false));
 
+            popupMenu.show();
+        }
     }
 
     private ArrayList<String> getSelectedFiles() {

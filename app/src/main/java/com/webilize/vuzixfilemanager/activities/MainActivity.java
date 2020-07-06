@@ -78,7 +78,6 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedOutputStream;
@@ -389,20 +388,22 @@ public class MainActivity extends BaseActivity implements NavigationListener, Vi
         JSONObject jsonObject = onThumbsReceived.jsonObject;
         JSONArray jsonArray = new JSONArray();
         if (jsonObject.has("folders")) {
-            try {
-                jsonArray = jsonObject.getJSONArray("folders");
-                for (int i = 0; i < jsonArray.length(); i++) {
-                    bladeItemArrayList.add(new BladeItem(jsonArray.optJSONObject(i)));
-                }
-            } catch (JSONException e) {
-                e.printStackTrace();
-                FirebaseCrashlytics.getInstance().recordException(e);
+            jsonArray = jsonObject.optJSONArray("folders");
+            for (int i = 0; i < jsonArray.length(); i++) {
+                bladeItemArrayList.add(new BladeItem(jsonArray.optJSONObject(i)));
             }
+        }
+        String folderPath = "";
+        if (jsonObject.has("folderPath")) {
+            folderPath = jsonObject.optString("folderPath");
+        }
+        if (TextUtils.isEmpty(folderPath)) {
+            folderPath = AppConstants.HOME_DIRECTORY.getAbsolutePath();
         }
         if (bladeItemArrayList.isEmpty()) {
             StaticUtils.showToast(this, getString(R.string.folder_is_empty));
         } else {
-            addFragment(BladeFolderFragment.newInstance(bladeItemArrayList), true);
+            addFragment(BladeFolderFragment.newInstance(bladeItemArrayList, folderPath), true);
         }
         Log.e("size ", onThumbsReceived.jsonObject.length() + "");
     }
@@ -609,7 +610,7 @@ public class MainActivity extends BaseActivity implements NavigationListener, Vi
             serviceIntent.putExtra("folderPath", folderPath);
             ContextCompat.startForegroundService(this, serviceIntent);
         } else
-            replaceFragmentWithoutAnimation(BladeFolderFragment.newInstance(new ArrayList<>()), false);
+            replaceFragmentWithoutAnimation(BladeFolderFragment.newInstance(new ArrayList<>(), ""), false);
         updateTitle(TextUtils.isEmpty(folderPath) ? getString(R.string.blade_files) : folderPath);
     }
 
@@ -746,7 +747,7 @@ public class MainActivity extends BaseActivity implements NavigationListener, Vi
                     showMenuInTopBar();
                     if (!(currFrag instanceof FolderFragment)) {
                         clearBackStackCompletely();
-                        updateTitle(AppConstants.homeDirectory.getName());
+                        updateTitle(AppConstants.HOME_DIRECTORY.getName());
                         replaceFragmentWithoutAnimation(FolderFragment.newInstance(), false);
                     }
                     return true;
@@ -841,16 +842,19 @@ public class MainActivity extends BaseActivity implements NavigationListener, Vi
                 case R.id.menuImages:
                     clearBackStackCompletely();
                     updateTitle(AppConstants.CONST_IMAGES);
+                    activityMainBinding.bottomBar.setSelectedItemId(R.id.navFilesManager);
                     replaceFragment(FolderFragment.newInstance(AppConstants.CONST_IMAGES), true);
                     break;
                 case R.id.menuVideos:
                     clearBackStackCompletely();
                     updateTitle(AppConstants.CONST_VIDEOS);
+                    activityMainBinding.bottomBar.setSelectedItemId(R.id.navFilesManager);
                     replaceFragment(FolderFragment.newInstance(AppConstants.CONST_VIDEOS), true);
                     break;
                 case R.id.menuAudio:
                     clearBackStackCompletely();
                     updateTitle(AppConstants.CONST_AUDIO);
+                    activityMainBinding.bottomBar.setSelectedItemId(R.id.navFilesManager);
                     replaceFragment(FolderFragment.newInstance(AppConstants.CONST_AUDIO), true);
                     break;
 //                case R.id.menuRecent:
@@ -861,15 +865,17 @@ public class MainActivity extends BaseActivity implements NavigationListener, Vi
                 case R.id.menuInternalStorage:
                     StaticUtils.showToast(this, "Used: " + internalMemory.getUsedSpace() + " out of " + internalMemory.getTotalSpace() + "\n Available Memory: " + internalMemory.getFreeSpace());
                     clearBackStackCompletely();
-                    updateTitle(AppConstants.homeDirectory.getName());
+                    updateTitle(AppConstants.HOME_DIRECTORY.getName());
+                    activityMainBinding.bottomBar.setSelectedItemId(R.id.navFilesManager);
                     replaceFragmentWithoutAnimation(FolderFragment.newInstance(), false);
                     break;
                 case R.id.menuDrive:
                     DialogUtils.showImportFromDriveDialog(this, v -> viewModel.requestDownloadFile(/*getApplicationContext(),*/viewModel.getCurrentFileFolderItem().file, (String) v.getTag()));
                     break;
                 case R.id.menuDownloads:
-                    FileFolderItem fileFolderItem = new FileFolderItem(new File(AppConstants.homeDirectory, Environment.DIRECTORY_DOWNLOADS));
+                    FileFolderItem fileFolderItem = new FileFolderItem(new File(AppConstants.HOME_DIRECTORY, Environment.DIRECTORY_DOWNLOADS));
                     updateTitle(getString(R.string.downloads));
+                    activityMainBinding.bottomBar.setSelectedItemId(R.id.navFilesManager);
                     replaceFragmentWithoutAnimation(FolderFragment.newInstance(fileFolderItem), true);
                     break;
                 case R.id.menuSettings:

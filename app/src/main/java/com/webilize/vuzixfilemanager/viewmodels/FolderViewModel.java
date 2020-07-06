@@ -101,7 +101,7 @@ public class FolderViewModel extends AndroidViewModel {
             Cursor cursor;
             int column_index_data;
             String PathOfImage = "";
-            uri = android.provider.MediaStore.Files.getContentUri(AppConstants.homeDirectory.getAbsolutePath());
+            uri = android.provider.MediaStore.Files.getContentUri(AppConstants.HOME_DIRECTORY.getAbsolutePath());
             String[] projection = {MediaStore.Files.FileColumns.DATA};
             cursor = BaseApplication.getInstance().getContentResolver().query(uri, projection, null, null, null);
             column_index_data = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
@@ -138,13 +138,13 @@ public class FolderViewModel extends AndroidViewModel {
 
     public FileFolderItem getCurrentFileFolderItem() {
         if (currentFileFolderItem == null)
-            currentFileFolderItem = new FileFolderItem(AppConstants.homeDirectory);
+            currentFileFolderItem = new FileFolderItem(AppConstants.HOME_DIRECTORY);
         return currentFileFolderItem;
     }
 
     public Completable getFiles(boolean showHidden, FileFolderItem folder) {
         if (folder == null)
-            folder = new FileFolderItem(AppConstants.homeDirectory);
+            folder = new FileFolderItem(AppConstants.HOME_DIRECTORY);
 
         currentFileFolderItem = folder;
         boolean showOnlyFiles = AppStorage.getInstance(BaseApplication.getInstance()).getValue(AppStorage.SP_SHOW_ONLY_FILES, false);
@@ -154,7 +154,7 @@ public class FolderViewModel extends AndroidViewModel {
         return Completable.fromAction(() -> {
             if (currentFileFolderItem.file.list() != null && currentFileFolderItem.file.list().length > 0) {
                 File[] filesList = currentFileFolderItem.file.listFiles();
-                Arrays.sort(filesList);
+//                Arrays.sort(filesList);
                 switch (BaseApplication.filterSortingMode) {
                     case AppConstants.CONST_NAME:
                         Arrays.sort(filesList, mode == AppConstants.CONST_SORT_ASC ? NameFileComparator.NAME_INSENSITIVE_COMPARATOR : NameFileComparator.NAME_INSENSITIVE_REVERSE);
@@ -163,6 +163,7 @@ public class FolderViewModel extends AndroidViewModel {
                         Arrays.sort(filesList, mode == AppConstants.CONST_SORT_ASC ? LastModifiedFileComparator.LASTMODIFIED_COMPARATOR : LastModifiedFileComparator.LASTMODIFIED_REVERSE);
                         break;
                     case AppConstants.CONST_SIZE:
+//                        Arrays.sort(filesList, new FileSizeComparatorTest(mode));
                         Arrays.sort(filesList, mode == AppConstants.CONST_SORT_ASC ? SizeFileComparator.SIZE_COMPARATOR : SizeFileComparator.SIZE_REVERSE);
                         break;
                     default:
@@ -201,7 +202,7 @@ public class FolderViewModel extends AndroidViewModel {
 
     public void getUsbFiles(FileFolderItem folder) {
         if (folder == null)
-            folder = new FileFolderItem(AppConstants.homeDirectory);
+            folder = new FileFolderItem(AppConstants.HOME_DIRECTORY);
 
         currentFileFolderItem = folder;
         try {

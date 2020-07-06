@@ -515,7 +515,7 @@ public class RXConnectionFGService extends Service implements ConnectionHelper.L
      * @return
      */
     private DeviceFavouritesModel generateDeviceFavModel(long deviceId, String name) {
-        String path = AppConstants.homeDirectory.getAbsolutePath();
+        String path = AppConstants.HOME_DIRECTORY.getAbsolutePath();
         String folder = path + "/" + name;
         DeviceFavouritesModel deviceFavouritesModel = new DeviceFavouritesModel();
         deviceFavouritesModel.deviceId = deviceId;

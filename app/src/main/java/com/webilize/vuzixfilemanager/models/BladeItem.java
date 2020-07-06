@@ -12,16 +12,16 @@ import org.json.JSONObject;
 
 public class BladeItem implements Parcelable {
 
-    public String mimeType = "", extension = "", fileInfo = "", name = "", path = "";
+    public String mimeType = "", extension = "", fileInfo = "", name = "", path = "", rootPath;
     public long size, lastModified;
     public int imageRes;
-    public boolean isSelected = false, isFolder = false, isOriginalFile = false, isFavourite = false, isHidden = false;
+    public boolean isSelected = false, isFolder, isOriginalFile = false, isFavourite = false, isHidden = false;
 
-    //                    name, path, fileInfo, isFolder, size, isFavourite,isHidden
     public BladeItem(JSONObject jsonObject) {
 //        this.jsonObject = jsonObject;
         name = jsonObject.optString("name");
         path = jsonObject.optString("path");
+        rootPath = jsonObject.optString("rootPath");
         size = jsonObject.optLong("size");
         lastModified = jsonObject.optLong("lastModified");
         extension = FileUtils.getExtensionByStringHandling(path);
@@ -29,8 +29,8 @@ public class BladeItem implements Parcelable {
         isFolder = jsonObject.optBoolean("isFolder");
         isFavourite = jsonObject.optBoolean("isFavourite");
         if (isFolder) {
-            fileInfo = size + " files ," + jsonObject.optString("fileInfo");
-        } else fileInfo = FileUtils.getFileSize(size) + " " + jsonObject.optString("fileInfo");
+            fileInfo = size + " files\n" + jsonObject.optString("fileInfo");
+        } else fileInfo = FileUtils.getFileSize(size) + "\n" + jsonObject.optString("fileInfo");
         if (isSelected) imageRes = R.drawable.ic_select;
         else {
             if (isImageFile())
@@ -40,10 +40,7 @@ public class BladeItem implements Parcelable {
             else if (isAudioFile())
                 imageRes = R.drawable.ic_music;
             else if (isFolder) {
-                if (size == 0) {
-                    imageRes = R.drawable.ic_folder_empty;
-                } else
-                    imageRes = R.drawable.ic_folder;
+                imageRes = size == 0 ? R.drawable.ic_folder_empty : R.drawable.ic_folder;
             } else imageRes = R.drawable.ic_file;
         }
     }
@@ -53,6 +50,7 @@ public class BladeItem implements Parcelable {
         extension = in.readString();
         fileInfo = in.readString();
         name = in.readString();
+        rootPath = in.readString();
         size = in.readLong();
         lastModified = in.readLong();
         path = in.readString();
@@ -82,6 +80,7 @@ public class BladeItem implements Parcelable {
         dest.writeString(path);
         dest.writeString(fileInfo);
         dest.writeString(name);
+        dest.writeString(rootPath);
         dest.writeLong(size);
         dest.writeLong(lastModified);
         dest.writeByte((byte) (isFolder ? 1 : 0));

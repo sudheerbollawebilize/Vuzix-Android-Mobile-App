@@ -74,17 +74,6 @@ public class FileFoldersAdapter extends RecyclerView.Adapter<FileFoldersAdapter.
             holder.itemFileBinding.cardBody.setCardBackgroundColor(ContextCompat.getColor(context, R.color.colorRedTint));
         } else {
             holder.itemFileBinding.cardBody.setCardBackgroundColor(ContextCompat.getColor(context, R.color.colorWhite));
-/*
-            if (listMode == AppConstants.SHOW_LIST) {
-                holder.itemFolderBinding.txtFolderName.setGravity(Gravity.CENTER_VERTICAL);
-                holder.itemFolderBinding.txtFolderName.setCompoundDrawablesWithIntrinsicBounds(
-                        ContextCompat.getDrawable(context, R.drawable.ic_folder), null, null, null);
-            } else {
-                holder.itemFolderBinding.txtFolderName.setGravity(Gravity.CENTER);
-                holder.itemFolderBinding.txtFolderName.setCompoundDrawablesWithIntrinsicBounds(
-                        null, ContextCompat.getDrawable(context, R.drawable.ic_folder), null, null);
-            }
-*/
         }
     }
 

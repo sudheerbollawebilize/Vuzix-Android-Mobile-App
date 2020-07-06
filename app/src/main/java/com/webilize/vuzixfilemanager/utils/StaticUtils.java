@@ -366,7 +366,7 @@ public class StaticUtils {
     }
 
     private static String addDefaultLocations(Context context) {
-        String bookMarkString = AppConstants.homeDirectory.getAbsolutePath();
+        String bookMarkString = AppConstants.HOME_DIRECTORY.getAbsolutePath();
         bookMarkString += AppConstants.BOOKMARK_SEPERATOR + new File(Environment.getExternalStorageDirectory(), Environment.DIRECTORY_DCIM).getAbsolutePath();
         bookMarkString += AppConstants.BOOKMARK_SEPERATOR + new File(Environment.getExternalStorageDirectory(), Environment.DIRECTORY_DOCUMENTS).getAbsolutePath();
         bookMarkString += AppConstants.BOOKMARK_SEPERATOR + new File(Environment.getExternalStorageDirectory(), Environment.DIRECTORY_DOWNLOADS).getAbsolutePath();
@@ -506,6 +506,17 @@ public class StaticUtils {
             e.printStackTrace();
         }
         return context.getString(R.string.no_dev_connected);
+    }
+
+
+    public static void setDeviceName(Context context, String deviceName) {
+        try {
+            SharedPreferences sp = context.getSharedPreferences(WiFiDirectUtils.SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE);
+            sp.edit().putString(WiFiDirectUtils.WIFI_DIRECT_REMOTE_DEVICE_NAME, deviceName).apply();
+            AppStorage.getInstance(context).setValue(WiFiDirectUtils.WIFI_DIRECT_REMOTE_DEVICE_NAME, deviceName);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public static String getDeviceAddress(Context context) {

@@ -31,7 +31,7 @@ public class FileFolderItem implements Parcelable {
             mimeType = StaticUtils.getMimeTypeFromExtension(extension);
             size = FileUtils.getFileSize(file);
             timeStamp = DateUtils.getDateTimeFromTimeStamp(file.lastModified(), DateUtils.DATE_FORMAT_0);
-            fileInfo = size + "\n" + timeStamp;
+//            fileInfo = size + "\n" + timeStamp;
             imageRes = StaticUtils.getFileDrawable(file);
             name = FileUtils.getFileNameWthoutExtension(file);
         } else {
@@ -41,8 +41,9 @@ public class FileFolderItem implements Parcelable {
             if (size.equalsIgnoreCase("0 files")) {
                 imageRes = R.drawable.ic_folder_empty;
             } else imageRes = R.drawable.ic_folder;
-            fileInfo = size + "\n" + timeStamp;
+//            fileInfo = size + "\n" + timeStamp;
         }
+        fileInfo = size + "\n" + timeStamp;
     }
 
     public FileFolderItem(UsbFile file) {

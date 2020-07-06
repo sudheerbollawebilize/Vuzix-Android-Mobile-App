@@ -175,7 +175,6 @@ public class DBHelper {
         } else {
             selectQuery =
                     "select * FROM " + TableTransferModel.TABLE_NAME + " WHERE " + TableTransferModel.status + "='" + 0 + (isIncoming ? ("' AND " + TableTransferModel.isIncoming + "='" + 0 + "'") : "'") + " ORDER BY " + TableTransferModel.id + " DESC LIMIT 20";
-
 //            if (isIncoming) {
 //                selectQuery =
 //                        "select * FROM " + TableTransferModel.TABLE_NAME + " WHERE " + TableTransferModel.status + "='" + 0 + (isIncoming ? ("' AND" + TableTransferModel.isIncoming + "='" + 0 + "'") : "'") + " ORDER BY " + TableTransferModel.id + " DESC LIMIT 20";

@@ -10,8 +10,8 @@ android {
         applicationId "com.webilize.vuzixfilemanager"
         minSdkVersion 21
         targetSdkVersion 28
-        versionCode 2
-        versionName "1.0.2"
+        versionCode 4
+        versionName "1.0.4"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -70,8 +70,6 @@ dependencies {
     implementation 'io.reactivex.rxjava2:rxjava:2.2.8'
 
     implementation project(':transfersdk')
-//    implementation 'com.github.sudheerbollawebilize:Vuzix-Android-Mobile-App:1.0.1'
-//    implementation 'com.github.sudheerbollawebilize:Vuzix-Android-Connectivity-SDK:1.0.0'
 
     implementation 'me.jahnen:libaums:0.7.5'
     implementation 'com.google.firebase:firebase-analytics:17.4.3'

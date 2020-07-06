@@ -208,7 +208,7 @@ public class DialogUtils {
     public static Dialog showFolderSelectionDialog(Context context) {
         try {
             stringArrayList = new ArrayList<>();
-            final File home = AppConstants.homeDirectory;
+            final File home = AppConstants.HOME_DIRECTORY;
             currentFolder = home;
             setFoldersList(context);
             AppTextView txtHeading = null, txtHint, txtBack, txtCancel;

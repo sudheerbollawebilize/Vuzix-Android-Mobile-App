@@ -53,7 +53,7 @@ public class SearchActivity extends BaseActivity implements View.OnClickListener
                 AsyncTask.execute(() -> {
                     if (TextUtils.isEmpty(editable.toString())) {
                         search();
-                    } else search(editable.toString(), AppConstants.homeDirectory);
+                    } else search(editable.toString(), AppConstants.HOME_DIRECTORY);
                 });
 //                if (TextUtils.isEmpty(editable.toString())) {
 //                    search("", AppConstants.homeDirectory);
@@ -75,7 +75,7 @@ public class SearchActivity extends BaseActivity implements View.OnClickListener
     SearchAsyncTask searchAsyncTask;
 
     public void search() {
-        File directory = AppConstants.homeDirectory;
+        File directory = AppConstants.HOME_DIRECTORY;
         if (directory.isDirectory()) {
             if (directory.canRead()) {
                 for (File temp : directory.listFiles()) {

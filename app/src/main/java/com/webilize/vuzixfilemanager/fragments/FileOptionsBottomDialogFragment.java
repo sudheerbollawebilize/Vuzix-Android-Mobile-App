@@ -45,7 +45,7 @@ public class FileOptionsBottomDialogFragment extends BottomSheetDialogFragment i
             if (getArguments().containsKey("isFolder"))
                 isFolder = getArguments().getBoolean("isFolder", false);
             if (getArguments().containsKey("path"))
-                path = getArguments().getString("path", AppConstants.homeDirectory.getAbsolutePath());
+                path = getArguments().getString("path", AppConstants.HOME_DIRECTORY.getAbsolutePath());
         }
     }
 

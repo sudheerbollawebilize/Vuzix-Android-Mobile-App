@@ -100,7 +100,6 @@ public class ConnectivityFragment extends BaseFragment implements CompoundButton
         setAdapters();
         checkForControlsEnable();
         checkForDisconnectButton();
-
     }
 
     private void checkForDisconnectButton() {
@@ -120,6 +119,7 @@ public class ConnectivityFragment extends BaseFragment implements CompoundButton
                 } else {
                     fragmentConnectivityBinding.txtConnectedDevices.setVisibility(View.VISIBLE);
                     fragmentConnectivityBinding.relDisconnect.setVisibility(View.VISIBLE);
+                    fragmentConnectivityBinding.seperatorGrey.setVisibility(View.VISIBLE);
                     fragmentConnectivityBinding.txtConnectedDevice.setText(name);
                     fragmentConnectivityBinding.btnDisconnect.setEnabled(true);
                 }
@@ -145,12 +145,14 @@ public class ConnectivityFragment extends BaseFragment implements CompoundButton
     }
 
     private void checkForControlsEnable() {
-        if (fragmentConnectivityBinding.switchWifi.isChecked() || fragmentConnectivityBinding.switchBluetooth.isChecked()) {
+        if (fragmentConnectivityBinding.switchWifi.isChecked()) {
             fragmentConnectivityBinding.btnScanForDevices.setEnabled(true);
             fragmentConnectivityBinding.btnQRCode.setEnabled(true);
+            fragmentConnectivityBinding.btnHotSpot.setEnabled(true);
         } else {
             fragmentConnectivityBinding.btnScanForDevices.setEnabled(false);
             fragmentConnectivityBinding.btnQRCode.setEnabled(false);
+            fragmentConnectivityBinding.btnHotSpot.setEnabled(false);
         }
         if (wifiP2pDeviceArrayList.isEmpty()) {
             fragmentConnectivityBinding.txtAvailableDevices.setVisibility(View.GONE);
@@ -291,9 +293,11 @@ public class ConnectivityFragment extends BaseFragment implements CompoundButton
                     MainActivity.stopServiceManually(mainActivity);
                     fragmentConnectivityBinding.txtConnectedDevices.setVisibility(View.GONE);
                     fragmentConnectivityBinding.relDisconnect.setVisibility(View.GONE);
+                    StaticUtils.setConnectionType(AppConstants.CONST_CONNECTION_EMPTY);
+                    StaticUtils.setDeviceName(mainActivity, "");
+                    updateConnectionStatusData();
                     showHideConnectivityOptions(true);
-                } else
-                    StaticUtils.showToast(mainActivity, getString(R.string.no_dev_connected));
+                } else StaticUtils.showToast(mainActivity, getString(R.string.no_dev_connected));
                 break;
             case R.id.txtWifiDirect:
                 DialogUtils.showConnectionInfoDialog(mainActivity, AppConstants.CONST_WIFI_DIRECT);
@@ -514,18 +518,6 @@ public class ConnectivityFragment extends BaseFragment implements CompoundButton
                 fragmentConnectivityBinding.relDisconnect.setVisibility(View.GONE);
                 mainActivity.viewModel.updateConnectedWifiP2PDevices(selectedPos);
                 fragmentConnectivityBinding.btnDisconnect.setEnabled(false);
-            } else {
-                String name = StaticUtils.getDeviceName(mainActivity);
-                fragmentConnectivityBinding.txtConnectedDevices.setVisibility(View.VISIBLE);
-                fragmentConnectivityBinding.seperatorGrey.setVisibility(View.VISIBLE);
-                if (TextUtils.isEmpty(name)) {
-                    fragmentConnectivityBinding.relDisconnect.setVisibility(View.GONE);
-                    fragmentConnectivityBinding.btnDisconnect.setEnabled(false);
-                } else {
-                    fragmentConnectivityBinding.relDisconnect.setVisibility(View.VISIBLE);
-                    fragmentConnectivityBinding.txtConnectedDevice.setText(name);
-                    fragmentConnectivityBinding.btnDisconnect.setEnabled(true);
-                }
             }
             wifiP2pDeviceArrayList = mainActivity.viewModel.getAvailableWifiP2PDevices();
             connectedDevicesArrayList = mainActivity.viewModel.getConnectedWifiP2PDevices();
@@ -533,6 +525,20 @@ public class ConnectivityFragment extends BaseFragment implements CompoundButton
             DialogUtils.dismissProgressDialog();
             updateConnectionStatusData();
             StaticUtils.showToast(mainActivity, "Connected");
+            if (!onSocketConnected.isWifiDirect) {
+                fragmentConnectivityBinding.txtConnectedDevices.setVisibility(View.VISIBLE);
+                String name = StaticUtils.getDeviceName(mainActivity);
+                if (TextUtils.isEmpty(name)) {
+                    fragmentConnectivityBinding.relDisconnect.setVisibility(View.GONE);
+                    fragmentConnectivityBinding.btnDisconnect.setEnabled(false);
+                    fragmentConnectivityBinding.seperatorGrey.setVisibility(View.GONE);
+                } else {
+                    fragmentConnectivityBinding.relDisconnect.setVisibility(View.VISIBLE);
+                    fragmentConnectivityBinding.txtConnectedDevice.setText(name);
+                    fragmentConnectivityBinding.btnDisconnect.setEnabled(true);
+                    fragmentConnectivityBinding.seperatorGrey.setVisibility(View.VISIBLE);
+                }
+            }
         } catch (Exception e) {
             e.printStackTrace();
             FirebaseCrashlytics.getInstance().recordException(e);
@@ -545,18 +551,10 @@ public class ConnectivityFragment extends BaseFragment implements CompoundButton
             showHideConnectivityOptions(false);
             fragmentConnectivityBinding.linDevice.txtDeviceName.setText(StaticUtils.getDeviceName(mainActivity));
             fragmentConnectivityBinding.linDevice.txtDeviceName.setTextColor(Color.BLACK);
-            fragmentConnectivityBinding.btnQRCode.setEnabled(false);
-            fragmentConnectivityBinding.btnScanForDevices.setEnabled(false);
-            fragmentConnectivityBinding.btnHotSpot.setEnabled(false);
-            fragmentConnectivityBinding.btnScanForBTDevices.setEnabled(false);
         } else {
             showHideConnectivityOptions(true);
             fragmentConnectivityBinding.linDevice.txtDeviceName.setText(getString(R.string.no_dev_connected));
             fragmentConnectivityBinding.linDevice.txtDeviceName.setTextColor(Color.LTGRAY);
-            fragmentConnectivityBinding.btnQRCode.setEnabled(true);
-            fragmentConnectivityBinding.btnScanForDevices.setEnabled(true);
-            fragmentConnectivityBinding.btnHotSpot.setEnabled(true);
-            fragmentConnectivityBinding.btnScanForBTDevices.setEnabled(true);
         }
     }
 
@@ -578,9 +576,14 @@ public class ConnectivityFragment extends BaseFragment implements CompoundButton
                 selectedPos = position;
                 if (((TextView) view).getText().toString().equalsIgnoreCase(getString(R.string.connect))) {
                     connectToWifiDirect(wifiP2pDeviceArrayList.get(position));
+                    showHideConnectivityOptions(false);
                 } else {
+                    StaticUtils.setConnectionType(AppConstants.CONST_CONNECTION_EMPTY);
+                    StaticUtils.setDeviceName(mainActivity, "");
+                    updateConnectionStatusData();
                     MainActivity.stopServiceManually(mainActivity);
                     resetWifiDevices();
+                    showHideConnectivityOptions(true);
                 }
             }
         } catch (Exception e) {
@@ -597,6 +600,7 @@ public class ConnectivityFragment extends BaseFragment implements CompoundButton
         DialogUtils.showProgressDialog(mainActivity, "Connecting to " + serviceSelected.deviceName + " ...", v1 -> {
             MainActivity.stopServiceManually(mainActivity);
             resetWifiDevices();
+            showHideConnectivityOptions(true);
         });
     }
 

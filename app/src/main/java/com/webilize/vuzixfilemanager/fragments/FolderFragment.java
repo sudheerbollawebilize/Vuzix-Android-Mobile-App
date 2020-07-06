@@ -460,7 +460,7 @@ public class FolderFragment extends BaseFragment implements IClickListener, View
                         StaticUtils.showToast(folderFragmentBinding.getRoot().getContext(), "Error getting the files");
                     });
             if (currentFileFolderItem == null || currentFileFolderItem.file == null) {
-                currentFileFolderItem = new FileFolderItem(AppConstants.homeDirectory);
+                currentFileFolderItem = new FileFolderItem(AppConstants.HOME_DIRECTORY);
             }
         }
     }

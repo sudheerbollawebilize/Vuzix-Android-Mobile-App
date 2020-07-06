@@ -12,7 +12,7 @@ public class TableTransferModel {
     public static String size = "zSize";
     public static String id = "zid";
 
-    public static String TABLE_NAME = "TableAddress";
+    public static String TABLE_NAME = "TableTransfer";
     public static String CREATE_TABLE = "create table if not exists " + TABLE_NAME + " ( " + id + " INTEGER PRIMARY KEY NOT NULL, " + name +
             " TEXT, " + timeStamp + " TEXT, " + folderPath + " TEXT, " + progress + " INTEGER, " + status + " INTEGER, " + size + " TEXT, " + isIncoming + " INTEGER, " + rawData + " TEXT, UNIQUE (" + id + ") ON CONFLICT REPLACE);";
 

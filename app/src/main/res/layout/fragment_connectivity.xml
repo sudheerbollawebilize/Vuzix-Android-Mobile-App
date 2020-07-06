@@ -112,48 +112,6 @@
                 android:scrollbars="none"
                 app:layout_constraintTop_toBottomOf="@id/txtConnectedDevices" />
 
-            <View
-                android:id="@+id/seperatorGrey1"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/ten_dp"
-                android:background="@color/colorLightGrey"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/recyclerViewConnectedDevices" />
-
-            <com.webilize.vuzixfilemanager.utils.customviews.AppTextView
-                android:id="@+id/txtAvailableDevices"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/fifteen_dp"
-                android:layout_marginTop="@dimen/ten_dp"
-                android:layout_marginEnd="@dimen/fifteen_dp"
-                android:padding="@dimen/ten_dp"
-                android:text="@string/available_devices"
-                android:textColor="@color/colorCyan"
-                android:textSize="@dimen/sixteen_sp"
-                android:textStyle="bold"
-                android:visibility="visible"
-                app:layout_constraintTop_toBottomOf="@id/seperatorGrey1" />
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyclerViewAvailableDevices"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="@dimen/five_dp"
-                android:overScrollMode="never"
-                android:padding="@dimen/five_dp"
-                android:scrollbars="none"
-                android:visibility="visible"
-                app:layout_constraintTop_toBottomOf="@id/txtAvailableDevices" />
-
-            <View
-                android:id="@+id/seperatorGrey2"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/ten_dp"
-                android:background="@color/colorLightGrey"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/recyclerViewAvailableDevices" />
-
             <RelativeLayout
                 android:id="@+id/relDisconnect"
                 android:layout_width="match_parent"
@@ -162,7 +120,7 @@
                 android:visibility="gone"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/seperatorGrey2">
+                app:layout_constraintTop_toBottomOf="@id/txtConnectedDevices">
 
                 <androidx.appcompat.widget.AppCompatImageView
                     android:id="@+id/imgFileSmall"
@@ -214,6 +172,55 @@
 
             </RelativeLayout>
 
+            <androidx.constraintlayout.widget.Barrier
+                android:id="@+id/labelBarrier"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:barrierDirection="bottom"
+                app:constraint_referenced_ids="recyclerViewConnectedDevices,relDisconnect" />
+
+            <View
+                android:id="@+id/seperatorGrey1"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/ten_dp"
+                android:background="@color/colorLightGrey"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/labelBarrier" />
+
+            <com.webilize.vuzixfilemanager.utils.customviews.AppTextView
+                android:id="@+id/txtAvailableDevices"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/fifteen_dp"
+                android:layout_marginTop="@dimen/ten_dp"
+                android:layout_marginEnd="@dimen/fifteen_dp"
+                android:padding="@dimen/ten_dp"
+                android:text="@string/available_devices"
+                android:textColor="@color/colorCyan"
+                android:textSize="@dimen/sixteen_sp"
+                android:textStyle="bold"
+                android:visibility="visible"
+                app:layout_constraintTop_toBottomOf="@id/seperatorGrey1" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerViewAvailableDevices"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/five_dp"
+                android:overScrollMode="never"
+                android:padding="@dimen/five_dp"
+                android:scrollbars="none"
+                android:visibility="visible"
+                app:layout_constraintTop_toBottomOf="@id/txtAvailableDevices" />
+
+            <View
+                android:id="@+id/seperatorGrey2"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/ten_dp"
+                android:background="@color/colorLightGrey"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/recyclerViewAvailableDevices" />
+
             <com.webilize.vuzixfilemanager.utils.customviews.AppTextView
                 android:id="@+id/txtAvailableOptions"
                 android:layout_width="match_parent"
@@ -227,7 +234,7 @@
                 android:textSize="@dimen/sixteen_sp"
                 android:textStyle="bold"
                 android:visibility="visible"
-                app:layout_constraintTop_toBottomOf="@id/relDisconnect" />
+                app:layout_constraintTop_toBottomOf="@id/seperatorGrey2" />
 
             <RelativeLayout
                 android:id="@+id/relWifiDirect"
@@ -295,7 +302,7 @@
                     android:layout_alignParentStart="true"
                     android:layout_centerInParent="true"
                     android:layout_margin="@dimen/five_dp"
-                    android:drawableStart="@drawable/ic_wifi"
+                    android:drawableStart="@drawable/ic_hotspot"
                     android:drawableEnd="@drawable/ic_info"
                     android:drawablePadding="@dimen/fifteen_dp"
                     android:padding="@dimen/five_dp"

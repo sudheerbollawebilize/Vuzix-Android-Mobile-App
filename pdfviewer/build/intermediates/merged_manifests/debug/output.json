@@ -1,1 +1,27 @@
-[{"outputType":{"type":"MERGED_MANIFESTS"},"apkData":{"type":"MAIN","splits":[],"versionCode":1,"versionName":"3.1.0-beta.1","enabled":true,"outputFile":"pdfviewer-debug.aar","fullName":"debug","baseName":"debug","dirName":""},"path":"../../library_manifest/debug/AndroidManifest.xml","properties":{"packageId":"com.webilize.pdfviewer.pdfviewer","split":""}}]
+{
+  "version": 1,
+  "applicationId": "com.webilize.pdfviewer.pdfviewer",
+  "variantType": "LIBRARY",
+  "elements": [
+    {
+      "outputType": {
+        "type": "MERGED_MANIFESTS"
+      },
+      "apkData": {
+        "type": "MAIN",
+        "splits": [],
+        "versionCode": 1,
+        "versionName": "3.1.0-beta.1",
+        "outputFile": "pdfviewer-debug.aar",
+        "fullName": "debug",
+        "baseName": "debug",
+        "dirName": ""
+      },
+      "path": "../../library_manifest/debug/AndroidManifest.xml",
+      "properties": {
+        "packageId": "com.webilize.pdfviewer.pdfviewer",
+        "split": ""
+      }
+    }
+  ]
+}
