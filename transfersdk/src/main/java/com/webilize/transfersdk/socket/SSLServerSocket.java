@@ -149,7 +149,7 @@ public class SSLServerSocket extends ISocket {
             client.close();
 
         if (serverSocket != null) {
-            Log.d(TAG, "Closing server: " + serverSocket.getInetAddress().getHostAddress() + ":" + serverSocket.getLocalPort());
+//            Log.d(TAG, "Closing server: " + serverSocket.getInetAddress().getHostAddress() + ":" + serverSocket.getLocalPort());
             serverSocket.close();
         }
 

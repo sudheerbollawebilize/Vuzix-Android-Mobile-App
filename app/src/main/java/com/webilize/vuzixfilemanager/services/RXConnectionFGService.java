@@ -89,7 +89,6 @@ public class RXConnectionFGService extends Service implements ConnectionHelper.L
             if (dataWrapper.getSocketState() == SocketState.PROGRESS) {
                 try {
                     if (dataWrapper.getData() != null) {
-                        printLogs();
                         if (dataWrapper.getData() instanceof Integer) {
                             int progress = (Integer) dataWrapper.getData();
                             if (transferModel != null) {
@@ -152,7 +151,7 @@ public class RXConnectionFGService extends Service implements ConnectionHelper.L
     @Override
     public void onTaskRemoved(Intent rootIntent) {
         super.onTaskRemoved(rootIntent);
-        communicationProtocol.destroy(this);
+        if (communicationProtocol != null) communicationProtocol.destroy(this);
     }
 
     @Override
@@ -627,7 +626,6 @@ public class RXConnectionFGService extends Service implements ConnectionHelper.L
     private void requestForFolders(String folderPath) {
         try {
             if (communicationProtocol.isConnected()) {
-                printLogs();
                 isAllowNewRequests = false;
                 progressDisposable = progressObservable.subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
@@ -661,7 +659,6 @@ public class RXConnectionFGService extends Service implements ConnectionHelper.L
     private void requestForOnlyFolders(String folderPath) {
         try {
             if (communicationProtocol.isConnected()) {
-                printLogs();
                 isAllowNewRequests = false;
                 progressDisposable = progressObservable.subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
@@ -687,17 +684,6 @@ public class RXConnectionFGService extends Service implements ConnectionHelper.L
         }
     }
 
-    private void printLogs() {
-//        try {
-//            Log.e("opsh", communicationProtocol.getConnection().getSocket().isOutputShutdown() + "");
-//            Log.e("ipsh", communicationProtocol.getConnection().getSocket().isInputShutdown() + "");
-//            Log.e("bound", communicationProtocol.getConnection().getSocket().isBound() + "");
-//            Log.e("closed", communicationProtocol.getConnection().getSocket().isClosed() + "");
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-    }
-
     /**
      * This method is used for sending single file from phone to blade.
      *
@@ -714,7 +700,6 @@ public class RXConnectionFGService extends Service implements ConnectionHelper.L
      */
     private void sendFileToBlade(String[] files) {
         try {
-            printLogs();
             long fileSize = 0;
             String parentFolderPath = "";
             File firstItem = new File(files[0]);
@@ -812,7 +797,6 @@ public class RXConnectionFGService extends Service implements ConnectionHelper.L
     private void setDestinationToBlade(String destinationPath, File file, String[] files) {
         try {
             if (communicationProtocol.isConnected()) {
-                printLogs();
                 isAllowNewRequests = false;
                 progressDisposable = progressObservable.subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
@@ -849,8 +833,7 @@ public class RXConnectionFGService extends Service implements ConnectionHelper.L
      */
     private void requestForOriginals(long size, ArrayList<String> folderPaths) {
         try {
-            if (communicationProtocol.isConnected()) {
-                printLogs();
+            if (communicationProtocol.isConnected() && folderPaths != null && !folderPaths.isEmpty()) {
                 isAllowNewRequests = false;
                 progressDisposable = progressObservable.subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
