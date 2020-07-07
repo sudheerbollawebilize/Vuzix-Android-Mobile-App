@@ -40,7 +40,6 @@
         tools:ignore="ProtectedPermissions" />
     <uses-permission android:name="android.permission.TETHER_PRIVILEGED" />
 
-
     <application
         android:name=".BaseApplication"
         android:allowBackup="false"

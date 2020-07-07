@@ -127,12 +127,20 @@ public class RXConnectionFGService extends Service implements ConnectionHelper.L
 
     @Override
     public void onDestroy() {
-        Log.e(TAG, "On Destroy");
-        clearDeviceData();
-        communicationProtocol.destroy(this);
-        if (connectionHelper != null) {
-            connectionHelper.destroy(this);
+        try {
+            clearDeviceData();
+            if (communicationProtocol != null) {
+                communicationProtocol.getConnection().disconnect();
+                communicationProtocol.destroy(this);
+            }
+            if (connectionHelper != null) {
+                connectionHelper.destroy(this);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            FirebaseCrashlytics.getInstance().recordException(e);
         }
+
         super.onDestroy();
     }
 
@@ -140,7 +148,6 @@ public class RXConnectionFGService extends Service implements ConnectionHelper.L
         AppStorage.getInstance(this).setValue(WiFiDirectUtils.WIFI_DIRECT_REMOTE_DEVICE_NAME, "");
         AppStorage.getInstance(this).setValue(WiFiDirectUtils.WIFI_DIRECT_DEVICE_ADDRESS, "");
         AppStorage.getInstance(this).setValue(AppStorage.SP_DEVICE_ADDRESS, "");
-
     }
 
     @Override
@@ -841,7 +848,17 @@ public class RXConnectionFGService extends Service implements ConnectionHelper.L
                 toast("Started Fetching Originals from Blade");
                 transferModel = new TransferModel();
                 try {
-                    transferModel.name = "File ";
+                    String name = folderPaths.get(0);
+                    if (!TextUtils.isEmpty(name)) {
+                        if (name.contains("/")) {
+                            String[] spl = name.split("/");
+                            name = spl.length > 0 ? spl[spl.length - 1] : "File";
+                        }
+                    } else {
+                        name = "File";
+                    }
+
+                    transferModel.name = name;
                     transferModel.timeStamp = DateUtils.getCurrentDate();
                     transferModel.progress = 0;
                     transferModel.status = AppConstants.CONST_TRANSFER_ONGOING;

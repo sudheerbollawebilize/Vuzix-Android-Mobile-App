@@ -113,6 +113,30 @@ public class StaticUtils {
         return drawable;
     }
 
+    @DrawableRes
+    public static int getFileDrawable(String path, String mimeType) {
+        int drawable = R.drawable.ic_file;
+        if (FileUtils.isImage(mimeType)) {
+            drawable = R.drawable.ic_image;
+        } else if (FileUtils.isVideo(mimeType)) {
+            drawable = R.drawable.ic_video;
+        } else if (FileUtils.isAudio(mimeType)) {
+            drawable = R.drawable.ic_music;
+        } else if (FileUtils.isPDF(path)) {
+            drawable = R.drawable.ic_pdf;
+        } else if (FileUtils.isPresentation(path)) {
+            drawable = R.drawable.ic_ppt;
+        } else if (FileUtils.isWord(path)) {
+            drawable = R.drawable.ic_word;
+        } else if (FileUtils.isSpreadSheet(path)) {
+            drawable = R.drawable.ic_excel;
+        } else if (FileUtils.isTextFile(path)) {
+            drawable = R.drawable.ic_txt;
+        }
+
+        return drawable;
+    }
+
 
     @DrawableRes
     public static int getFileDrawable(boolean isFolder) {
@@ -496,7 +520,7 @@ public class StaticUtils {
     public static String getDeviceName(Context context) {
         try {
             SharedPreferences sp = context.getSharedPreferences(WiFiDirectUtils.SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE);
-            String deviceName = "";
+            String deviceName;
             deviceName = sp.getString(WiFiDirectUtils.WIFI_DIRECT_REMOTE_DEVICE_NAME, "");
             if (TextUtils.isEmpty(deviceName)) {
                 deviceName = AppStorage.getInstance(context).getValue(WiFiDirectUtils.WIFI_DIRECT_REMOTE_DEVICE_NAME, "");

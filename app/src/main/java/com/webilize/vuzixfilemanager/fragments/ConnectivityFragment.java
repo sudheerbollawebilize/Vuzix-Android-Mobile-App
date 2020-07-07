@@ -113,7 +113,7 @@ public class ConnectivityFragment extends BaseFragment implements CompoundButton
             case AppConstants.CONST_BLUETOOTH:
             case AppConstants.CONST_WIFI_HOTSPOT:
                 String name = StaticUtils.getDeviceName(mainActivity);
-                if (TextUtils.isEmpty(name)) {
+                if (TextUtils.isEmpty(name) || name.equalsIgnoreCase(getString(R.string.no_dev_connected))) {
                     fragmentConnectivityBinding.relDisconnect.setVisibility(View.GONE);
                     fragmentConnectivityBinding.btnDisconnect.setEnabled(false);
                 } else {
@@ -528,7 +528,7 @@ public class ConnectivityFragment extends BaseFragment implements CompoundButton
             if (!onSocketConnected.isWifiDirect) {
                 fragmentConnectivityBinding.txtConnectedDevices.setVisibility(View.VISIBLE);
                 String name = StaticUtils.getDeviceName(mainActivity);
-                if (TextUtils.isEmpty(name)) {
+                if (TextUtils.isEmpty(name) || name.equalsIgnoreCase(getString(R.string.no_dev_connected))) {
                     fragmentConnectivityBinding.relDisconnect.setVisibility(View.GONE);
                     fragmentConnectivityBinding.btnDisconnect.setEnabled(false);
                     fragmentConnectivityBinding.seperatorGrey.setVisibility(View.GONE);
@@ -549,12 +549,19 @@ public class ConnectivityFragment extends BaseFragment implements CompoundButton
         fragmentConnectivityBinding.linDevice.txtConnectionType.setText(StaticUtils.getConnectionType());
         if (cp.isConnected()) {
             showHideConnectivityOptions(false);
-            fragmentConnectivityBinding.linDevice.txtDeviceName.setText(StaticUtils.getDeviceName(mainActivity));
-            fragmentConnectivityBinding.linDevice.txtDeviceName.setTextColor(Color.BLACK);
+            String name = StaticUtils.getDeviceName(mainActivity);
+            if (TextUtils.isEmpty(name) || name.equalsIgnoreCase(getString(R.string.no_dev_connected))) {
+                fragmentConnectivityBinding.linDevice.txtDeviceName.setText(getString(R.string.no_dev_connected));
+                fragmentConnectivityBinding.linDevice.txtDeviceName.setTextColor(Color.LTGRAY);
+                showHideConnectivityOptions(true);
+            } else {
+                fragmentConnectivityBinding.linDevice.txtDeviceName.setText(name);
+                fragmentConnectivityBinding.linDevice.txtDeviceName.setTextColor(Color.BLACK);
+            }
         } else {
-            showHideConnectivityOptions(true);
             fragmentConnectivityBinding.linDevice.txtDeviceName.setText(getString(R.string.no_dev_connected));
             fragmentConnectivityBinding.linDevice.txtDeviceName.setTextColor(Color.LTGRAY);
+            showHideConnectivityOptions(true);
         }
     }
 

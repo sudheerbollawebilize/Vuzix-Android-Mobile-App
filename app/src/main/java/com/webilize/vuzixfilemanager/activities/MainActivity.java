@@ -27,7 +27,6 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
-import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import androidx.core.view.GravityCompat;
@@ -199,8 +198,7 @@ public class MainActivity extends BaseActivity implements NavigationListener, Vi
                 } else if (FileUtils.isAPKFile(fileFolderItem.file.getAbsolutePath())) {
                     FileUtils.installApk(this, fileFolderItem.file);
                 } else {
-                    FileUtils.showFile(this,fileFolderItem.file);
-
+                    FileUtils.showFile(this, fileFolderItem.file);
                 }
             }
         } else {
@@ -267,13 +265,21 @@ public class MainActivity extends BaseActivity implements NavigationListener, Vi
         Fragment curr = getCurrentFragment();
         if (curr instanceof FolderFragment && isSelectionTopBar) {
             ((FolderFragment) curr).deselectAll();
-        } else if (curr instanceof FolderFragment && getSupportFragmentManager().getBackStackEntryCount() > 0) {
+        } /*else if (curr instanceof FolderFragment && getSupportFragmentManager().getBackStackEntryCount() > 0) {
             popBackStack();
-        } else if (!(curr instanceof FolderFragment)) {
+        } */else if (!(curr instanceof FolderFragment)) {
             if (curr instanceof BladeFolderFragment) {
-                popBackStack();
-                updateTitle(getString(R.string.blade_files));
+                if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
+                    popBackStack();
+                    updateTitle(getString(R.string.blade_files));
+                } else {
+                    activityMainBinding.bottomBar.setSelectedItemId(R.id.navFilesManager);
+                    open(new FileFolderItem(AppConstants.HOME_DIRECTORY));
+                    updateTitle(getString(R.string.phone_files));
+                }
             } else if (activityMainBinding.bottomBar.getSelectedItemId() != R.id.navFilesManager) {
+                open(new FileFolderItem(AppConstants.HOME_DIRECTORY));
+                updateTitle(getString(R.string.phone_files));
                 activityMainBinding.bottomBar.setSelectedItemId(R.id.navFilesManager);
             }
         } else if (back_pressed + AppConstants.BACK_PRESSED_TIME > System.currentTimeMillis())

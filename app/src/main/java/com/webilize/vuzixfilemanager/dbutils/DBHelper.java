@@ -165,16 +165,13 @@ public class DBHelper {
         ArrayList<TransferModel> arrayList = new ArrayList<>();
         String selectQuery = "";
         if (showFinished) {
-            if (isIncoming) {
-                selectQuery =
-                        "select * FROM " + TableTransferModel.TABLE_NAME + " WHERE " + TableTransferModel.isIncoming + "='" + 0 + "'" + " ORDER BY " + TableTransferModel.id + " DESC LIMIT 20";
-            } else {
-                selectQuery =
-                        "select * FROM " + TableTransferModel.TABLE_NAME + " WHERE " + TableTransferModel.isIncoming + "='" + 1 + "'" + " ORDER BY " + TableTransferModel.id + " DESC LIMIT 20";
-            }
+//            if (isIncoming) {
+            selectQuery = "select * FROM " + TableTransferModel.TABLE_NAME + " WHERE " + TableTransferModel.isIncoming + "='" + (isIncoming ? 0 : 1) + "'" + " ORDER BY " + TableTransferModel.id + " DESC LIMIT 20";
+//            } else {
+//                selectQuery = "select * FROM " + TableTransferModel.TABLE_NAME + " WHERE " + TableTransferModel.isIncoming + "='" + 1 + "'" + " ORDER BY " + TableTransferModel.id + " DESC LIMIT 20";
+//            }
         } else {
-            selectQuery =
-                    "select * FROM " + TableTransferModel.TABLE_NAME + " WHERE " + TableTransferModel.status + "='" + 0 + (isIncoming ? ("' AND " + TableTransferModel.isIncoming + "='" + 0 + "'") : "'") + " ORDER BY " + TableTransferModel.id + " DESC LIMIT 20";
+            selectQuery = "select * FROM " + TableTransferModel.TABLE_NAME + " WHERE " + TableTransferModel.status + "='" + 0 + (isIncoming ? ("' AND " + TableTransferModel.isIncoming + "='" + 0 + "'") : "'") + " ORDER BY " + TableTransferModel.id + " DESC LIMIT 20";
 //            if (isIncoming) {
 //                selectQuery =
 //                        "select * FROM " + TableTransferModel.TABLE_NAME + " WHERE " + TableTransferModel.status + "='" + 0 + (isIncoming ? ("' AND" + TableTransferModel.isIncoming + "='" + 0 + "'") : "'") + " ORDER BY " + TableTransferModel.id + " DESC LIMIT 20";
@@ -271,8 +268,7 @@ public class DBHelper {
                 String[] itemIds = arrayListToDelete.toArray(new String[arrayListToDelete.size()]);
                 if (itemIds != null && itemIds.length > 0) {
                     databaseHandler.getWritableDatabase();
-                    databaseHandler.deleteData(TableTransferModel.TABLE_NAME,
-                            TableTransferModel.id + "=?", itemIds);
+                    databaseHandler.deleteData(TableTransferModel.TABLE_NAME, TableTransferModel.id + "=?", itemIds);
                 }
             }
         } catch (Exception e) {

@@ -43,7 +43,7 @@ import org.greenrobot.eventbus.ThreadMode;
 import java.io.File;
 import java.util.ArrayList;
 
-public class TransfersFragment extends BaseFragment implements IClickListener, View.OnClickListener {
+public class TransfersFragmentBc extends BaseFragment implements IClickListener, View.OnClickListener {
 
     private FragmentTransfersBinding fragmentTransfersBinding;
     private View rootView;
@@ -55,10 +55,9 @@ public class TransfersFragment extends BaseFragment implements IClickListener, V
     private PopupMenu popupMenu, itemPopUpMenu;
     private TransferModel selectedFile;
     private NavigationListener navigationListener;
-    private TransfersPagerAdapter transfersPagerAdapter;
 
-    public static TransfersFragment newInstance() {
-        return new TransfersFragment();
+    public static TransfersFragmentBc newInstance() {
+        return new TransfersFragmentBc();
     }
 
     @Override
@@ -316,11 +315,12 @@ public class TransfersFragment extends BaseFragment implements IClickListener, V
         setAdapter();
     }
 
+
     public class TransfersPagerAdapter extends PagerAdapter {
 
         private Context mContext;
-        RecyclerView recyclerViewIncoming, recyclerViewOutGoing;
-        TextView txtNoDataFoundIncoming, txtNoDataFoundOutGoing;
+        RecyclerView recyclerView;
+        TextView txtNoDataFound;
 
         public TransfersPagerAdapter(Context context) {
             mContext = context;
@@ -331,11 +331,11 @@ public class TransfersFragment extends BaseFragment implements IClickListener, V
         public Object instantiateItem(@NonNull ViewGroup collection, int position) {
             LayoutInflater inflater = LayoutInflater.from(mContext);
             ViewGroup layout = (ViewGroup) inflater.inflate(R.layout.fragment_transfers_list, collection, false);
+            recyclerView = layout.findViewById(R.id.recyclerView);
+            txtNoDataFound = layout.findViewById(R.id.txtNoDataFound);
             if (position == 0) {
-                recyclerViewIncoming = layout.findViewById(R.id.recyclerView);
-                txtNoDataFoundIncoming = layout.findViewById(R.id.txtNoDataFound);
-                recyclerViewIncoming.addItemDecoration(new DividerItemDecoration(mainActivity, DividerItemDecoration.VERTICAL_LIST));
-                recyclerViewIncoming.setLayoutManager(new LinearLayoutManager(mainActivity));
+                recyclerView.addItemDecoration(new DividerItemDecoration(mainActivity, DividerItemDecoration.VERTICAL_LIST));
+                recyclerView.setLayoutManager(new LinearLayoutManager(mainActivity));
                 transfersAdapterIncoming = new TransfersAdapter(mainActivity, transferModelArrayListIncoming, new IClickListener() {
                     @Override
                     public void onClick(View view, int position) {
@@ -350,13 +350,11 @@ public class TransfersFragment extends BaseFragment implements IClickListener, V
 
                     }
                 });
-                recyclerViewIncoming.setAdapter(transfersAdapterIncoming);
+                recyclerView.setAdapter(transfersAdapterIncoming);
                 checkForVisibility(true);
             } else {
-                recyclerViewOutGoing = layout.findViewById(R.id.recyclerView);
-                txtNoDataFoundOutGoing = layout.findViewById(R.id.txtNoDataFound);
-                recyclerViewOutGoing.addItemDecoration(new DividerItemDecoration(mainActivity, DividerItemDecoration.VERTICAL_LIST));
-                recyclerViewOutGoing.setLayoutManager(new LinearLayoutManager(mainActivity));
+                recyclerView.addItemDecoration(new DividerItemDecoration(mainActivity, DividerItemDecoration.VERTICAL_LIST));
+                recyclerView.setLayoutManager(new LinearLayoutManager(mainActivity));
                 transfersAdapterOutGoing = new TransfersAdapter(mainActivity, transferModelArrayListOutGoing, new IClickListener() {
                     @Override
                     public void onClick(View view, int position) {
@@ -371,7 +369,7 @@ public class TransfersFragment extends BaseFragment implements IClickListener, V
 
                     }
                 });
-                recyclerViewOutGoing.setAdapter(transfersAdapterOutGoing);
+                recyclerView.setAdapter(transfersAdapterOutGoing);
                 checkForVisibility(false);
             }
             collection.addView(layout);
@@ -379,7 +377,7 @@ public class TransfersFragment extends BaseFragment implements IClickListener, V
         }
 
         @Override
-        public void destroyItem(ViewGroup collection, int position, @NonNull Object view) {
+        public void destroyItem(ViewGroup collection, int position, Object view) {
             collection.removeView((View) view);
         }
 
@@ -389,7 +387,7 @@ public class TransfersFragment extends BaseFragment implements IClickListener, V
         }
 
         @Override
-        public boolean isViewFromObject(@NonNull View view, @NonNull Object object) {
+        public boolean isViewFromObject(View view, Object object) {
             return view == object;
         }
 
@@ -405,24 +403,26 @@ public class TransfersFragment extends BaseFragment implements IClickListener, V
         public void checkForVisibility(boolean isIncoming) {
             if (isIncoming) {
                 if (transferModelArrayListIncoming == null || transferModelArrayListIncoming.isEmpty()) {
-                    txtNoDataFoundIncoming.setVisibility(View.VISIBLE);
-                    recyclerViewIncoming.setVisibility(View.GONE);
+                    txtNoDataFound.setVisibility(View.VISIBLE);
+                    recyclerView.setVisibility(View.GONE);
                 } else {
-                    txtNoDataFoundIncoming.setVisibility(View.GONE);
-                    recyclerViewIncoming.setVisibility(View.VISIBLE);
+                    txtNoDataFound.setVisibility(View.GONE);
+                    recyclerView.setVisibility(View.VISIBLE);
                 }
             } else {
                 if (transferModelArrayListOutGoing == null || transferModelArrayListOutGoing.isEmpty()) {
-                    txtNoDataFoundOutGoing.setVisibility(View.VISIBLE);
-                    recyclerViewOutGoing.setVisibility(View.GONE);
+                    txtNoDataFound.setVisibility(View.VISIBLE);
+                    recyclerView.setVisibility(View.GONE);
                 } else {
-                    txtNoDataFoundOutGoing.setVisibility(View.GONE);
-                    recyclerViewOutGoing.setVisibility(View.VISIBLE);
+                    txtNoDataFound.setVisibility(View.GONE);
+                    recyclerView.setVisibility(View.VISIBLE);
                 }
             }
         }
 
     }
+
+    TransfersPagerAdapter transfersPagerAdapter;
 
     private void setAdapter() {
         transfersPagerAdapter = new TransfersPagerAdapter(mainActivity);

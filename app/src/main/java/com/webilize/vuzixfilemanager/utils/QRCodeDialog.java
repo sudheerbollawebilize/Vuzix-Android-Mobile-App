@@ -81,10 +81,9 @@ public class QRCodeDialog extends Dialog implements DialogInterface.OnDismissLis
             bag.add(cp.disconnect().subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(() -> {
-                                Log.d(TAG, "Current server disconnected");
-                                bag.dispose();
-                            }
-                            , throwable -> Log.e(TAG, "Error disconnecting server")));
+                        Log.d(TAG, "Current server disconnected");
+                        bag.dispose();
+                    }, throwable -> Log.e(TAG, "Error disconnecting server")));
 
         } else {
             onSuccess = false;

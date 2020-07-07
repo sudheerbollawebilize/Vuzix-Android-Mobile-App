@@ -146,7 +146,7 @@
     </string>
 
     <string name="hotspot_step1">
-        1. Enable your phone’s HotSpot.\n2. On your phone tap on GET CODE next to Hotspot in the Connectivity tab.\n3. Your phone should show a QR code to be scanned.\n4. Open the FileManager App on yourd evice.\n5. Tap the Connectivity screen.\n6. Find the connectivity method you would like to use: HotSpot Connection
+        1. Enable your phone’s HotSpot.\n2. On your phone tap on GET CODE next to Hotspot in the Connectivity tab.\n3. Your phone should show a QR code to be scanned.\n4. Open the FileManager App on your device.\n5. Tap the Connectivity screen.\n6. Find the connectivity method you would like to use: HotSpot Connection
     </string>
 
     <string name="hotspot_step2">

@@ -33,15 +33,9 @@ public class BladeItem implements Parcelable {
         } else fileInfo = FileUtils.getFileSize(size) + "\n" + jsonObject.optString("fileInfo");
         if (isSelected) imageRes = R.drawable.ic_select;
         else {
-            if (isImageFile())
-                imageRes = R.drawable.ic_image;
-            else if (isVideoFile())
-                imageRes = R.drawable.ic_video;
-            else if (isAudioFile())
-                imageRes = R.drawable.ic_music;
-            else if (isFolder) {
+            if (isFolder) {
                 imageRes = size == 0 ? R.drawable.ic_folder_empty : R.drawable.ic_folder;
-            } else imageRes = R.drawable.ic_file;
+            } else imageRes = StaticUtils.getFileDrawable(name, mimeType);
         }
     }
 

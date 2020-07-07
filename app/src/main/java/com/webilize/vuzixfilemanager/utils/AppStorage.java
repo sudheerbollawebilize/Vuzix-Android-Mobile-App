@@ -14,7 +14,6 @@ public class AppStorage {
     public static final String SP_IP = "SP_IP";
     public static final String SP_PORT = "SP_PORT";
     public static final String SP_SSID = "SP_SSID";
-    public static final String SP_DEVICE_NAME = "SP_DEVICE_NAME";
     public static final String SP_DEVICE_MODE = "SP_DEVICE_MODE";
     public static final String SP_IS_STORAGE_FIRST_TIME = "SP_IS_STORAGE_FIRST_TIME";
     public static final String SP_SHOW_HIDDEN = "SP_SHOW_HIDDEN";
@@ -108,16 +107,8 @@ public class AppStorage {
         return getValue(SP_PORT, -1);
     }
 
-    public void setDeviceName(String deviceName) {
-        setValue(SP_DEVICE_NAME, deviceName);
-    }
-
     public void setSSID(String ssid) {
         setValue(SP_SSID, ssid);
-    }
-
-    public String getDeviceName() {
-        return getValue(SP_DEVICE_NAME, "");
     }
 
     public String getSSID() {
