@@ -95,5 +95,16 @@ public class AppConstants {
     public static final String COPY = "Copy";
     public static final String PASTE = "Paste";
 
+    // Service commands
+    public static final String INTENT_INPUT_EXTRA = "inputExtra";
+    public static final String INTENT_FOLDER_PATH = "folderPath";
+    public static final String INTENT_IS_ONLY_FOLDERS = "isOnlyfolders";
+    public static final String INTENT_DESTINATION_PATH = "destinationPath";
+    public static final String INTENT_ADD_TO_FAV = "addToFav";
+    public static final String INTENT_ADD_TO_FAV_PATH = "addToFavPath";
+    public static final String INTENT_ADD_TO_FAV_NAME = "addToFavName";
+    public static final String INTENT_SELECTED_FILE = "selectedFile";
+
+
 
 }

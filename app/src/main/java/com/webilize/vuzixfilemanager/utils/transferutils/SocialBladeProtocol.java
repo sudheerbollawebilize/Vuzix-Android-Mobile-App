@@ -146,6 +146,23 @@ public class SocialBladeProtocol {
         return requestFolders(rxConnection, cacheStatus(folderPath, isOnlyFolders), folder, publisher);
     }
 
+    public static Single<JSONObject> sendCommand(JSONObject jsonObject, final RXConnection rxConnection, PublishSubject<DataWrapper> publisher) throws JSONException {
+        return rxConnection.write(jsonObject, publisher).andThen(rxConnection.read(publisher)).map(dataWrapper -> {
+            if (dataWrapper.getSocketState() == SocketState.DISCONNECTED ||
+                    dataWrapper.getSocketState() == SocketState.CLIENT_DISCONNECTED) {
+                rxConnection.clientDisconnected();
+                throw new Exception("Connection lost");
+            } else {
+                if (dataWrapper.getSocketState() == SocketState.JSON_RECEIVED) {
+                    return (JSONObject) dataWrapper.getData();
+                } else if (dataWrapper.getSocketState() == SocketState.MULTIPLE_FILES) {
+                    return new JSONObject();
+                }
+                return new JSONObject();
+            }
+        });
+    }
+
     public static Single<JSONObject> setDestinationFolder(Context context, final RXConnection rxConnection
             , PublishSubject<DataWrapper> publisher, String destinationPath) throws JSONException {
         File folder = getThumbnailsFolder(context);

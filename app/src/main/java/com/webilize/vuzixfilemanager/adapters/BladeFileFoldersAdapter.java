@@ -24,7 +24,6 @@ public class BladeFileFoldersAdapter extends RecyclerView.Adapter<BladeFileFolde
     private ArrayList<BladeItem> fileFolderItemArrayList;
     private Context context;
     private IClickListener iClickListener;
-    private int listMode;
 
     public BladeFileFoldersAdapter(Context context, ArrayList<BladeItem> fileFolderItemArrayList, IClickListener iClickListener) {
         this.context = context;
@@ -41,7 +40,7 @@ public class BladeFileFoldersAdapter extends RecyclerView.Adapter<BladeFileFolde
     @Override
     public void onBindViewHolder(@NonNull FileViewHolder fileFoldersViewHolder, int position) {
         BladeItem fileFolderItem = fileFolderItemArrayList.get(position);
-        listMode = AppStorage.getInstance(context).getValue(AppStorage.SP_LIST_MODE, AppConstants.SHOW_GRID);
+        int listMode = AppStorage.getInstance(context).getValue(AppStorage.SP_LIST_MODE, AppConstants.SHOW_GRID);
         fileFoldersViewHolder.itemView.setOnClickListener(v -> {
             if (iClickListener != null) iClickListener.onClick(v, position);
         });

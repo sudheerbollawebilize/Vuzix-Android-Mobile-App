@@ -1,6 +1,5 @@
 package com.webilize.vuzixfilemanager.adapters;
 
-import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
@@ -18,11 +17,9 @@ import java.util.ArrayList;
 public class FavouriteFolderAdapter extends RecyclerView.Adapter<FavouriteFolderAdapter.DevicesViewHolder> {
 
     private ArrayList<DeviceFavouritesModel> folderNamesArrayList;
-    private Context context;
     private IClickListener iClickListener;
 
-    public FavouriteFolderAdapter(Context context, ArrayList<DeviceFavouritesModel> folderNamesArrayList, IClickListener iClickListener) {
-        this.context = context;
+    public FavouriteFolderAdapter(ArrayList<DeviceFavouritesModel> folderNamesArrayList, IClickListener iClickListener) {
         this.folderNamesArrayList = folderNamesArrayList;
         this.iClickListener = iClickListener;
     }

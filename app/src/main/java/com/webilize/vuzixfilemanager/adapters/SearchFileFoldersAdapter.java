@@ -1,6 +1,5 @@
 package com.webilize.vuzixfilemanager.adapters;
 
-import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,11 +19,9 @@ import java.util.ArrayList;
 public class SearchFileFoldersAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private ArrayList<FileFolderItem> fileFolderItemArrayList;
-    private Context context;
     private IClickListener iClickListener;
 
-    public SearchFileFoldersAdapter(Context context, ArrayList<FileFolderItem> fileFolderItemArrayList, IClickListener iClickListener) {
-        this.context = context;
+    public SearchFileFoldersAdapter(ArrayList<FileFolderItem> fileFolderItemArrayList, IClickListener iClickListener) {
         this.fileFolderItemArrayList = fileFolderItemArrayList;
         this.iClickListener = iClickListener;
     }
@@ -54,9 +51,6 @@ public class SearchFileFoldersAdapter extends RecyclerView.Adapter<RecyclerView.
                 if (iClickListener != null) iClickListener.onLongClick(v, position);
                 return false;
             });
-//            ((FoldersViewHolder) fileFoldersViewHolder).itemFolderBinding.imgMore.setOnClickListener(v -> {
-//                if (iClickListener != null) iClickListener.onClick(v, position);
-//            });
             ((FoldersViewHolder) fileFoldersViewHolder).itemFolderBinding.imgMore.setVisibility(View.GONE);
         } else {
             ((FileViewHolder) fileFoldersViewHolder).itemFileBinding.setFileFolderItem(fileFolderItem);
@@ -67,9 +61,6 @@ public class SearchFileFoldersAdapter extends RecyclerView.Adapter<RecyclerView.
                 if (iClickListener != null) iClickListener.onLongClick(v, position);
                 return false;
             });
-//            ((FileViewHolder) fileFoldersViewHolder).itemFileBinding.imgMore.setOnClickListener(v -> {
-//                if (iClickListener != null) iClickListener.onClick(v, position);
-//            });
             ((FileViewHolder) fileFoldersViewHolder).itemFileBinding.imgMore.setVisibility(View.GONE);
             ((FileViewHolder) fileFoldersViewHolder).itemFileBinding.imgFile.setVisibility(View.GONE);
         }
@@ -85,7 +76,7 @@ public class SearchFileFoldersAdapter extends RecyclerView.Adapter<RecyclerView.
         return fileFolderItemArrayList != null ? fileFolderItemArrayList.size() : 0;
     }
 
-    class FoldersViewHolder extends RecyclerView.ViewHolder {
+    static class FoldersViewHolder extends RecyclerView.ViewHolder {
         public ItemFolderBinding itemFolderBinding;
 
         public FoldersViewHolder(@NonNull ItemFolderBinding itemFileFolderBinding) {
@@ -94,7 +85,7 @@ public class SearchFileFoldersAdapter extends RecyclerView.Adapter<RecyclerView.
         }
     }
 
-    class FileViewHolder extends RecyclerView.ViewHolder {
+    static class FileViewHolder extends RecyclerView.ViewHolder {
         public ItemFileBinding itemFileBinding;
 
         public FileViewHolder(@NonNull ItemFileBinding itemFileFolderBinding) {

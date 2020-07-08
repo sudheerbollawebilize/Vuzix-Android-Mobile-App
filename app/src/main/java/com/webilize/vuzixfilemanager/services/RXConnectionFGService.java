@@ -130,7 +130,6 @@ public class RXConnectionFGService extends Service implements ConnectionHelper.L
         try {
             clearDeviceData();
             if (communicationProtocol != null) {
-                communicationProtocol.getConnection().disconnect();
                 communicationProtocol.destroy(this);
             }
             if (connectionHelper != null) {
@@ -163,7 +162,6 @@ public class RXConnectionFGService extends Service implements ConnectionHelper.L
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.e(TAG, "On Start Command");
         if (dbHelper == null) dbHelper = new DBHelper(this);
         if (intent != null && intent.hasExtra("inputExtra")) {
             String input = intent.getStringExtra("inputExtra");
@@ -221,6 +219,13 @@ public class RXConnectionFGService extends Service implements ConnectionHelper.L
                                 requestForOnlyFolders(intent.getStringExtra("folderPath"));
                             else requestForFolders(intent.getStringExtra("folderPath"));
                         } else requestForFolders(intent.getStringExtra("folderPath"));
+                    } else if (intent.hasExtra("command")) {
+                        try {
+                            sendCommandToDevice(new JSONObject(intent.getStringExtra("command")));
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                            FirebaseCrashlytics.getInstance().recordException(e);
+                        }
                     } else if (intent.hasExtra("fileNames")) {
                         requestForOriginals(intent.getLongExtra("size", 0), intent.getStringArrayListExtra("fileNames"));
                     }
@@ -626,6 +631,37 @@ public class RXConnectionFGService extends Service implements ConnectionHelper.L
     }
 
     /**
+     * This method is for sending commands to connected device.
+     *
+     * @param commandObject
+     */
+    private void sendCommandToDevice(JSONObject commandObject) {
+        try {
+            if (communicationProtocol.isConnected()) {
+                progressDisposable = progressObservable.subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(progressObserver);
+                toast("Started Fetching Data from Blade");
+                getFoldersDisposable = SocialBladeProtocol.sendCommand(commandObject, communicationProtocol.getConnection(), progressObservable)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(jsonObject -> {
+                            isAllowNewRequests = true;
+                        }, error -> {
+                            FirebaseCrashlytics.getInstance().recordException(error);
+                            isAllowNewRequests = true;
+                        });
+                communicationProtocol.addDisposable(getFoldersDisposable);
+            } else {
+                toast("Connection not available");
+            }
+        } catch (Exception e) {
+            FirebaseCrashlytics.getInstance().recordException(e);
+            Log.e(TAG, "onCreateView: ", e);
+        }
+    }
+
+    /**
      * This method is for getting folders and files from the specified path. If empty path is specified, it will fetch root folder contents.
      *
      * @param folderPath
@@ -646,7 +682,7 @@ public class RXConnectionFGService extends Service implements ConnectionHelper.L
                             EventBus.getDefault().post(new OnJSONObjectReceived(jsonObject));
                         }, error -> {
                             isAllowNewRequests = true;
-                            Log.e(TAG, "fetchThumbnails: ", error);
+                            FirebaseCrashlytics.getInstance().recordException(error);
                         });
                 communicationProtocol.addDisposable(getFoldersDisposable);
             } else {
@@ -654,7 +690,6 @@ public class RXConnectionFGService extends Service implements ConnectionHelper.L
             }
         } catch (Exception e) {
             FirebaseCrashlytics.getInstance().recordException(e);
-            Log.e(TAG, "onCreateView: ", e);
         }
     }
 
@@ -679,7 +714,7 @@ public class RXConnectionFGService extends Service implements ConnectionHelper.L
                             EventBus.getDefault().post(new OnJSONObjectReceivedFolders(jsonObject));
                         }, error -> {
                             isAllowNewRequests = true;
-                            Log.e(TAG, "fetchThumbnails: ", error);
+                            FirebaseCrashlytics.getInstance().recordException(error);
                         });
                 communicationProtocol.addDisposable(getFoldersDisposable);
             } else {
@@ -762,6 +797,7 @@ public class RXConnectionFGService extends Service implements ConnectionHelper.L
                                 dbHelper.addTransferModel(transferModel);
                                 EventBus.getDefault().post(new OnProgressUpdated(transferModel));
                             }
+                            FirebaseCrashlytics.getInstance().recordException(error);
                         });
                 communicationProtocol.addDisposable(sendFilesDisposable);
             } else {

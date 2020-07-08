@@ -14,6 +14,7 @@ import com.webilize.vuzixfilemanager.fragments.BladeFavFolderFragment;
 import com.webilize.vuzixfilemanager.fragments.BladeFolderSelectionFragment;
 import com.webilize.vuzixfilemanager.models.BladeItem;
 import com.webilize.vuzixfilemanager.services.RXConnectionFGService;
+import com.webilize.vuzixfilemanager.utils.AppConstants;
 import com.webilize.vuzixfilemanager.utils.StaticUtils;
 import com.webilize.vuzixfilemanager.utils.eventbus.OnJSONObjectReceivedFolders;
 
@@ -55,9 +56,9 @@ public class BladeFoldersActivity extends BaseActivity implements View.OnClickLi
 
     public void requestForBladeFolders(String folderPath) {
         Intent serviceIntent = new Intent(this, RXConnectionFGService.class);
-        serviceIntent.putExtra("inputExtra", "folder");
-        serviceIntent.putExtra("folderPath", folderPath);
-        serviceIntent.putExtra("isOnlyfolders", true);
+        serviceIntent.putExtra(AppConstants.INTENT_INPUT_EXTRA, "folder");
+        serviceIntent.putExtra(AppConstants.INTENT_FOLDER_PATH, folderPath);
+        serviceIntent.putExtra(AppConstants.INTENT_IS_ONLY_FOLDERS, true);
         ContextCompat.startForegroundService(this, serviceIntent);
     }
 
@@ -82,13 +83,11 @@ public class BladeFoldersActivity extends BaseActivity implements View.OnClickLi
         ArrayList<BladeItem> bladeItemArrayList = new ArrayList<>();
         try {
             JSONObject jsonObject = onJSONObjectReceivedFolders.jsonObject;
-            JSONArray jsonArray = new JSONArray();
             if (jsonObject.has("folders")) {
                 try {
-                    jsonArray = jsonObject.getJSONArray("folders");
+                    JSONArray jsonArray = jsonObject.getJSONArray("folders");
                     for (int i = 0; i < jsonArray.length(); i++) {
-                        BladeItem bladeItem = new BladeItem(jsonArray.optJSONObject(i));
-                        bladeItemArrayList.add(bladeItem);
+                        bladeItemArrayList.add(new BladeItem(jsonArray.optJSONObject(i)));
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -111,30 +110,24 @@ public class BladeFoldersActivity extends BaseActivity implements View.OnClickLi
 
     public void sendToFolder(String folderPath) {
         Intent data = getIntent();
-        data.putExtra("destinationPath", folderPath);
+        data.putExtra(AppConstants.INTENT_DESTINATION_PATH, folderPath);
         setResult(RESULT_OK, data);
         finish();
     }
 
     public void addToFavourites(BladeItem bladeItem) {
-        StaticUtils.showToast(getApplicationContext(), "Added to favourites");
+        StaticUtils.showToast(getApplicationContext(), getString(R.string.added_to_favourites));
         Intent data = getIntent();
-        data.putExtra("addToFav", bladeItem.path);
-        data.putExtra("addToFavPath", bladeItem.path);
-        data.putExtra("addToFavName", bladeItem.name);
+        data.putExtra(AppConstants.INTENT_ADD_TO_FAV, bladeItem.path);
+        data.putExtra(AppConstants.INTENT_ADD_TO_FAV_PATH, bladeItem.path);
+        data.putExtra(AppConstants.INTENT_ADD_TO_FAV_NAME, bladeItem.name);
         setResult(RESULT_OK, data);
         finish();
     }
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.imgBack:
-                onBackPressed();
-                break;
-            default:
-                break;
-        }
+        if (v.getId() == R.id.imgBack) onBackPressed();
     }
 
 }

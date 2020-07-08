@@ -179,4 +179,5 @@ public abstract class BaseActivity extends AppCompatActivity {
 //            ft.setCustomAnimations(R.anim.slide_in_bottom, R.anim.slide_out_top, R.anim.slide_in_top, R.anim.slide_out_bottom);
         }
     }
+
 }

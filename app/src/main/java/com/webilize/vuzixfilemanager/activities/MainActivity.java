@@ -265,30 +265,31 @@ public class MainActivity extends BaseActivity implements NavigationListener, Vi
         Fragment curr = getCurrentFragment();
         if (curr instanceof FolderFragment && isSelectionTopBar) {
             ((FolderFragment) curr).deselectAll();
-        } /*else if (curr instanceof FolderFragment && getSupportFragmentManager().getBackStackEntryCount() > 0) {
+        } else if (curr instanceof FolderFragment && getSupportFragmentManager().getBackStackEntryCount() > 0) {
             popBackStack();
-        } */else if (!(curr instanceof FolderFragment)) {
+        } else if (!(curr instanceof FolderFragment)) {
             if (curr instanceof BladeFolderFragment) {
-                if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
+                if (getSupportFragmentManager().getBackStackEntryCount() > 1) {
                     popBackStack();
                     updateTitle(getString(R.string.blade_files));
                 } else {
+                    clearBackStackCompletely();
                     activityMainBinding.bottomBar.setSelectedItemId(R.id.navFilesManager);
-                    open(new FileFolderItem(AppConstants.HOME_DIRECTORY));
-                    updateTitle(getString(R.string.phone_files));
                 }
             } else if (activityMainBinding.bottomBar.getSelectedItemId() != R.id.navFilesManager) {
-                open(new FileFolderItem(AppConstants.HOME_DIRECTORY));
-                updateTitle(getString(R.string.phone_files));
+                clearBackStackCompletely();
                 activityMainBinding.bottomBar.setSelectedItemId(R.id.navFilesManager);
             }
-        } else if (back_pressed + AppConstants.BACK_PRESSED_TIME > System.currentTimeMillis())
-            super.onBackPressed();
-        else
-            StaticUtils.showToast(getApplicationContext(), getString(R.string.press_once_again_to_exit));
-        back_pressed = System.currentTimeMillis();
+        } else {
+            if (back_pressed + AppConstants.BACK_PRESSED_TIME > System.currentTimeMillis())
+                super.onBackPressed();
+            else {
+                StaticUtils.showToast(getApplicationContext(), getString(R.string.press_once_again_to_exit));
+                back_pressed = System.currentTimeMillis();
+            }
+        }
         try {
-            if (activityMainBinding.bottomBar.getSelectedItemId() != R.id.navFilesManager)
+            if (activityMainBinding.bottomBar.getSelectedItemId() == R.id.navFilesManager)
                 updateTitle(viewModel.getCurrentFileFolderItem().file == null ? (viewModel.getCurrentFileFolderItem().usbFile == null ? "" : viewModel.getCurrentFileFolderItem().usbFile.getName()) : viewModel.getCurrentFileFolderItem().file.getName());
         } catch (Exception e) {
             e.printStackTrace();
@@ -417,7 +418,6 @@ public class MainActivity extends BaseActivity implements NavigationListener, Vi
         } else {
             addFragment(BladeFolderFragment.newInstance(bladeItemArrayList, folderPath), true);
         }
-        Log.e("size ", onThumbsReceived.jsonObject.length() + "");
     }
 
     private void openQRCode(String ip, Integer port) {
@@ -622,7 +622,7 @@ public class MainActivity extends BaseActivity implements NavigationListener, Vi
             serviceIntent.putExtra("folderPath", folderPath);
             ContextCompat.startForegroundService(this, serviceIntent);
         } else
-            replaceFragmentWithoutAnimation(BladeFolderFragment.newInstance(new ArrayList<>(), ""), false);
+            replaceFragmentWithoutAnimation(BladeFolderFragment.newInstance(new ArrayList<>(), folderPath), false);
         updateTitle(TextUtils.isEmpty(folderPath) ? getString(R.string.blade_files) : folderPath);
     }
 
@@ -633,7 +633,10 @@ public class MainActivity extends BaseActivity implements NavigationListener, Vi
     }
 
     public void passCommandToBlade(JSONObject jsonObject) {
-
+        Intent serviceIntent = new Intent(MainActivity.this, RXConnectionFGService.class);
+        serviceIntent.putExtra("inputExtra", "folder");
+        serviceIntent.putExtra("command", jsonObject.toString());
+        ContextCompat.startForegroundService(MainActivity.this, serviceIntent);
     }
 
     public void requestForFilesOriginal(long size, ArrayList<String> fileNames) {

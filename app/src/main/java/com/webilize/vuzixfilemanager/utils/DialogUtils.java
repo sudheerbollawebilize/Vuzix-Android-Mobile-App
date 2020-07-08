@@ -173,7 +173,7 @@ public class DialogUtils {
             window.setAttributes(lp);
 
             txtCancel.setOnClickListener(v -> alertDialog.dismiss());
-            favouriteLocationsAdapter = new FavouriteLocationsAdapter(context, locations, new IClickListener() {
+            favouriteLocationsAdapter = new FavouriteLocationsAdapter(locations, new IClickListener() {
                 @Override
                 public void onClick(View view, int position) {
                     DialogUtils.showDeleteDialog(context, showRemove ? "Are you sure you want to delete the favourite?" : "Are you sure you want to set this path?", showRemove ? "Delete" : "Set", (dialog, which) -> {
@@ -242,7 +242,7 @@ public class DialogUtils {
             });
 
             txtCancel.setOnClickListener(v -> alertDialog.dismiss());
-            selectFolderAdapter = new SelectFolderAdapter(context, stringArrayList, new IClickListener() {
+            selectFolderAdapter = new SelectFolderAdapter(stringArrayList, new IClickListener() {
                 @Override
                 public void onClick(View view, int position) {
                     currentFolder = stringArrayList.get(position);

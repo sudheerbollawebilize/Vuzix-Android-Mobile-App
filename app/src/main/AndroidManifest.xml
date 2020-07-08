@@ -54,8 +54,6 @@
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
 
-        <activity android:name=".activities.WebViewActivity" />
-
         <activity android:name=".activities.SettingsActivity" />
 
         <activity
@@ -102,7 +100,6 @@
             </intent-filter>
         </provider>
 
-        <activity android:name=".activities.ImageVideoPlayerActivity" />
         <activity android:name=".activities.SearchActivity" />
         <activity android:name=".activities.BladeFoldersActivity" />
 

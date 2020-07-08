@@ -169,6 +169,7 @@
     7. Scan the QR code on your phone with your device’s camera.
     </string>
     <string name="files_format_not_supported_yet">Files format not supported yet.</string>
+    <string name="added_to_favourites">Added to favourites</string>
 
 
 </resources>

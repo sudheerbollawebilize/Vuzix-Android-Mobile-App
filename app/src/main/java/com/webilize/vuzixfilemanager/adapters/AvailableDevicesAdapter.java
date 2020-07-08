@@ -1,6 +1,5 @@
 package com.webilize.vuzixfilemanager.adapters;
 
-import android.content.Context;
 import android.net.wifi.p2p.WifiP2pDevice;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
@@ -18,13 +17,11 @@ import java.util.ArrayList;
 public class AvailableDevicesAdapter extends RecyclerView.Adapter<AvailableDevicesAdapter.DevicesViewHolder> {
 
     private ArrayList<WifiP2pDevice> wifiP2pDeviceArrayList;
-    private Context context;
     private IClickListener iClickListener;
     private boolean isConnected;
 
-    public AvailableDevicesAdapter(Context context, ArrayList<WifiP2pDevice> fileFolderItemArrayList, IClickListener iClickListener, boolean isConnected) {
+    public AvailableDevicesAdapter(ArrayList<WifiP2pDevice> fileFolderItemArrayList, IClickListener iClickListener, boolean isConnected) {
         this.isConnected = isConnected;
-        this.context = context;
         this.wifiP2pDeviceArrayList = fileFolderItemArrayList;
         this.iClickListener = iClickListener;
     }

@@ -128,7 +128,7 @@ public class BladeFavFolderFragment extends BaseFragment implements IClickListen
 
     private void setRecyclerViewAdapter() {
         folderFragmentBinding.recyclerView.setLayoutManager(new LinearLayoutManager(bladeFoldersActivity));
-        fileFoldersAdapter = new FavouriteFolderAdapter(bladeFoldersActivity, bladeItemArrayList, this);
+        fileFoldersAdapter = new FavouriteFolderAdapter(bladeItemArrayList, this);
         folderFragmentBinding.recyclerView.setAdapter(fileFoldersAdapter);
     }
 

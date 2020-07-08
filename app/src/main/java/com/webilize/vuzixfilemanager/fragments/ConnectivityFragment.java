@@ -125,7 +125,6 @@ public class ConnectivityFragment extends BaseFragment implements CompoundButton
                 }
                 break;
         }
-//        Log.e("address: ", StaticUtils.getDeviceAddress(mainActivity));
     }
 
     private void setListeners() {
@@ -148,11 +147,9 @@ public class ConnectivityFragment extends BaseFragment implements CompoundButton
         if (fragmentConnectivityBinding.switchWifi.isChecked()) {
             fragmentConnectivityBinding.btnScanForDevices.setEnabled(true);
             fragmentConnectivityBinding.btnQRCode.setEnabled(true);
-            fragmentConnectivityBinding.btnHotSpot.setEnabled(true);
         } else {
             fragmentConnectivityBinding.btnScanForDevices.setEnabled(false);
             fragmentConnectivityBinding.btnQRCode.setEnabled(false);
-            fragmentConnectivityBinding.btnHotSpot.setEnabled(false);
         }
         if (wifiP2pDeviceArrayList.isEmpty()) {
             fragmentConnectivityBinding.txtAvailableDevices.setVisibility(View.GONE);
@@ -493,13 +490,13 @@ public class ConnectivityFragment extends BaseFragment implements CompoundButton
 
     private void setAvailableDevicesAdapter() {
         fragmentConnectivityBinding.recyclerViewAvailableDevices.setLayoutManager(new LinearLayoutManager(mainActivity));
-        availableDevicesAdapter = new AvailableDevicesAdapter(mainActivity, wifiP2pDeviceArrayList, this, false);
+        availableDevicesAdapter = new AvailableDevicesAdapter(wifiP2pDeviceArrayList, this, false);
         fragmentConnectivityBinding.recyclerViewAvailableDevices.setAdapter(availableDevicesAdapter);
     }
 
     private void setConnectedDevicesAdapter() {
         fragmentConnectivityBinding.recyclerViewConnectedDevices.setLayoutManager(new LinearLayoutManager(mainActivity));
-        connectedDevicesAdapter = new AvailableDevicesAdapter(mainActivity, connectedDevicesArrayList, this, true);
+        connectedDevicesAdapter = new AvailableDevicesAdapter(connectedDevicesArrayList, this, true);
         fragmentConnectivityBinding.recyclerViewConnectedDevices.setAdapter(connectedDevicesAdapter);
     }
 
@@ -521,8 +518,8 @@ public class ConnectivityFragment extends BaseFragment implements CompoundButton
             }
             wifiP2pDeviceArrayList = mainActivity.viewModel.getAvailableWifiP2PDevices();
             connectedDevicesArrayList = mainActivity.viewModel.getConnectedWifiP2PDevices();
-            setAdapters();
             DialogUtils.dismissProgressDialog();
+            setAdapters();
             updateConnectionStatusData();
             StaticUtils.showToast(mainActivity, "Connected");
             if (!onSocketConnected.isWifiDirect) {
@@ -538,6 +535,7 @@ public class ConnectivityFragment extends BaseFragment implements CompoundButton
                     fragmentConnectivityBinding.btnDisconnect.setEnabled(true);
                     fragmentConnectivityBinding.seperatorGrey.setVisibility(View.VISIBLE);
                 }
+
             }
         } catch (Exception e) {
             e.printStackTrace();

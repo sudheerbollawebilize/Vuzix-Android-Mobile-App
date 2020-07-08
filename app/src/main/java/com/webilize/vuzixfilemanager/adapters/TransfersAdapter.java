@@ -44,7 +44,6 @@ public class TransfersAdapter extends RecyclerView.Adapter<TransfersAdapter.Devi
         TransferModel transferModel = transferModelArrayList.get(position);
         fileFoldersViewHolder.itemFolderBinding.txtFileName.setText(transferModel.name);
         fileFoldersViewHolder.itemFolderBinding.txtTimeStamp.setText(transferModel.timeStamp);
-//        fileFoldersViewHolder.itemFolderBinding.txtIsIncoming.setText(transferModel.isIncoming ? "Incoming" : "Outgoing");
         if (transferModel.isIncoming) {
             fileFoldersViewHolder.itemFolderBinding.imgFileSmall.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_incoming));
         } else {

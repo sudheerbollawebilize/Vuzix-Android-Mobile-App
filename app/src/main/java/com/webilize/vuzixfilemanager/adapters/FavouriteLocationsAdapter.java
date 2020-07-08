@@ -1,9 +1,7 @@
 package com.webilize.vuzixfilemanager.adapters;
 
-import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
-import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
@@ -19,12 +17,10 @@ import java.util.List;
 public class FavouriteLocationsAdapter extends RecyclerView.Adapter<FavouriteLocationsAdapter.DevicesViewHolder> {
 
     private List<String> folderNamesArrayList;
-    private Context context;
     private IClickListener iClickListener;
     private boolean showRemove;
 
-    public FavouriteLocationsAdapter(Context context, List<String> folderNamesArrayList, IClickListener iClickListener, boolean showRemove) {
-        this.context = context;
+    public FavouriteLocationsAdapter(List<String> folderNamesArrayList, IClickListener iClickListener, boolean showRemove) {
         this.showRemove = showRemove;
         this.folderNamesArrayList = folderNamesArrayList;
         this.iClickListener = iClickListener;

@@ -32,7 +32,6 @@ public class SplashActivity extends BaseActivity {
 
     @Override
     void initComponents() {
-//        FirebaseCrashlytics.getInstance().recordException(new Throwable("testing non fatal exceptions"));
         appStorage = AppStorage.getInstance(this);
         if (checkForStoragePermissions()) {
             handler = new Handler();

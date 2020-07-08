@@ -44,7 +44,7 @@ public class FolderViewModel extends AndroidViewModel {
     private ArrayList<FileFolderItem> currentFiles = new ArrayList<>();
     private ArrayList<WifiP2pDevice> availableDevices = new ArrayList<>();
     private ArrayList<WifiP2pDevice> connectedDevices = new ArrayList<>();
-    //    private ArrayList<FileFolderItem> homeFolderFiles = new ArrayList<>();
+
     private DownloadManager downloadManager = (DownloadManager) getApplication().getSystemService(DOWNLOAD_SERVICE);
     private FileFolderItem currentFileFolderItem;
 
@@ -154,7 +154,7 @@ public class FolderViewModel extends AndroidViewModel {
         return Completable.fromAction(() -> {
             if (currentFileFolderItem.file.list() != null && currentFileFolderItem.file.list().length > 0) {
                 File[] filesList = currentFileFolderItem.file.listFiles();
-//                Arrays.sort(filesList);
+                Arrays.sort(filesList);
                 switch (BaseApplication.filterSortingMode) {
                     case AppConstants.CONST_NAME:
                         Arrays.sort(filesList, mode == AppConstants.CONST_SORT_ASC ? NameFileComparator.NAME_INSENSITIVE_COMPARATOR : NameFileComparator.NAME_INSENSITIVE_REVERSE);
@@ -163,7 +163,6 @@ public class FolderViewModel extends AndroidViewModel {
                         Arrays.sort(filesList, mode == AppConstants.CONST_SORT_ASC ? LastModifiedFileComparator.LASTMODIFIED_COMPARATOR : LastModifiedFileComparator.LASTMODIFIED_REVERSE);
                         break;
                     case AppConstants.CONST_SIZE:
-//                        Arrays.sort(filesList, new FileSizeComparatorTest(mode));
                         Arrays.sort(filesList, mode == AppConstants.CONST_SORT_ASC ? SizeFileComparator.SIZE_COMPARATOR : SizeFileComparator.SIZE_REVERSE);
                         break;
                     default:
@@ -384,7 +383,7 @@ public class FolderViewModel extends AndroidViewModel {
                         .setAllowedOverMetered(true)// Set if download is allowed on Mobile network
                         .setAllowedOverRoaming(true);// Set if download is allowed on roaming network
 
-                downloadManager.enqueue(request);
+                getDownloadManager().enqueue(request);
 
                 //endregion
                 return true;
@@ -467,7 +466,7 @@ public class FolderViewModel extends AndroidViewModel {
                         .setAllowedOverMetered(true)// Set if download is allowed on Mobile network
                         .setAllowedOverRoaming(true);// Set if download is allowed on roaming network
 
-                downloadManager.enqueue(request);
+                getDownloadManager().enqueue(request);
                 StaticUtils.showToast(BaseApplication.getInstance(), "Downloaded Successfully.");
             } catch (Exception ex) {
                 Log.e(TAG, "requestFile ", ex);

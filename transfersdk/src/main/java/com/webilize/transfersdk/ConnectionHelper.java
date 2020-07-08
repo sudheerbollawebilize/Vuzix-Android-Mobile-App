@@ -125,7 +125,6 @@ public class ConnectionHelper {
                 if (!isService) {
                     findWifiDirectDevices(listener);
                 }
-
             } else {
                 listener.onError(new WifiNotEnabledException());
             }
@@ -150,7 +149,15 @@ public class ConnectionHelper {
 //                if (WifiHelper.isEnabled(context)) {
                 if (!TextUtils.isEmpty(ip))
                     startTCPCommunication(context, listener, ip, port, isServer, false);
-                else listener.onError(new WifiNotConnectedException());
+                else {
+                    ip = WifiHelper.getIp(context.getApplicationContext());
+                    if (!TextUtils.isEmpty(ip))
+                        startTCPCommunication(context, listener, ip, port, isServer, false);
+                    else {
+                        listener.onError(new WifiNotConnectedException());
+                    }
+                }
+//                Toast.makeText(context, "ip " + ip, Toast.LENGTH_SHORT).show();
 //                } else
 //                    listener.onError(new WifiNotConnectedException());
             }

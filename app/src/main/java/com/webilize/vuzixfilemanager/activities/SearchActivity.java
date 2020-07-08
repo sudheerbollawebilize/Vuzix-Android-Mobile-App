@@ -55,9 +55,6 @@ public class SearchActivity extends BaseActivity implements View.OnClickListener
                         search();
                     } else search(editable.toString(), AppConstants.HOME_DIRECTORY);
                 });
-//                if (TextUtils.isEmpty(editable.toString())) {
-//                    search("", AppConstants.homeDirectory);
-//                } else search(editable.toString(), AppConstants.homeDirectory);
             }
         });
         activitySearchBinding.imgBack.setOnClickListener(this);
@@ -68,11 +65,9 @@ public class SearchActivity extends BaseActivity implements View.OnClickListener
 
     private void setAdapter() {
         activitySearchBinding.recyclerViewSearch.setLayoutManager(new LinearLayoutManager(this));
-        searchFileFoldersAdapter = new SearchFileFoldersAdapter(this, fileFolderItemArrayList, this);
+        searchFileFoldersAdapter = new SearchFileFoldersAdapter(fileFolderItemArrayList, this);
         activitySearchBinding.recyclerViewSearch.setAdapter(searchFileFoldersAdapter);
     }
-
-    SearchAsyncTask searchAsyncTask;
 
     public void search() {
         File directory = AppConstants.HOME_DIRECTORY;
@@ -117,19 +112,13 @@ public class SearchActivity extends BaseActivity implements View.OnClickListener
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.imgBack:
-                onBackPressed();
-                break;
-            default:
-                break;
-        }
+        if (v.getId() == R.id.imgBack) onBackPressed();
     }
 
     @Override
     public void onClick(View view, int position) {
         Intent intent = getIntent();
-        intent.putExtra("selectedFile", fileFolderItemArrayList.get(position));
+        intent.putExtra(AppConstants.INTENT_SELECTED_FILE, fileFolderItemArrayList.get(position));
         setResult(RESULT_OK, intent);
         finish();
     }
@@ -137,60 +126,6 @@ public class SearchActivity extends BaseActivity implements View.OnClickListener
     @Override
     public void onLongClick(View view, int position) {
 
-    }
-
-    private class SearchAsyncTask extends AsyncTask<Void, Integer, ArrayList<FileFolderItem>> {
-
-        String searchQuery;
-        File directory;
-
-        public SearchAsyncTask(String query, File directory) {
-            this.searchQuery = query;
-            this.directory = directory;
-        }
-
-        @Override
-        protected ArrayList<FileFolderItem> doInBackground(Void... voids) {
-            fileFolderItemArrayList = new ArrayList<>();
-            if (directory.isDirectory()) {
-                searchFile(searchQuery, directory);
-            } else {
-                if (searchQuery.equalsIgnoreCase(directory.getName())) {
-                    fileFolderItemArrayList.add(new FileFolderItem(directory));
-                }
-            }
-            return fileFolderItemArrayList;
-        }
-
-
-        public void searchFile(String searchQuery, File directory) {
-            if (directory.isDirectory()) {
-                if (directory.canRead()) {
-                    for (File temp : directory.listFiles()) {
-                        if (temp.isDirectory()) {
-                            searchFile(searchQuery, temp);
-                        } else {
-                            if (searchQuery.equalsIgnoreCase(temp.getName())) {
-                                fileFolderItemArrayList.add(new FileFolderItem(temp));
-                            }
-                        }
-                    }
-                }
-            } else {
-                if (searchQuery.equalsIgnoreCase(directory.getName())) {
-                    fileFolderItemArrayList.add(new FileFolderItem(directory));
-                }
-            }
-        }
-
-        @Override
-        protected void onPostExecute(ArrayList<FileFolderItem> fileFolderItems) {
-//            super.onPostExecute(fileFolderItems);
-            runOnUiThread(() -> {
-                activitySearchBinding.recyclerViewSearch.setLayoutManager(new LinearLayoutManager(SearchActivity.this));
-                searchFileFoldersAdapter.setFileFolderItemArrayList(fileFolderItemArrayList);
-            });
-        }
     }
 
 }

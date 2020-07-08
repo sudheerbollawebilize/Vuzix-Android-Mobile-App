@@ -476,15 +476,17 @@ public class BladeFolderFragment extends BaseFragment implements IClickListener,
                         try {
                             jsonObject.put("command", AppConstants.NEW_FOLDER);
                             jsonObject.put("folderName", name);
-                            jsonObject.put("rootPath", "");
+                            jsonObject.put("rootPath", folderPath);
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
                         mainActivity.passCommandToBlade(jsonObject);
                         BladeItem bladeItem = createNewBladeItem(name, folderPath);
-                        bladeItemArrayListOriginal.add(bladeItem);
-                        bladeItemArrayList.add(bladeItem);
-                        fileFoldersAdapter.notifyDataSetChanged();
+                        if (!bladeItemArrayListOriginal.contains(bladeItem)) {
+                            bladeItemArrayListOriginal.add(bladeItem);
+                            bladeItemArrayList.add(bladeItem);
+                            fileFoldersAdapter.notifyDataSetChanged();
+                        }
                     });
                     return false;
                 case R.id.menuDelete:

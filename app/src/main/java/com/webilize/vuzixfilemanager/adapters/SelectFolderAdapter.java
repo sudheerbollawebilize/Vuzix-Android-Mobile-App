@@ -1,11 +1,9 @@
 package com.webilize.vuzixfilemanager.adapters;
 
-import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
-import androidx.core.content.ContextCompat;
 import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -19,11 +17,9 @@ import java.util.ArrayList;
 public class SelectFolderAdapter extends RecyclerView.Adapter<SelectFolderAdapter.DevicesViewHolder> {
 
     private ArrayList<File> folderNamesArrayList;
-    private Context context;
     private IClickListener iClickListener;
 
-    public SelectFolderAdapter(Context context, ArrayList<File> folderNamesArrayList, IClickListener iClickListener) {
-        this.context = context;
+    public SelectFolderAdapter(ArrayList<File> folderNamesArrayList, IClickListener iClickListener) {
         this.folderNamesArrayList = folderNamesArrayList;
         this.iClickListener = iClickListener;
     }
